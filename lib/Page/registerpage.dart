@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:watalygold_admin/Page/loginpage.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
@@ -37,6 +38,32 @@ class _registerPageState extends State<registerPage> {
     super.dispose();
   }
 
+  Future<void> createCollectionAdmin(String email, String encryptedPassword,
+      String firstName, String lastName, String phoneNumber) async {
+    final adminData = {
+      "email": email,
+      "password": encryptedPassword,
+      "admin_name": "$firstName $lastName",
+      "phone_number": phoneNumber,
+      "create_at": DateTime.timestamp(),
+      "update_at": null,
+      "delete_at": null,
+    };
+
+    await FirebaseFirestore.instance
+        .collection('Admin')
+        .doc(email)
+        .set(adminData);
+  }
+
+  static EncryptAES(text) async {
+    final key = encrypt.Key.fromUtf8('my 32 length key................');
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final encrypted = encrypter.encrypt(text, iv: iv);
+    return encrypted;
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
@@ -68,8 +95,7 @@ class _registerPageState extends State<registerPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "สร้างบัญชี",
-                        style:
-                            TextStyle(fontSize: 30, color: Color(0xFF7ED957)),
+                        style: TextStyle(fontSize: 30, color: G2PrimaryColor),
                       ),
                     ),
                     Row(
@@ -337,7 +363,7 @@ class _registerPageState extends State<registerPage> {
                         margin: const EdgeInsets.symmetric(
                             vertical: 20, horizontal: 10),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_passwordController.text ==
                                 _passwordenterController.text) {
                               _register();
@@ -346,7 +372,7 @@ class _registerPageState extends State<registerPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF7ED957),
+                              backgroundColor: G2PrimaryColor,
                               shape: ContinuousRectangleBorder(
                                   borderRadius: BorderRadius.circular(10))),
                           child: SizedBox(
@@ -393,12 +419,22 @@ class _registerPageState extends State<registerPage> {
 
   void _register() async {
     String name = "${_FnameController.text} ${_LnameController.text}";
+    String fName = _FnameController.text;
+    String lName = _LnameController.text;
     String phonenumber = _phonenumberController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
+    final future = EncryptAES(password);
+    final encrypted = await future;
+    await createCollectionAdmin(
+        _emailController.text,
+        encrypted.base64.toString(),
+        _LnameController.text,
+        _FnameController.text,
+        _phonenumberController.text);
     User? user = await _auth.RegisterWithEmailandPassword(email, password);
-
+    print(user?.uid);
     if (user != null) {
       Navigator.pushNamed(context, "/login");
     } else {

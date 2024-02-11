@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "ยินดีต้อนรับ",
-                      style: TextStyle(fontSize: 30, color: Color(0xFF7ED957)),
+                      style: TextStyle(fontSize: 30, color: G2PrimaryColor),
                     ),
                   ),
                   Align(
@@ -61,8 +61,8 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           TextSpan(
                             text: "เข้าสู่ระบบ Wataly ",
-                            style: TextStyle(
-                                fontSize: 30, color: Color(0xFF7ED957)),
+                            style:
+                                TextStyle(fontSize: 30, color: G2PrimaryColor),
                           ),
                           TextSpan(
                             text: "Gold",
@@ -160,20 +160,44 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Align(
                     alignment: Alignment.center,
-                    child: buttonall(name: "เข้าสู่ระบบ"),
+                    child: Container(
+                      width: 300,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 20, horizontal: 10),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _login();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: G2PrimaryColor,
+                            shape: ContinuousRectangleBorder(
+                                borderRadius: BorderRadius.circular(10))),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: Center(
+                              child: Text(
+                            "เข้าสู่ระบบ",
+                            style: const TextStyle(color: WhiteColor),
+                          )),
+                        ),
+                      ),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       const Text("ถ้าหากคุณยังไม่มีบัญชี"),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/register");
+                          },
                           child: const Text(
                             "สมัครสมาชิก",
                             style: TextStyle(
-                                color: Color(0xFF7ED957),
+                                color: G2PrimaryColor,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFF7ED957)),
+                                decorationColor: G2PrimaryColor),
                           ))
                     ],
                   )
@@ -187,19 +211,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
 
-      String email = _emailController.text;
-      String password = _passwordController.text;
+    User? user = await _auth.LoginWithEmailandPassword(email, password);
 
-      User? user = await _auth.LoginWithEmailandPassword(email, password);
-
-      if (user != null) {
-        Navigator.pushNamed(context, "/homeKnowlege");
-      } else {
-        print("error someting");
-      }
+    if (user != null) {
+      Navigator.pushNamed(context, "/homeKnowlege");
+    } else {
+      print("error someting");
     }
-
+  }
 }
 
 class Input_string extends StatelessWidget {
@@ -299,7 +321,7 @@ Widget buttonall({required String name, bool isActive = false}) {
     child: ElevatedButton(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF7ED957),
+          backgroundColor: G2PrimaryColor,
           shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(10))),
       child: SizedBox(
