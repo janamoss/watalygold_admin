@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:watalygold_admin/Page/Knowlege/AddKnowlege.dart';
+import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:watalygold_admin/Widgets/image_picker.dart';

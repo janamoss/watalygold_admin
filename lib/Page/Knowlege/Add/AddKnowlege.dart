@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:watalygold_admin/Page/Knowlege/Multiplecontent.dart';
-import 'package:watalygold_admin/Page/Knowlege/Singlecontent.dart';
+import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
+import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
+
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:web/helpers.dart';
 
