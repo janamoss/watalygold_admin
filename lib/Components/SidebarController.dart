@@ -8,9 +8,9 @@ class SidebarController extends GetxController {
   RxBool dropdown = false.obs;
 
   var pages = [
+    // AddKnowlege(),
     Add_Knowlege(),
-    Add_Knowlege(),
-    AddKnowlege(),
+    // AddKnowlege(),
     // MainKnowlege(),
     // AddKnowlege(),
   ];
