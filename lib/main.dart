@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Home.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:watalygold_admin/Page/test.dart';
 import 'package:watalygold_admin/Widgets/image_picker.dart';
 import 'Page/addknowlege.dart';
 import 'firebase_options.dart';
-
 
 Future<void> main() async {
   await Firebase.initializeApp(
