@@ -10,7 +10,7 @@ class SidebarController extends GetxController {
   var pages = [
     MainDash(),
     MainKnowlege(),
-    Add_Knowlege(),
+    AddKnowlege(),
     // AddKnowlege(),
     // MainKnowlege(),
     // AddKnowlege(),
