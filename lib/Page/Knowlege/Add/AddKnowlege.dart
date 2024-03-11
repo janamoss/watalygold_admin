@@ -65,7 +65,8 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                             dividerColor: Colors.transparent,
                             // indicatorWeight: 10,
                             indicator: BoxDecoration(
-                              color: Colors.green,
+                              color: Color(0xFF42BD41),
+                              // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             tabs: [

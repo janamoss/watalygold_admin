@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
-import 'package:watalygold_admin/Page/addknowlege.dart';
+import 'package:watalygold_admin/Page/Knowlege/Home.dart';
+import 'package:watalygold_admin/Page/Knowlege/HomeKnowlege.dart';
+
 
 
 class SidebarController extends GetxController {
@@ -10,6 +12,8 @@ class SidebarController extends GetxController {
   var pages = [
     // AddKnowlege(),
     Add_Knowlege(),
+    HomeKnowlege(),
+    
     // AddKnowlege(),
     // MainKnowlege(),
     // AddKnowlege(),

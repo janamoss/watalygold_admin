@@ -1,21 +1,31 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
+import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
+import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
+
+import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
+import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/database.dart';
 
-Map<String, IconData> iconDataMap = {
+Map<String, IconData> icons = {
   'บ้าน': Icons.home,
-  'ติดตั้ง': Icons.settings,
+  'ดอกไม้': Icons.yard,
   'บุคคล': Icons.person,
+  'น้ำ': Icons.water_drop_outlined,
+  'ระวัง': Icons.warning_rounded
 };
 
-// List<String> iconNames = iconDataMap.keys.toList();
+String selectedImageUrl =
+    "https://static.thenounproject.com/png/3322766-200.png";
 
 class Singlecontent extends StatefulWidget {
   const Singlecontent({Key? key}) : super(key: key);
@@ -25,9 +35,13 @@ class Singlecontent extends StatefulWidget {
 }
 
 class _SinglecontentState extends State<Singlecontent> {
+  final List<Product> _products = Product.generateItems(8);
+
   IconData? selectedIconData;
-  TextEditingController contentcontroller = new TextEditingController();
-  TextEditingController namecontroller = TextEditingController();
+  String? _selectedValue;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
+
   List<Widget> itemPhotosWidgetList = <Widget>[];
   final ImagePicker _picker = ImagePicker();
   File? file;
@@ -36,22 +50,6 @@ class _SinglecontentState extends State<Singlecontent> {
   List<String> downloadUrl = <String>[];
   bool uploading = false;
 
-  // String getIconName(IconData iconData) {
-  //   return iconDataMap.entries
-  //       .firstWhere((entry) => entry.value == iconData,
-  //           orElse: () => MapEntry("", Icons.error))
-  //       .key;
-  // }
-
-  // String getIconName(IconData iconData) {
-  //   return iconData.toString(); // แปลง IconData เป็น String
-  // }
-  String getIconDataString(IconData iconData) {
-    // ใช้ .codePoint และ .fontFamily เพื่อสร้างค่าที่ unique สำหรับ IconData
-    return "${iconData.codePoint}-${iconData.fontFamily}";
-  }
-
-  String iconName = 'บ้าน'; // เลือกชื่อ icon ที่ต้องการ
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +65,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   children: [
                     Container(
                       width: 490,
-                      height: 850,
+                      height: 900,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -96,54 +94,139 @@ class _SinglecontentState extends State<Singlecontent> {
                                   const EdgeInsets.only(left: 0.0, right: 0),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  "ไอคอน",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontFamily: 'IBM Plex Sans Thai',
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "ไอคอน ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                    Text(
+                                      "*",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            DropdownButton<IconData>(
-                              value: selectedIconData,
-                              onChanged: (IconData? newValue) {
-                                setState(() {
-                                  selectedIconData = newValue;
-                                });
-                              },
-                              items: iconDataMap.entries.map((entry) {
-                                String iconName = entry.key;
-                                IconData iconData = entry.value;
-                                return DropdownMenuItem<IconData>(
-                                  value: iconData,
-                                  child: Row(
+
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                              
+                                child: DropdownButton(
+                                  items: <String>[
+                                    'บ้าน',
+                                    'ดอกไม้',
+                                    'บุคคล',
+                                    'น้ำ',
+                                    'ระวัง'
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Row(
+                                        children: [
+                                          icons[value] != null
+                                              ? Icon(
+                                                  icons[value]!,
+                                                  color: GPrimaryColor,
+                                                )
+                                              : SizedBox(),
+                                          SizedBox(width: 15),
+                                          Text(
+                                            value,
+                                            style:
+                                                TextStyle(color: GPrimaryColor),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedValue = value;
+                                    });
+                                  },
+                                  hint: Row(
                                     children: [
                                       Icon(
-                                        iconData,
-                                        color: GPrimaryColor,
+                                        Icons.image_outlined,
+                                        color: G2PrimaryColor,
+                                      ), // ไอคอนที่ต้องการเพิ่ม
+                                      SizedBox(
+                                          width:
+                                              10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                      Text(
+                                        "เลือกไอคอนสำหรับคลังความรู้",
+                                        style: TextStyle(
+                                            color: G2PrimaryColor,
+                                            fontSize: 17),
                                       ),
-                                      SizedBox(width: 8),
-                                      Text(iconName),
                                     ],
                                   ),
-                                );
-                              }).toList(),
+                                  value: _selectedValue,
+                                ),
+                              ),
                             ),
+
+                            // DropdownButton<IconData>(
+                            //   value: selectedIconData,
+                            //   onChanged: (IconData? newValue) {
+                            //     setState(() {
+                            //       selectedIconData = newValue;
+                            //     });
+                            //   },
+                            //   items: iconDataMap.entries.map((entry) {
+                            //     String iconName = entry.key;
+                            //     IconData iconData = entry.value;
+                            //     return DropdownMenuItem<IconData>(
+                            //       value: iconData,
+                            //       child: Row(
+                            //         children: [
+                            //           Icon(
+                            //             iconData,
+                            //             color: GPrimaryColor,
+                            //           ),
+                            //           SizedBox(width: 8),
+                            //           Text(iconName),
+                            //         ],
+                            //       ),
+                            //     );
+                            //   }).toList(),
+                            // ),
                             SizedBox(height: 30),
                             Padding(
                               padding:
                                   const EdgeInsets.only(left: 0.0, right: 0),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  "ชื่อ",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontFamily: 'IBM Plex Sans Thai',
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "ชื่อ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                    Text(
+                                      "*",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -157,7 +240,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: TextField(
-                                  controller: namecontroller,
+                                  controller: nameController,
                                   decoration:
                                       InputDecoration(border: InputBorder.none),
                                 ),
@@ -169,13 +252,25 @@ class _SinglecontentState extends State<Singlecontent> {
                                   const EdgeInsets.only(left: 0.0, right: 0),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  "เนื้อหา",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontFamily: 'IBM Plex Sans Thai',
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "เนื้อหา",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                    Text(
+                                      "*",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -188,7 +283,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                         Border.all(color: Color(0xffCFD3D4)),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextField(
-                                  controller: contentcontroller,
+                                  controller: contentController,
                                   keyboardType: TextInputType.multiline,
                                   maxLines: 5,
                                   decoration: InputDecoration(
@@ -203,13 +298,25 @@ class _SinglecontentState extends State<Singlecontent> {
                               padding: const EdgeInsets.only(left: 0, right: 0),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  "รูปภาพ",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontFamily: 'IBM Plex Sans Thai',
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "รูปภาพ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                    Text(
+                                      "*",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                        fontFamily: 'IBM Plex Sans Thai',
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -256,12 +363,36 @@ class _SinglecontentState extends State<Singlecontent> {
                               ),
                             ),
                             SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                pickPhotoFromGallery().then((newImageUrl) {
+                                  if (newImageUrl != null) {
+                                    setState(() {
+                                      selectedImageUrl = newImageUrl;
+                                      addImage(); // เพิ่มภาพใหม่
+                                    });
+                                  }
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: G2PrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                "เพิ่มรูปภาพ",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+
+                            SizedBox(
                               height: 50.0,
                             ),
                             ElevatedButton(
-                              onPressed: () async {
-                               updateText() ;
-                              },
+                              onPressed: display,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xffE69800),
                                 shape: RoundedRectangleBorder(
@@ -280,7 +411,7 @@ class _SinglecontentState extends State<Singlecontent> {
                     SizedBox(width: 20), // SizedBox
                     Container(
                       width: 490,
-                      height: 850,
+                      height: 900,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -312,7 +443,7 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Container(
                               width: 390,
-                              height: 120,
+                              height: 100,
                               decoration: ShapeDecoration(
                                 color: Color(0xFFE7E7E7),
                                 shape: RoundedRectangleBorder(
@@ -321,15 +452,12 @@ class _SinglecontentState extends State<Singlecontent> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  yourText,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: _displayedWidget ?? Container(),
+                                  )
+                                ],
                               ),
                             ),
                             SizedBox(
@@ -337,7 +465,7 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Container(
                               width: 390,
-                              height: 550,
+                              height: 630,
                               decoration: ShapeDecoration(
                                 color: Color(0xFFE7E7E7),
                                 shape: RoundedRectangleBorder(
@@ -345,6 +473,14 @@ class _SinglecontentState extends State<Singlecontent> {
                                       width: 5, color: Color(0xFF42BD41)),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child:
+                                        _displayedcontentWidget ?? Container(),
+                                  )
+                                ],
                               ),
                             ),
                           ],
@@ -417,10 +553,11 @@ class _SinglecontentState extends State<Singlecontent> {
     );
   }
 
-  addImage() {
+  void addImage() {
+    removeImage(); // ลบภาพเดิมก่อนที่จะเพิ่มภาพใหม่
     for (var bytes in photo!) {
       itemPhotosWidgetList.add(Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: const EdgeInsets.all(0),
         child: Container(
           height: 200.0,
           child: AspectRatio(
@@ -488,6 +625,12 @@ class _SinglecontentState extends State<Singlecontent> {
     return knowledgetId;
   }
 
+  void removeImage() {
+    setState(() {
+      itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
+    });
+  }
+
   // uploadImageToStorage(PickedFile? pickedFile, String knowledgetId) async {
   //   String? kId = const Uuid().v4();
   //   Reference reference = FirebaseStorage.instance
@@ -511,26 +654,75 @@ class _SinglecontentState extends State<Singlecontent> {
       SettableMetadata(contentType: 'image/jpeg'),
     );
     String imageUrl = await reference.getDownloadURL();
-    addKnowlege(imageUrl);
+    addKnowledge(imageUrl);
   }
 
-  void addKnowlege(String imageUrl) async {
-    if (selectedIconData != null &&
-        namecontroller.text.isNotEmpty &&
-        contentcontroller.text.isNotEmpty) {
-      String Id = namecontroller.text;
-      IconData selectedIconData = iconDataMap[iconName]!;
-      String iconDataString = getIconDataString(selectedIconData);
+  // void addKnowlege(String imageUrl) async {
+  //   if (_selectedValue != null &&
+  //       namecontroller.text.isNotEmpty &&
+  //       contentcontroller.text.isNotEmpty) {
+  //     String Id = namecontroller.text;
+  //     // String iconName = getIconName(selectedIconData!);
 
+  //     Map<String, dynamic> knowledgeMap = {
+  //       "KnowledgeName": namecontroller.text,
+  //       "KnowledgeDetail": contentcontroller.text,
+  //       "KnowledgeImg": imageUrl,
+  //       "KnowledgeIcons": _selectedValue,
+  //       "Content":[],
+  //     };
+  //     await Databasemethods().addKnowlege(knowledgeMap, Id).then((value) {
+  //       Fluttertoast.showToast(
+  //         msg: "เพิ่มความรู้เรียบร้อยแล้ว",
+  //         toastLength: Toast.LENGTH_SHORT,
+  //         gravity: ToastGravity.CENTER,
+  //         timeInSecForIosWeb: 1,
+  //         backgroundColor: Colors.red,
+  //         textColor: Colors.white,
+  //         fontSize: 16.0,
+  //       );
+  //     });
+  //   } else {
+  //     Fluttertoast.showToast(
+  //       msg: "กรุณากรอกข้อมูลให้ครบ",
+  //       toastLength: Toast.LENGTH_SHORT,
+  //       gravity: ToastGravity.CENTER,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,
+  //     );
+  //   }
+  // }
+
+  Future<void> addKnowledge(String imageUrl) async {
+    if (nameController.text.isNotEmpty &&
+        contentController.text.isNotEmpty &&
+        _selectedValue!.isNotEmpty &&
+        imageUrl != null) {
+      // var now = DateTime.now();
+      // สร้าง Map ข้อมูลที่จะเพิ่มลงใน Firestore
+      String Id = nameController.text;
       Map<String, dynamic> knowledgeMap = {
-        "KnowledgeName": namecontroller.text,
-        "KnowledgeDetail": contentcontroller.text,
+        "KnowledgeName": nameController.text,
+        "KnowledgeDetail": contentController.text,
+        "KnowledgeIcons": _selectedValue,
         "KnowledgeImg": imageUrl,
-        "KnowledgeIcons": iconDataString,
+        "Create_at":  Timestamp.now(),
+        "Content": [],
+        // // เพิ่มฟิลด์รูปภาพจาก imageUrl ถ้ามี
+        // "knowledgeImg": imageUrl ?? "",
       };
+
+      // เรียกใช้งานฟังก์ชัน addKnowledge จากคลาส DatabaseMethods
       await Databasemethods().addKnowlege(knowledgeMap, Id).then((value) {
+        showDialog(
+          context: context,
+          builder: (context) => const Addknowledgedialog(),
+        );
+      }).catchError((error) {
         Fluttertoast.showToast(
-          msg: "เพิ่มความรู้เรียบร้อยแล้ว",
+          msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
@@ -553,11 +745,11 @@ class _SinglecontentState extends State<Singlecontent> {
   }
 
   void clearAllFields() {
-    namecontroller.clear();
-    contentcontroller.clear();
+    nameController.clear();
+    contentController.clear();
 
     setState(() {
-      selectedIconData = null;
+      _selectedValue = null;
     });
 
     setState(() {
@@ -565,13 +757,151 @@ class _SinglecontentState extends State<Singlecontent> {
       itemPhotosWidgetList.clear();
     });
   }
-  
-  String yourText = "";
 
-  void updateText() {
-  setState(() {
-    // เปลี่ยนค่าของ Text Widget เมื่อกดปุ่ม "แสดงผล"
-    yourText = "Your Updated Text";
-  });
-}
+  Widget _displayedWidget = Container();
+  Widget _displayedcontentWidget = Container();
+
+  Widget _displaycoverWidget() {
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: Container(
+        width: 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: WhiteColor,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                ),
+                Icon(
+                  icons[_selectedValue] ??
+                      Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                  size: 24, // ขนาดของไอคอน
+                  color: GPrimaryColor, // สีของไอคอน
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                  nameController.text,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 9),
+                  child: Icon(
+                    Icons
+                        .keyboard_arrow_right_rounded, // ระบุไอคอนตามค่าที่เลือก
+                    size: 24, // ขนาดของไอคอน
+                    color: GPrimaryColor, // สีของไอคอน
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _displaycontentWidget() {
+    return Scaffold(
+      appBar: Appbarmain_no_botton(
+        name: nameController.text,
+      ),
+      body: Stack(
+        children: [
+          ListView.builder(
+            itemCount: itemPhotosWidgetList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                width: 390, // กำหนดความกว้างของรูปภาพ
+                height: 253, // กำหนดความสูงของรูปภาพ
+                child: itemPhotosWidgetList[index], // ใส่รูปภาพลงใน Container
+              );
+            },
+          ),
+          
+          Positioned(
+            
+         // ใช้ตัวแปร _positionY แทนค่า top
+            bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
+            left: 0.0,
+            right: 0.0,
+            child: Container(
+              height: 400,
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              decoration: BoxDecoration(
+                  color: WhiteColor,
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(40))),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        icons[_selectedValue] ??
+                            Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                        size: 24, // ขนาดของไอคอน
+                        color: GPrimaryColor, // สีของไอคอน
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Text(
+                        nameController.text,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          contentController.text,
+                          style: TextStyle(color: Colors.black, fontSize: 15),
+                          textAlign: TextAlign.left,
+                          maxLines: null,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              width: MediaQuery.of(context).size.width,
+             
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void display() {
+    // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
+    setState(() {
+      // เรียกใช้งาน Widget ที่จะแสดงผล
+      _displayedWidget = _displaycoverWidget();
+      _displayedcontentWidget = _displaycontentWidget();
+    });
+  }
 }
