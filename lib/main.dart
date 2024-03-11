@@ -21,9 +21,9 @@ class MainWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: GoogleFonts.ibmPlexSansThai().fontFamily),
+      // theme: ThemeData(fontFamily: GoogleFonts.ibmPlexSansThai().fontFamily),
       title: "Wataly Gold Admin",
-      home: Home_Knowlege(),
+      home: testss(),
       // initialRoute: '/login', // หน้าแรกเริ่มต้น
       // routes: {
       //   '/login': (context) => LoginPage(),
