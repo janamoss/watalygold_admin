@@ -68,7 +68,9 @@ class Deletedialog extends StatelessWidget {
                           horizontal: 32,
                         ),
                   ),
-                  onPressed: () {}, child: const Text("ยืนยัน"))
+                  onPressed: () {
+                    
+                  }, child: const Text("ยืนยัน"))
               ],
             )
           ],

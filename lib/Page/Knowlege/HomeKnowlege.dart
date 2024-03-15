@@ -1,50 +1,63 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Page/Knowlege/PageKnowledge.dart';
-import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Menu_top.dart';
-import 'package:watalygold_admin/service/database.dart';
+import 'package:watalygold_admin/Widgets/Deleteddialogknowledge.dart';
+import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 
-class HomeKnowlege extends StatefulWidget {
-  const HomeKnowlege({super.key});
+class KnowledgeMain extends StatefulWidget {
+  const KnowledgeMain({super.key});
 
   @override
-  State<HomeKnowlege> createState() => _Home_KnowlegeState();
+  State<KnowledgeMain> createState() => _KnowledgeMainState();
 }
+Future<Contents> getContentsById(String documentId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final docRef = firestore.collection('Content').doc(documentId);
+    final doc = await docRef.get();
 
-Map<String, IconData> icons = {
-  'บ้าน': Icons.home,
-  'ดอกไม้': Icons.yard,
-  'บุคคล': Icons.person,
-  'น้ำ': Icons.water_drop_outlined,
-  'ระวัง': Icons.warning_rounded
-};
+    if (doc.exists) {
+      final data = doc.data();
+      return Contents(
+        ContentName: data!['ContentName'].toString(),
+        ContentDetail: data['ContentDetail'].toString(),
+        ImageURL: data['ImageUrl'].toString(),
+      );
+    } else {
+      throw Exception('Document not found with ID: $documentId');
+    }
+  }
+  
 
-class _Home_KnowlegeState extends State<HomeKnowlege> {
+class _KnowledgeMainState extends State<KnowledgeMain> {
   List<Knowledge> knowledgelist = [];
 
-  Future<List<Knowledge>> getKnowledge() async {
+  Future<List<Knowledge>> getKnowledges() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final querySnapshot = await firestore.collection("Knowledge").get();
-    return querySnapshot.docs.map((doc) => Knowledge.fromFirestore(doc)).toList();
+    final querySnapshot = await firestore
+        .collection("Knowledge")
+        .where("deleted_at", isEqualTo:false)
+        .get();
+    return querySnapshot.docs
+        .map((doc) => Knowledge.fromFirestore(doc))
+        .toList();
   }
 
   @override
   void initState() {
     super.initState();
-    getKnowledge().then((value) {
+    getKnowledges().then((value) {
       setState(() {
         knowledgelist = value;
       });
+      for (var knowledge in knowledgelist) {
+        print('Knowledge : ${knowledge.contents}');
+      }
     });
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF2F6F5),
@@ -56,24 +69,69 @@ class _Home_KnowlegeState extends State<HomeKnowlege> {
             Column(
               children: [
                 for (var knowledge in knowledgelist)
-                  KnowlegdeCol(
-                    onTap: () {
-                      if (knowledge.contents.isEmpty) return;
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => KnowledgePage(
-                            knowledge: knowledge,
-                            icons: knowledge.knowledgeIcons,
-                          ),
+                  Container(
+                    width: 400,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(knowledge.knowledgeIcons),
+                        Text(knowledge.knowledgeName),
+                        SizedBox(width: 50,),
+                       
+                     
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => EditKnowlege(
+                                               knowledge: knowledge,
+                                               icons: knowledge.knowledgeIcons,
+                                            )));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xffE69800),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                "แก้ไข",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => Deleteddialogknowledge(
+                                    knowledgeName: knowledge.knowledgeName,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                "ลบ",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                    title: knowledge.knowledgeName,
-                    icons: knowledge.knowledgeIcons,
-                    ismutible: knowledge.contents.isEmpty ? false : true,
-                    contents: knowledge.contents,
-                  ),
+                      ],
+                    ),
+                  )
               ],
             )
           ],
@@ -81,4 +139,6 @@ class _Home_KnowlegeState extends State<HomeKnowlege> {
       ),
     );
   }
+
+
 }

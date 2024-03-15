@@ -3,6 +3,7 @@ import 'package:watalygold_admin/Page/Knowlege/Contentcol.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class KnowlegdeCol extends StatefulWidget {
+  
   const KnowlegdeCol(
       {super.key,
       required this.title,
@@ -56,6 +57,7 @@ class _KnowlegdeColState extends State<KnowlegdeCol> {
                             fontSize: 14,
                             fontWeight: FontWeight.bold),
                       ),
+                      
                       trailing: widget.ismutible
                           ? RotatedBox(
                               quarterTurns: 1,
@@ -64,14 +66,16 @@ class _KnowlegdeColState extends State<KnowlegdeCol> {
                                     ? Icons.keyboard_arrow_left_rounded
                                     : Icons.keyboard_arrow_right_rounded,
                                 color: GPrimaryColor,
+                                
                               ),
                             )
                           : RotatedBox(
                               quarterTurns: 1,
                               child: Icon(
-                                Icons.keyboard_arrow_up_rounded,
+                                Icons.create_outlined,
                                 color: GPrimaryColor,
                               ),
+                             
                             )),
                   _showDropdown
                       ? Column(

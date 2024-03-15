@@ -1,94 +1,130 @@
-import 'package:animated_tree_view/animated_tree_view.dart';
-import 'package:animated_tree_view/tree_view/tree_node.dart';
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Components/SidebarController.dart';
-import 'package:watalygold_admin/Page/Knowlege/Home.dart';
+
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-class SidebarMenu extends StatefulWidget {
-  const SidebarMenu({super.key});
+class SideNav extends StatefulWidget {
+  const SideNav({Key? key}) : super(key: key);
 
   @override
-  State<SidebarMenu> createState() => _SidebarMenuState();
+  State<SideNav> createState() => _SideNavState();
 }
 
-class _SidebarMenuState extends State<SidebarMenu> {
+class _SideNavState extends State<SideNav> {
+  int selected = -1;
   @override
+  void initState() {
+    super.initState();
+  }
+
+  SidebarController sidebarController = Get.put(SidebarController());
+
   Widget build(BuildContext context) {
-    SidebarController sidebarController = Get.put(SidebarController());
-    bool _isDropdownPressed = false;
     bool _showDropdown = false;
-    return Container(
-      color: Color(0xff7ED957),
-      child: Column(
-        children: [
-          Center(
-            child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Image.asset(
-                  "assets/images/watalygold-logo-2.png",
-                  fit: BoxFit.cover,
-                )),
-          ),
-          Obx(
-            () => Column(
-              children: [
-                SideMenutitle(
-                  selectedColors: Colors.black,
-                  title: 'ผลการวิเคราะห์รายวัน',
-                  icons: Icons.dashboard_outlined,
-                  press: () {
-                    sidebarController.index.value = 0;
-                  },
-                  seleteds: sidebarController.index.value == 0,
+    return Column(
+      children: [
+        Center(
+          child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+              child: Image.asset(
+                "assets/images/watalygold-logo-3.png",
+                fit: BoxFit.cover,
+              )),
+        ),
+        Obx(
+          () => Column(
+            children: [
+              SideMenutitle(
+                selectedColors: WhiteColor,
+                title: 'ผลการวิเคราะห์รายวัน',
+                icons: Icons.dashboard_outlined,
+                press: () {
+                  sidebarController.index.value = 0;
+                },
+                seleteds: sidebarController.index.value == 0,
+              ),
+              ListTile(
+                onTap: () {
+                  setState(() {
+                    _showDropdown = !_showDropdown;
+                  });
+                  sidebarController.dropdown.value =
+                      !sidebarController.dropdown.value;
+                },
+                leading: Icon(
+                  Icons.menu_book_rounded,
+                  color: WhiteColor,
                 ),
-                SideMenutitle_dropdown(
-                  title: "คลังความรู้",
-                  icons: Icons.menu_book_rounded,
-                  onPress: () {
-                    setState(() {
-                      _isDropdownPressed = true;
-                      _showDropdown = !_showDropdown;
-                      // sidebarController.index.value = 1;
-                    });
-                  },
-                  seleteds: sidebarController.index.value == 0,
+                title: Text(
+                  "คลังความรู้",
+                  style: TextStyle(color: WhiteColor, fontSize: 17),
                 ),
-              ],
-            ),
+                trailing: RotatedBox(
+                  quarterTurns: 1,
+                  child: Icon(
+                    _showDropdown
+                        ? Icons.keyboard_arrow_left_rounded
+                        : Icons.keyboard_arrow_right_rounded,
+                    color: WhiteColor,
+                  ),
+                ),
+                selected: sidebarController.index.value == 4,
+              ),
+            ],
           ),
-          _buildAddKnowledgeTile(_isDropdownPressed),
-        ],
-      ),
+        ),
+        Obx(() => _buildAddKnowledgeTile(sidebarController.dropdown.value)),
+      ],
     );
   }
 
-  Widget _buildAddKnowledgeTile(bool _isDropdownPressed) {
-    if (_isDropdownPressed == true) {
-      return Column(
-        children: [
-          ListTile(
-            onTap: () {},
-            contentPadding: EdgeInsets.only(left: 50),
-            title: Text(
-              "หน้าหลักคลังความรู้",
-              style: TextStyle(color: WhiteColor, fontSize: 17),
-            ),
-          ),
-          ListTile(
-            onTap: () {},
-            contentPadding: EdgeInsets.only(left: 50),
-            title: Text(
-              "เพิ่มคลังความรู้",
-              style: TextStyle(color: WhiteColor, fontSize: 17),
-            ),
-          ),
-        ],
-      );
+  Widget _buildAddKnowledgeTile(bool s) {
+    if (s == true) {
+      return Obx(() => Column(
+            children: [
+              ListTile(
+                onTap: () {
+                  sidebarController.index.value = 1;
+                  context.goNamed("/mainKnowledge");
+                },
+                contentPadding: EdgeInsets.only(left: 50),
+                title: Text(
+                  "หน้าหลักคลังความรู้",
+                  style: TextStyle(
+                      color: sidebarController.index.value == 1
+                          ? YPrimaryColor
+                          : WhiteColor,
+                      fontSize: 17),
+                ),
+                selected: sidebarController.index.value == 1,
+                selectedTileColor: sidebarController.index.value == 1
+                    ? WhiteColor.withOpacity(0.8)
+                    : null,
+              ),
+              ListTile(
+                onTap: () {
+                  sidebarController.index.value = 2;
+                },
+                contentPadding: EdgeInsets.only(left: 50),
+                title: Text(
+                  "เพิ่มคลังความรู้",
+                  style: TextStyle(
+                      color: sidebarController.index.value == 2
+                          ? YPrimaryColor
+                          : WhiteColor,
+                      fontSize: 17),
+                ),
+                selected: sidebarController.index.value == 2,
+                selectedTileColor: sidebarController.index.value == 2
+                    ? WhiteColor.withOpacity(0.8)
+                    : null,
+              ),
+            ],
+          ));
     } else {
       return SizedBox.shrink();
     }
@@ -116,64 +152,15 @@ class SideMenutitle extends StatelessWidget {
       onTap: press,
       leading: Icon(
         icons,
-        color: seleteds ? G2PrimaryColor : WhiteColor,
+        color: seleteds ? YPrimaryColor : WhiteColor,
       ),
       title: Text(
         title,
         style: TextStyle(
-            color: seleteds ? G2PrimaryColor : WhiteColor, fontSize: 17),
+            color: seleteds ? YPrimaryColor : WhiteColor, fontSize: 17),
       ),
       selected: seleteds,
       selectedTileColor: selectedColors.withOpacity(0.8),
-    );
-  }
-}
-
-class SideMenutitle_dropdown extends StatefulWidget {
-  const SideMenutitle_dropdown({
-    super.key,
-    required this.title,
-    required this.icons,
-    required this.onPress,
-    required this.seleteds,
-  });
-
-  final String title;
-  final IconData icons;
-  final VoidCallback onPress;
-  final bool seleteds;
-
-  @override
-  State<SideMenutitle_dropdown> createState() => _SideMenutitle_dropdownState();
-}
-
-class _SideMenutitle_dropdownState extends State<SideMenutitle_dropdown> {
-  @override
-  bool _showDropdown = false;
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        widget.onPress;
-        _showDropdown = !_showDropdown;
-      },
-      leading: Icon(
-        widget.icons,
-        color: WhiteColor,
-      ),
-      title: Text(
-        widget.title,
-        style: TextStyle(color: WhiteColor, fontSize: 17),
-      ),
-      trailing: RotatedBox(
-        quarterTurns: 1,
-        child: Icon(
-          _showDropdown
-              ? Icons.keyboard_arrow_left_rounded
-              : Icons.keyboard_arrow_right_rounded,
-          color: WhiteColor,
-        ),
-      ),
-      selected: widget.seleteds,
     );
   }
 }

@@ -22,9 +22,6 @@ Map<String, IconData> icons = {
   'ระวัง': Icons.warning_rounded
 };
 
-String selectedImageUrl =
-    "https://static.thenounproject.com/png/3322766-200.png";
-
 class ExpansionPanelData {
   TextEditingController nameController;
   TextEditingController detailController;
@@ -52,17 +49,19 @@ class _SinglecontentState extends State<Multiplecontent> {
   TextEditingController namecontroller = TextEditingController();
   TextEditingController contentdetailcontroller = TextEditingController();
   TextEditingController contentnamecontroller = TextEditingController();
-
   List<TextEditingController> contentNameControllers = [];
   List<TextEditingController> contentDetailControllers = [];
-  List<List<Widget>> itemPhotosWidgetLists = [];
 
-  List<Widget> itemPhotosWidgetList = <Widget>[];
+  List<int> _deletedPanels = [];
+
+  List<Widget> itemPhotosWidgetList = <Widget>[]; //แสดงตัวอย่างรูปภาพ
   final ImagePicker _picker = ImagePicker();
   File? file;
-  List<XFile>? photo = <XFile>[];
-  List<XFile> itemImagesList = <XFile>[];
-  List<String> downloadUrl = <String>[];
+  List<XFile>? photo =
+      <XFile>[]; //เป็นรายการของ XFile ที่ใช้ในการเก็บรูปภาพที่เลือกจากแกล
+  List<XFile> itemImagesList =
+      <XFile>[]; //ใช้ในการเก็บรูปภาพที่ผู้ใช้เลือกเพื่ออัปโหลด
+  List<String> downloadUrl = <String>[]; //เก็บ url ภาพ
   bool uploading = false;
 
   @override
@@ -318,24 +317,29 @@ class _SinglecontentState extends State<Multiplecontent> {
                 SizedBox(
                   height: 30,
                 ),
-
                 Padding(
                   padding: const EdgeInsets.only(right: 70),
                   child: ExpansionPanelList.radio(
                     expansionCallback: (int index, bool isExpanded) {
+                      if (_deletedPanels.contains(index)) {
+                        return;
+                      }
                       setState(() {
                         if (isExpanded) {
                           _currentExpandedIndex = index;
                         }
                       });
                     },
-                    children: _panelData.map<ExpansionPanelRadio>(
-                        (ExpansionPanelData panelData) {
+                    children: _panelData
+                        .where((panelData) => !_deletedPanels
+                            .contains(_panelData.indexOf(panelData)))
+                        .map<ExpansionPanelRadio>(
+                            (ExpansionPanelData panelData) {
                       final int index = _panelData.indexOf(panelData);
                       // สร้าง TextEditingController สำหรับชื่อเนื้อหาและรายละเอียดเนื้อหา
                       contentNameControllers.add(TextEditingController());
                       contentDetailControllers.add(TextEditingController());
-                      itemPhotosWidgetLists.add([]);
+
                       return ExpansionPanelRadio(
                         backgroundColor: Colors.white,
                         value: index,
@@ -345,10 +349,13 @@ class _SinglecontentState extends State<Multiplecontent> {
                             tileColor: Colors.white,
                             leading: IconButton(
                               onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => const Deletedialog(),
-                                );
+                                setState(() {
+                                  _deletedPanels.add(index);
+                                });
+                                // showDialog(
+                                //   context: context,
+                                //   builder: (context) => const Deletedialog(),
+                                // );
                               },
                               icon: Icon(
                                 Icons.cancel,
@@ -585,8 +592,6 @@ class _SinglecontentState extends State<Multiplecontent> {
                                                   .then((newImageUrl) {
                                                 if (newImageUrl != null) {
                                                   setState(() {
-                                                    selectedImageUrl =
-                                                        newImageUrl;
                                                     addImage(); // เพิ่มภาพใหม่
                                                   });
                                                 }
@@ -679,7 +684,6 @@ class _SinglecontentState extends State<Multiplecontent> {
                     }).toList(),
                   ),
                 ),
-
                 SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(right: 70),
@@ -721,49 +725,7 @@ class _SinglecontentState extends State<Multiplecontent> {
                     ),
                   ),
                 ),
-
-                // Padding(
-                //   padding: const EdgeInsets.only(right: 70),
-                //   child: ElevatedButton(
-                //     onPressed: () {
-                //       setState(() {
-                //         final newProduct = Product.generateItems(1).first;
-                //         while (_products
-                //             .any((product) => product.id == newProduct.id)) {
-                //           newProduct.id++;
-                //         }
-                //         _products.add(newProduct);
-                //       });
-                //     },
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: WhiteColor,
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(0),
-                //       ),
-                //       elevation: 3,
-                //     ),
-                //     child: Padding(
-                //       padding: const EdgeInsets.symmetric(vertical: 10),
-                //       child: Row(
-                //         mainAxisAlignment: MainAxisAlignment.start,
-                //         children: [
-                //           Icon(Icons.add_box_rounded,
-                //               color: Color(0xFF42BD41)), // เพิ่ม icon ที่นี่
-                //           SizedBox(width: 8), // ระยะห่างระหว่าง icon และข้อความ
-                //           Text(
-                //             "เพิ่มเนื้อหาย่อย",
-                //             style: TextStyle(
-                //               color: Colors.black,
-                //               fontSize: 18,
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 Padding(
-                  // padding: const EdgeInsets.all(25.0),
                   padding:
                       const EdgeInsets.only(right: 70.0, top: 50.0, bottom: 50),
                   child: Container(
@@ -831,6 +793,17 @@ class _SinglecontentState extends State<Multiplecontent> {
     });
   }
 
+  pickPhotoFromGallery() async {
+    photo = await _picker.pickMultiImage();
+    if (photo != null) {
+      setState(() {
+        itemImagesList = itemImagesList + photo!;
+        addImage();
+        photo!.clear();
+      });
+    }
+  }
+
   void addImage() {
     removeImage(); // ลบภาพเดิมก่อนที่จะเพิ่มภาพใหม่
     for (var bytes in photo!) {
@@ -853,25 +826,6 @@ class _SinglecontentState extends State<Multiplecontent> {
     }
   }
 
-  pickPhotoFromGallery() async {
-    photo = await _picker.pickMultiImage();
-    if (photo != null) {
-      setState(() {
-        itemImagesList = itemImagesList + photo!;
-        addImage();
-        photo!.clear();
-      });
-    }
-  }
-
-  upload() async {
-    String contentId = await uplaodImageAndSaveItemInfo();
-    setState(() {
-      uploading = false;
-    });
-    // showToast("Image Uploaded Successfully");
-  }
-
   Future<String> uplaodImageAndSaveItemInfo() async {
     setState(() {
       uploading = true;
@@ -887,6 +841,13 @@ class _SinglecontentState extends State<Multiplecontent> {
     return contentId;
   }
 
+  upload() async {
+    String contentId = await uplaodImageAndSaveItemInfo();
+    setState(() {
+      uploading = false;
+    });
+  }
+
   uploadImageToStorage(PickedFile? pickedFile, String contentId, index) async {
     String? kId = const Uuid().v4().substring(0, 10);
     Reference reference = FirebaseStorage.instance
@@ -896,109 +857,89 @@ class _SinglecontentState extends State<Multiplecontent> {
       await pickedFile!.readAsBytes(),
       SettableMetadata(contentType: 'image/jpeg'),
     );
-    String ImageUrl = await reference.getDownloadURL();
-    addAllContent(ImageUrl, index);
+    String imageUrl = await reference.getDownloadURL();
+    addAllContent(imageUrl);
+  } 
+
+  Future<void> addAllContent(String imageUrl) async {
+  // Validate user input
+  if (namecontroller.text.isEmpty ||
+      _selectedValue == null ||
+      imageUrl == null) {
+    Fluttertoast.showToast(
+      msg: "กรุณากรอกข้อมูลให้ครบ",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    return;
   }
 
-  // void addContent(String imageUrl, int index) async {
-  //   String contentName = contentNameControllers[index].text;
-  //   String contentDetail = contentDetailControllers[index].text;
+  List<String> contentIds = [];
 
-  //   if (contentName.isNotEmpty && contentDetail.isNotEmpty) {
-  //     String contentId = const Uuid().v4().substring(0, 10);
+  // Loop through content and add them to Firebase
+  for (int index = 0; index < contentNameControllers.length; index++) {
+    String contentName = contentNameControllers[index].text;
+    String contentDetail = contentDetailControllers[index].text;
 
-  //     Map<String, dynamic> contentMap = {
-  //       "ContentName": contentName,
-  //       "ContentDetail": contentDetail,
-  //       "ImageUrl": imageUrl,
-  //     };
-
-  //     await Databasemethods().addContent(contentMap, contentId).then((value) {
-  //       String knowledgeId = namecontroller.text;
-
-  //       Map<String, dynamic> knowledgeMap = {
-  //         "KnowledgeName": namecontroller.text,
-  //         "KnowledgeIcons": _selectedValue,
-  //         "Content": [contentId], // เพิ่ม ID ของเนื้อหาลงในรายการ contents
-  //       };
-
-  //       // เพิ่มข้อมูลของความรู้ลงในคอลเลคชัน "Knowledge"
-  //       Databasemethods().addKnowlege(knowledgeMap, knowledgeId).then((value) {
-  //         Fluttertoast.showToast(
-  //           msg: "เพิ่มความรู้เรียบร้อยแล้ว",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           gravity: ToastGravity.CENTER,
-  //           timeInSecForIosWeb: 1,
-  //           backgroundColor: Colors.red,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0,
-  //         );
-  //       });
-  //     });
-  //   } else {
-  //     Fluttertoast.showToast(
-  //       msg: "กรุณากรอกข้อมูลให้ครบ",
-  //       toastLength: Toast.LENGTH_SHORT,
-  //       gravity: ToastGravity.CENTER,
-  //       timeInSecForIosWeb: 1,
-  //       backgroundColor: Colors.red,
-  //       textColor: Colors.white,
-  //       fontSize: 16.0,
-  //     );
-  //   }
-  // }
-
-  void addAllContent(String imageUrl, int index) async {
-    List<String> contentIds = [];
-    bool isToastShown = false;
-
-    for (int index = 0; index < contentNameControllers.length; index++) {
-      String contentName = contentNameControllers[index].text;
-      String contentDetail = contentDetailControllers[index].text;
-
-      if (contentName.isNotEmpty && contentDetail.isNotEmpty) {
-        String contentId = const Uuid().v4().substring(0, 10);
-        contentIds.add(contentId);
-
-        Map<String, dynamic> contentMap = {
-          "ContentName": contentName,
-          "ContentDetail": contentDetail,
-          "ImageUrl": imageUrl, // ต้องระบุ imageUrl ที่มาจากการเลือกรูปภาพ
-        };
-
-        await Databasemethods().addContent(contentMap, contentId).then((value) {
-          String knowledgeId = namecontroller.text;
-
-          Map<String, dynamic> knowledgeMap = {
-            "KnowledgeName": namecontroller.text,
-            "KnowledgeIcons": _selectedValue,
-            "Create_at": Timestamp.now(),
-            "Content": contentIds, // เพิ่ม ID ของเนื้อหาลงในรายการ contents
-          };
-
-          // เพิ่มข้อมูลของความรู้ลงในคอลเลคชัน "Knowledge"
-          Databasemethods()
-              .addKnowlege(knowledgeMap, knowledgeId)
-              .then((value) {
-            showDialog(
-              context: context,
-              builder: (context) => const Addknowledgedialog(),
-            );
-          });
-        });
-      } else {
-        // Fluttertoast.showToast(
-        //   msg: "กรุณากรอกข้อมูลให้ครบ",
-        //   toastLength: Toast.LENGTH_SHORT,
-        //   gravity: ToastGravity.CENTER,
-        //   timeInSecForIosWeb: 1,
-        //   backgroundColor: Colors.red,
-        //   textColor: Colors.white,
-        //   fontSize: 16.0,
-        // );
-      }
+    if (contentName.isNotEmpty && contentDetail.isNotEmpty) {
+      String contentId = await addContent(contentName, contentDetail, imageUrl);
+      contentIds.add(contentId);
     }
   }
+
+  // Generate a knowledge ID
+  String knowledgeId = const Uuid().v4().substring(0, 10);
+
+  // Prepare knowledge data
+  Map<String, dynamic> knowledgeMap = {
+    "KnowledgeName": namecontroller.text,
+    "KnowledgeIcons": _selectedValue,
+    "create_at": Timestamp.now(),
+    "deleted_at": false,
+    "update_at": '',
+    "Content": contentIds,
+  };
+
+  // Add knowledge to Firebase
+  await Databasemethods().addKnowlege(knowledgeMap, knowledgeId).then((value) {
+    showDialog(
+      context: context,
+      builder: (context) => const Addknowledgedialog(),
+    );
+  }).catchError((error) {
+    Fluttertoast.showToast(
+      msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  });
+}
+
+
+Future<String> addContent(String contentName, String contentDetail, String imageUrl) async {
+  Map<String, dynamic> contentMap = {
+    "ContentName": contentName,
+    "ContentDetail": contentDetail,
+    "image_url": imageUrl,
+  };
+
+  // Generate a unique ID (replace with your preferred method)
+  String contentId = const Uuid().v4().substring(0, 10);
+
+  // Add data using addKnowlege, passing both contentMap and generated ID
+  await Databasemethods().addContent(contentMap, contentId);
+
+  return contentId;
+}
+
 
   void clearAllFields() {
     namecontroller.clear();
@@ -1074,8 +1015,9 @@ class _SinglecontentState extends State<Multiplecontent> {
   Widget _displaycontentWidget() {
     return Scaffold(
       appBar: Appbarmain_no_botton(
-        
-        name: contentNameControllers.isNotEmpty ? contentNameControllers[0].text : '', 
+        name: contentNameControllers.isNotEmpty
+            ? contentNameControllers[0].text
+            : '',
       ),
       body: Stack(
         children: [
@@ -1117,14 +1059,13 @@ class _SinglecontentState extends State<Multiplecontent> {
                       for (int index = 0;
                           index < contentNameControllers.length;
                           index++)
-                          
-                      Text(
-                        contentNameControllers[index].text,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      )
+                        Text(
+                          contentNameControllers[index].text,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        )
                     ],
                   ),
                   SizedBox(

@@ -63,7 +63,7 @@ class _KnowledgePageState extends State<KnowledgePage> {
                     ],
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 50,
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,

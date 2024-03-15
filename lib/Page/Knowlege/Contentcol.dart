@@ -14,6 +14,7 @@ class Contentcol extends StatefulWidget {
 }
 
 class _ContentcolState extends State<Contentcol> {
+  
   Future<Contents> getContentsById(String documentId) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final docRef = firestore.collection('Content').doc(documentId);

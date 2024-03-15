@@ -1,22 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-
-Map<String, IconData> iconMap = {
-  'บ้าน': Icons.home,
+final Map<String, IconData> iconMap = {
   'ดอกไม้': Icons.yard,
-  'บุคคล': Icons.person,
-  'น้ำ': Icons.water_drop_outlined,
-  'ระวัง': Icons.warning_rounded
+  // เพิ่มไอคอนอื่น ๆ
 };
 
 class Knowledge {
   final String id;
   final String knowledgeName;
-  final List<dynamic> contents; // เพิ่มฟิลด์นี้เพื่อเก็บ ID ของเนื้อหา
+  final List<dynamic> contents;
   final String knowledgeDetail;
   final IconData knowledgeIcons;
   final String knowledgeImg;
+  final Timestamp? create_at;
+  final Timestamp? deleted_at;
+  final Timestamp? update_at;
 
   Knowledge({
     required this.id,
@@ -25,16 +24,22 @@ class Knowledge {
     required this.knowledgeDetail,
     required this.knowledgeIcons,
     required this.knowledgeImg,
+    required this.create_at,
+    this.deleted_at,
+    this.update_at,
   });
 
   factory Knowledge.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Knowledge(
       id: doc.id,
-      knowledgeName: doc['KnowledgeName'],
-      contents: doc['Content'].map((e) => e).cast<dynamic>().toList(),
-      knowledgeDetail: doc['KnowledgeDetail'],
-      knowledgeIcons: iconMap[doc['KnowledgeIcons']] ?? Icons.question_mark,
-      knowledgeImg: doc['KnowledgeImg'],
+      knowledgeName: data['KnowledgeName'] ?? '',
+      contents: data['Content']?.map((e) => e).cast<dynamic>().toList() ?? [],
+      knowledgeDetail: data['KnowledgeDetail'] ?? '',
+      knowledgeIcons: iconMap[data['KnowledgeIcons']] ?? Icons.question_mark,
+      knowledgeImg: data['KnowledgeImg'] ?? '',
+      create_at:
+          data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
     );
   }
 }

@@ -1,15 +1,13 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
-
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Deletedialog.dart';
@@ -24,32 +22,35 @@ Map<String, IconData> icons = {
   'ระวัง': Icons.warning_rounded
 };
 
-String selectedImageUrl =
-    "https://static.thenounproject.com/png/3322766-200.png";
-
-class Singlecontent extends StatefulWidget {
-  const Singlecontent({Key? key}) : super(key: key);
+class Multiplecontent extends StatefulWidget {
+  const Multiplecontent({Key? key}) : super(key: key);
 
   @override
   _SinglecontentState createState() => _SinglecontentState();
 }
 
-class _SinglecontentState extends State<Singlecontent> {
-  final List<Product> _products = Product.generateItems(8);
-
+class _SinglecontentState extends State<Multiplecontent> {
   IconData? selectedIconData;
   String? _selectedValue;
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
 
-  List<Widget> itemPhotosWidgetList = <Widget>[];
+  TextEditingController contentcontroller = new TextEditingController();
+  TextEditingController namecontroller = TextEditingController();
+  TextEditingController contentdetailcontroller = TextEditingController();
+  TextEditingController contentnamecontroller = TextEditingController();
+  List<TextEditingController> contentNameControllers = [];
+  List<TextEditingController> contentDetailControllers = [];
+
+  List<ExpansionTile> _expansionTiles = []; // เก็บรายการ ExpansionTile
+
+  List<Widget> itemPhotosWidgetList = <Widget>[]; //แสดงตัวอย่างรูปภาพ
   final ImagePicker _picker = ImagePicker();
   File? file;
-  List<XFile>? photo = <XFile>[];
-  List<XFile> itemImagesList = <XFile>[];
-  List<String> downloadUrl = <String>[];
+  List<XFile>? photo =
+      <XFile>[]; //เป็นรายการของ XFile ที่ใช้ในการเก็บรูปภาพที่เลือกจากแกล
+  List<XFile> itemImagesList =
+      <XFile>[]; //ใช้ในการเก็บรูปภาพที่ผู้ใช้เลือกเพื่ออัปโหลด
+  List<String> downloadUrl = <String>[]; //เก็บ url ภาพ
   bool uploading = false;
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +66,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   children: [
                     Container(
                       width: 490,
-                      height: 900,
+                      height: 400,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -76,7 +77,7 @@ class _SinglecontentState extends State<Singlecontent> {
                           children: [
                             Row(
                               children: [
-                                // Image.asset("assets/images/knowlege.png"),
+                                Image.asset("assets/images/knowlege.png"),
                                 SizedBox(width: 10),
                                 Text(
                                   "เพิ่มคลังความรู้",
@@ -116,11 +117,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
-
                             Align(
                               alignment: Alignment.topLeft,
                               child: Container(
-                              
                                 child: DropdownButton(
                                   items: <String>[
                                     'บ้าน',
@@ -214,156 +213,15 @@ class _SinglecontentState extends State<Singlecontent> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: TextField(
-                                  controller: nameController,
+                                  controller: namecontroller,
                                   decoration:
                                       InputDecoration(border: InputBorder.none),
                                 ),
                               ),
                             ),
                             SizedBox(height: 30),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "เนื้อหา",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontFamily: 'IBM Plex Sans Thai',
-                                      ),
-                                    ),
-                                    Text(
-                                      "*",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 18,
-                                        fontFamily: 'IBM Plex Sans Thai',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 0.0, right: 0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffCFD3D4)),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: TextField(
-                                  controller: contentController,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: 5,
-                                  decoration: InputDecoration(
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              width: 1, color: Colors.white))),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 30),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "รูปภาพ",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontFamily: 'IBM Plex Sans Thai',
-                                      ),
-                                    ),
-                                    Text(
-                                      "*",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 18,
-                                        fontFamily: 'IBM Plex Sans Thai',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  color: Colors.white70,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.shade200,
-                                      offset: const Offset(0.0, 0.5),
-                                      blurRadius: 30.0,
-                                    )
-                                  ]),
-                              width: MediaQuery.of(context).size.width,
-                              height: 200.0,
-                              child: Center(
-                                child: itemPhotosWidgetList.isEmpty
-                                    ? Center(
-                                        child: MaterialButton(
-                                          onPressed: pickPhotoFromGallery,
-                                          child: Container(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Center(
-                                              child: Image.network(
-                                                "https://static.thenounproject.com/png/3322766-200.png",
-                                                height: 100.0,
-                                                width: 100.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: Wrap(
-                                          spacing: 5.0,
-                                          direction: Axis.horizontal,
-                                          children: itemPhotosWidgetList,
-                                          alignment: WrapAlignment.spaceEvenly,
-                                          runSpacing: 10.0,
-                                        ),
-                                      ),
-                              ),
-                            ),
                             SizedBox(
-                              height: 10,
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                pickPhotoFromGallery().then((newImageUrl) {
-                                  if (newImageUrl != null) {
-                                    setState(() {
-                                      selectedImageUrl = newImageUrl;
-                                      addImage(); // เพิ่มภาพใหม่
-                                    });
-                                  }
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: G2PrimaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Text(
-                                "เพิ่มรูปภาพ",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: 50.0,
+                              height: 20.0,
                             ),
                             ElevatedButton(
                               onPressed: display,
@@ -385,7 +243,7 @@ class _SinglecontentState extends State<Singlecontent> {
                     SizedBox(width: 20), // SizedBox
                     Container(
                       width: 490,
-                      height: 900,
+                      height: 400,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -437,32 +295,67 @@ class _SinglecontentState extends State<Singlecontent> {
                             SizedBox(
                               height: 20,
                             ),
-                            Container(
-                              width: 390,
-                              height: 630,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFFE7E7E7),
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      width: 5, color: Color(0xFF42BD41)),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child:
-                                        _displayedcontentWidget ?? Container(),
-                                  )
-                                ],
-                              ),
-                            ),
                           ],
                         ),
                       ),
                     ),
                     // Container
                   ],
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 70),
+                  child: Container(
+                    color: Colors.white, // กำหนดสีพื้นหลังของ Container
+                    child: Column(
+                      children: [
+                        for (var tile in _expansionTiles) tile,
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 70),
+                  child: Container(
+                    color: Colors.white,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _addExpansionTile();
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                        elevation: 3,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.add_box_rounded,
+                                color: Color(0xFF42BD41)), // เพิ่ม icon ที่นี่
+                            SizedBox(
+                                width: 8), // ระยะห่างระหว่าง icon และข้อความ
+                            Text(
+                              "เพิ่มเนื้อหาย่อย",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 Padding(
                   // padding: const EdgeInsets.all(25.0),
@@ -527,6 +420,23 @@ class _SinglecontentState extends State<Singlecontent> {
     );
   }
 
+  void removeImage() {
+    setState(() {
+      itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
+    });
+  }
+
+  pickPhotoFromGallery() async {
+    photo = await _picker.pickMultiImage();
+    if (photo != null) {
+      setState(() {
+        itemImagesList = itemImagesList + photo!;
+        addImage();
+        photo!.clear();
+      });
+    }
+  }
+
   void addImage() {
     removeImage(); // ลบภาพเดิมก่อนที่จะเพิ่มภาพใหม่
     for (var bytes in photo!) {
@@ -549,114 +459,101 @@ class _SinglecontentState extends State<Singlecontent> {
     }
   }
 
-  pickPhotoFromGallery() async {
-    photo = await _picker.pickMultiImage();
-    if (photo != null) {
-      setState(() {
-        itemImagesList = itemImagesList + photo!;
-        addImage();
-        photo!.clear();
-      });
-    }
-  }
-
-  upload() async {
-    String knowledgetId = await uplaodImageAndSaveItemInfo();
-    setState(() {
-      uploading = false;
-    });
-  }
-
   Future<String> uplaodImageAndSaveItemInfo() async {
     setState(() {
       uploading = true;
     });
     PickedFile? pickedFile;
-    String? knowledgetId = const Uuid().v4().substring(0, 10);
+    String? contentId = const Uuid().v4().substring(0, 10);
     for (int i = 0; i < itemImagesList.length; i++) {
       file = File(itemImagesList[i].path);
       pickedFile = PickedFile(file!.path);
 
-      await uploadImageToStorage(pickedFile, knowledgetId);
+      await uploadImageToStorage(pickedFile, contentId, i);
     }
-    return knowledgetId;
+    return contentId;
   }
 
-  void removeImage() {
+  upload() async {
+    String contentId = await uplaodImageAndSaveItemInfo();
     setState(() {
-      itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
+      uploading = false;
     });
   }
 
-  uploadImageToStorage(PickedFile? pickedFile, String knowledgetId) async {
+  uploadImageToStorage(PickedFile? pickedFile, String contentId, index) async {
     String? kId = const Uuid().v4().substring(0, 10);
     Reference reference = FirebaseStorage.instance
         .ref()
-        .child('Knowledge/$knowledgetId/knowledImg_$kId');
+        .child('Content/$contentId/contentImg_$kId');
     await reference.putData(
       await pickedFile!.readAsBytes(),
       SettableMetadata(contentType: 'image/jpeg'),
     );
     String imageUrl = await reference.getDownloadURL();
-    addKnowledge(imageUrl);
+    addAllContent(imageUrl, index);
   }
 
-  Future<void> addKnowledge(String imageUrl) async {
-    if (nameController.text.isNotEmpty &&
-        contentController.text.isNotEmpty &&
-        _selectedValue!.isNotEmpty &&
-        imageUrl != null) {
+  void addAllContent(String imageUrl, int index) async {
+    List<String> contentIds = [];
+    bool isToastShown = false;
 
-      String Id = const Uuid().v4().substring(0, 10);
+    for (int index = 0; index < contentNameControllers.length; index++) {
+      String contentName = contentNameControllers[index].text;
+      String contentDetail = contentDetailControllers[index].text;
 
-      Map<String, dynamic> knowledgeMap = {
-        "KnowledgeName": nameController.text,
-        "KnowledgeDetail": contentController.text,
-        "KnowledgeIcons": _selectedValue,
-        "KnowledgeImg": imageUrl,
-        "create_at":  Timestamp.now(),
-        "deleted_at": false,
-        "update_at": '',
-        "Content": [],
-      };
+      if (contentName.isNotEmpty && contentDetail.isNotEmpty) {
+        String contentId = const Uuid().v4().substring(0, 10);
+        contentIds.add(contentId);
 
-      // เรียกใช้งานฟังก์ชัน addKnowledge จากคลาส DatabaseMethods
-      await Databasemethods().addKnowlege(knowledgeMap, Id).then((value) {
-        
-        showDialog(
-          context: context,
-          builder: (context) => const Addknowledgedialog(),
-        );
-      }).catchError((error) {
-        Fluttertoast.showToast(
-          msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      });
-    } else {
-      Fluttertoast.showToast(
-        msg: "กรุณากรอกข้อมูลให้ครบ",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+        Map<String, dynamic> contentMap = {
+          "ContentName": contentName,
+          "ContentDetail": contentDetail,
+          "image_url": imageUrl, // ต้องระบุ imageUrl ที่มาจากการเลือกรูปภาพ
+        };
+
+        await Databasemethods().addContent(contentMap, contentId).then((value) {
+          String knowledgeId = const Uuid().v4().substring(0, 10);
+
+          Map<String, dynamic> knowledgeMap = {
+            "KnowledgeName": namecontroller.text,
+            "KnowledgeIcons": _selectedValue,
+            "create_at": Timestamp.now(),
+            "deleted_at": false,
+            "update_at": '',
+            "Content": contentIds, // เพิ่ม ID ของเนื้อหาลงในรายการ contents
+          };
+
+          // เพิ่มข้อมูลของความรู้ลงในคอลเลคชัน "Knowledge"
+          Databasemethods()
+              .addKnowlege(knowledgeMap, knowledgeId)
+              .then((value) {
+            showDialog(
+              context: context,
+              builder: (context) => const Addknowledgedialog(),
+            );
+          });
+        });
+      } else {
+        // Fluttertoast.showToast(
+        //   msg: "กรุณากรอกข้อมูลให้ครบ",
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.CENTER,
+        //   timeInSecForIosWeb: 1,
+        //   backgroundColor: Colors.red,
+        //   textColor: Colors.white,
+        //   fontSize: 16.0,
+        // );
+      }
     }
   }
 
   void clearAllFields() {
-    nameController.clear();
-    contentController.clear();
+    namecontroller.clear();
+    contentcontroller.clear();
 
     setState(() {
-      _selectedValue = null;
+      selectedIconData = null;
     });
 
     setState(() {
@@ -672,7 +569,7 @@ class _SinglecontentState extends State<Singlecontent> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Container(
-        width: 320,
+        width: 300,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: WhiteColor,
@@ -695,7 +592,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   width: 20,
                 ),
                 Text(
-                  nameController.text,
+                  namecontroller.text,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -725,7 +622,9 @@ class _SinglecontentState extends State<Singlecontent> {
   Widget _displaycontentWidget() {
     return Scaffold(
       appBar: Appbarmain_no_botton(
-        name: nameController.text,
+        name: contentNameControllers.isNotEmpty
+            ? contentNameControllers[0].text
+            : '',
       ),
       body: Stack(
         children: [
@@ -739,10 +638,8 @@ class _SinglecontentState extends State<Singlecontent> {
               );
             },
           ),
-          
           Positioned(
-            
-         // ใช้ตัวแปร _positionY แทนค่า top
+            // ใช้ตัวแปร _positionY แทนค่า top
             bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
             left: 0.0,
             right: 0.0,
@@ -766,13 +663,16 @@ class _SinglecontentState extends State<Singlecontent> {
                       SizedBox(
                         width: 15,
                       ),
-                      Text(
-                        nameController.text,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      )
+                      for (int index = 0;
+                          index < contentNameControllers.length;
+                          index++)
+                        Text(
+                          contentNameControllers[index].text,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        )
                     ],
                   ),
                   SizedBox(
@@ -781,21 +681,23 @@ class _SinglecontentState extends State<Singlecontent> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          contentController.text,
-                          style: TextStyle(color: Colors.black, fontSize: 15),
-                          textAlign: TextAlign.left,
-                          maxLines: null,
+                      for (int index = 0;
+                          index < contentDetailControllers.length;
+                          index++)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            contentDetailControllers[index].text,
+                            style: TextStyle(color: Colors.black, fontSize: 15),
+                            textAlign: TextAlign.left,
+                            maxLines: null,
+                          ),
                         ),
-                      ),
                     ],
                   )
                 ],
               ),
               width: MediaQuery.of(context).size.width,
-             
             ),
           ),
         ],
@@ -808,7 +710,295 @@ class _SinglecontentState extends State<Singlecontent> {
     setState(() {
       // เรียกใช้งาน Widget ที่จะแสดงผล
       _displayedWidget = _displaycoverWidget();
+    });
+  }
+
+  void displaycontent() {
+    // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
+    setState(() {
       _displayedcontentWidget = _displaycontentWidget();
+    });
+  }
+
+  Widget _buildExpansionTile(int index) {
+    return ExpansionTile(
+      leading: IconButton(
+        onPressed: () {},
+        icon: Icon(
+          Icons.cancel,
+          color: Color(0xFFFF543E),
+        ),
+      ),
+      title: Text("เนื้อหาย่อย ${index + 1}"),
+      
+      children: [
+        Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 490,
+                    height: 750,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0, right: 0),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "ชื่อ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                  Text(
+                                    "*",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0, right: 0),
+                            child: Container(
+                              padding: EdgeInsets.only(left: 10.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0xffCFD3D4)),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: TextField(
+                                controller: contentcontroller,
+                                decoration:
+                                    InputDecoration(border: InputBorder.none),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0, right: 0),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "เนื้อหา",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                  Text(
+                                    "*",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0, right: 0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffCFD3D4)),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: TextField(
+                                // controller:,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: 5,
+                                decoration: InputDecoration(
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 1, color: Colors.white))),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0, right: 0),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "รูปภาพ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                  Text(
+                                    "*",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 18,
+                                      fontFamily: 'IBM Plex Sans Thai',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: Colors.white70,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.shade200,
+                                    offset: const Offset(0.0, 0.5),
+                                    blurRadius: 30.0,
+                                  )
+                                ]),
+                            width: MediaQuery.of(context).size.width,
+                            height: 200.0,
+                            child: Center(
+                              child: itemPhotosWidgetList.isEmpty
+                                  ? Center(
+                                      child: MaterialButton(
+                                        onPressed: pickPhotoFromGallery,
+                                        child: Container(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Center(
+                                            child: Image.network(
+                                              "https://static.thenounproject.com/png/3322766-200.png",
+                                              height: 100.0,
+                                              width: 100.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: Wrap(
+                                        spacing: 5.0,
+                                        direction: Axis.horizontal,
+                                        children: itemPhotosWidgetList,
+                                        alignment: WrapAlignment.spaceEvenly,
+                                        runSpacing: 10.0,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              pickPhotoFromGallery().then((newImageUrl) {
+                                if (newImageUrl != null) {
+                                  setState(() {
+                                    addImage(); // เพิ่มภาพใหม่
+                                  });
+                                }
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: G2PrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              "เพิ่มรูปภาพ",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: displaycontent,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xffE69800),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              "แสดงผล",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 490,
+                    height: 700,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            width: 390,
+                            height: 600,
+                            decoration: ShapeDecoration(
+                              color: Color(0xFFE7E7E7),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    width: 5, color: Color(0xFF42BD41)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: _displayedcontentWidget ?? Container(),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _addExpansionTile() {
+    setState(() {
+      _expansionTiles
+          .add(_buildExpansionTile(_expansionTiles.length) as ExpansionTile);
     });
   }
 }
