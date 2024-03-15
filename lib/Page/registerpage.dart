@@ -1,8 +1,10 @@
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
@@ -418,10 +420,6 @@ class _registerPageState extends State<registerPage> {
   }
 
   void _register() async {
-    String name = "${_FnameController.text} ${_LnameController.text}";
-    String fName = _FnameController.text;
-    String lName = _LnameController.text;
-    String phonenumber = _phonenumberController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -430,13 +428,13 @@ class _registerPageState extends State<registerPage> {
     await createCollectionAdmin(
         _emailController.text,
         encrypted.base64.toString(),
-        _LnameController.text,
         _FnameController.text,
+        _LnameController.text,
         _phonenumberController.text);
     User? user = await _auth.RegisterWithEmailandPassword(email, password);
     print(user?.uid);
     if (user != null) {
-      Navigator.pushNamed(context, "/login");
+      context.goNamed('/login');
     } else {
       print("error someting");
     }

@@ -1,6 +1,8 @@
+import 'package:beamer/beamer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
@@ -190,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                       const Text("ถ้าหากคุณยังไม่มีบัญชี"),
                       TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, "/register");
+                            context.goNamed('/register');
                           },
                           child: const Text(
                             "สมัครสมาชิก",
@@ -217,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
     User? user = await _auth.LoginWithEmailandPassword(email, password);
 
     if (user != null) {
-      Navigator.pushNamed(context, "/homeKnowlege");
+      context.goNamed('/dashborad');
     } else {
       print("error someting");
     }

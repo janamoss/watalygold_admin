@@ -1,5 +1,8 @@
+import 'package:beamer/beamer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:watalygold_admin/Page/loginpage.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
@@ -24,7 +27,7 @@ class _AppbarmainState extends State<Appbarmain> {
         Padding(
           padding: const EdgeInsets.only(right: 25),
           child: PopupMenuButton(
-            color: G2PrimaryColor,
+            color: GPrimaryColor,
             child: GestureDetector(
               child: Image.asset(
                 "assets/images/watalygold_profile.png",
@@ -40,7 +43,7 @@ class _AppbarmainState extends State<Appbarmain> {
                   child: ListTile(
                     onTap: () {
                       FirebaseAuth.instance.signOut();
-                      Navigator.pushNamed(context, "/login");
+                      Beamer.of(context).popToNamed('/login');
                     },
                     leading: Icon(
                       Icons.logout_rounded,

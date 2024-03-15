@@ -1,4 +1,6 @@
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class MenuTop extends StatefulWidget {
@@ -18,10 +20,10 @@ class _MenuTopState extends State<MenuTop> {
     });
 
     if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/register');
+      context.goNamed('/register');
     }
     if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/login');
+      context.goNamed('/login');
     }
   }
 
