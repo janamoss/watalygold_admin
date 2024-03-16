@@ -1,10 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 
 class MainDash extends StatefulWidget {
-  const MainDash({super.key});
+  final User? users;
+  const MainDash({super.key, this.users});
 
   @override
   State<MainDash> createState() => _MainDashState();
@@ -21,12 +23,14 @@ class _MainDashState extends State<MainDash> {
         Expanded(
           child: Container(
             color: GPrimaryColor,
-            child: SideNav(),
+            child: SideNav(
+              status: 0,
+            ),
           ),
         ),
         Expanded(
           child: Scaffold(
-            appBar: Appbarmain(),
+            appBar: Appbarmain(users: widget.users,),
             body: Center(
               child: Text("dsdsd"),
             ),

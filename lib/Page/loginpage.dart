@@ -53,28 +53,25 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "ยินดีต้อนรับ",
-                      style: TextStyle(fontSize: 30, color: G2PrimaryColor),
+                      style: TextStyle(fontSize: 30, color: GPrimaryColor),
                     ),
                   ),
                   Align(
-                    alignment: Alignment.centerLeft,
-                    child: RichText(
-                      text: const TextSpan(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
                         children: [
-                          TextSpan(
-                            text: "เข้าสู่ระบบ Wataly ",
+                          Text(
+                            "เข้าสู่ระบบ Wataly ",
                             style:
-                                TextStyle(fontSize: 30, color: G2PrimaryColor),
+                                TextStyle(fontSize: 30, color: GPrimaryColor),
                           ),
-                          TextSpan(
-                            text: "Gold",
+                          Text(
+                            "Gold",
                             style:
                                 TextStyle(fontSize: 30, color: YPrimaryColor),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
+                      )),
                   Container(
                     width: 600,
                     margin: const EdgeInsetsDirectional.only(top: 15),
@@ -171,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                           _login();
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: G2PrimaryColor,
+                            backgroundColor: GPrimaryColor,
                             shape: ContinuousRectangleBorder(
                                 borderRadius: BorderRadius.circular(10))),
                         child: SizedBox(
@@ -197,9 +194,9 @@ class _LoginPageState extends State<LoginPage> {
                           child: const Text(
                             "สมัครสมาชิก",
                             style: TextStyle(
-                                color: G2PrimaryColor,
+                                color: GPrimaryColor,
                                 decoration: TextDecoration.underline,
-                                decorationColor: G2PrimaryColor),
+                                decorationColor: GPrimaryColor),
                           ))
                     ],
                   )
@@ -217,9 +214,9 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text;
 
     User? user = await _auth.LoginWithEmailandPassword(email, password);
-
+    
     if (user != null) {
-      context.goNamed('/dashborad');
+      context.pushNamed('/dashborad',extra: user);
     } else {
       print("error someting");
     }
@@ -323,7 +320,7 @@ Widget buttonall({required String name, bool isActive = false}) {
     child: ElevatedButton(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
-          backgroundColor: G2PrimaryColor,
+          backgroundColor: GPrimaryColor,
           shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(10))),
       child: SizedBox(

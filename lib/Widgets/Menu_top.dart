@@ -30,7 +30,7 @@ class _MenuTopState extends State<MenuTop> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFFFAFAFA),
+      color: Color(0xFFF7F7F7),
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 10),
         child: Row(
@@ -99,9 +99,9 @@ Widget _menutopItem({
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isActive ? Color(0xFF7ED957) : Colors.black,
+              color: isActive ? GPrimaryColor : Colors.black,
               decoration: isActive ? TextDecoration.underline : null,
-              decorationColor: isActive ? Color(0xFF7ED957) : null,
+              decorationColor: isActive ? GPrimaryColor : null,
             ),
           )
         ],

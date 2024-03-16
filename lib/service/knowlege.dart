@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-final Map<String, IconData> iconMap = {
+Map<String, IconData> iconMap = {
+  'บ้าน': Icons.home,
   'ดอกไม้': Icons.yard,
-  // เพิ่มไอคอนอื่น ๆ
+  'บุคคล': Icons.person,
+  'น้ำ': Icons.water_drop_outlined,
+  'ระวัง': Icons.warning_rounded
 };
 
 class Knowledge {
@@ -12,10 +15,9 @@ class Knowledge {
   final List<dynamic> contents;
   final String knowledgeDetail;
   final IconData knowledgeIcons;
-  final String knowledgeImg;
+  late final String knowledgeImg;
   final Timestamp? create_at;
-  final Timestamp? deleted_at;
-  final Timestamp? update_at;
+
 
   Knowledge({
     required this.id,
@@ -25,8 +27,6 @@ class Knowledge {
     required this.knowledgeIcons,
     required this.knowledgeImg,
     required this.create_at,
-    this.deleted_at,
-    this.update_at,
   });
 
   factory Knowledge.fromFirestore(DocumentSnapshot doc) {

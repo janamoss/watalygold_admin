@@ -4,10 +4,11 @@ class FirebaseAuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<User?> RegisterWithEmailandPassword(
-      String email, String password) async {
+      String email, String password,String username) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      credential.user?.updateDisplayName(username);
       return credential.user;
     } catch (e) {
       print(e);

@@ -1,30 +1,33 @@
-import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Components/SidebarController.dart';
 
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class SideNav extends StatefulWidget {
-  const SideNav({Key? key}) : super(key: key);
+  final bool? dropdown;
+  final int? status;
+  const SideNav({Key? key, this.status, this.dropdown}) : super(key: key);
 
   @override
   State<SideNav> createState() => _SideNavState();
 }
 
 class _SideNavState extends State<SideNav> {
+  bool _showDropdown = false;
   int selected = -1;
+  @override
   @override
   void initState() {
     super.initState();
+    _showDropdown = widget.dropdown ?? false;
   }
 
   SidebarController sidebarController = Get.put(SidebarController());
 
   Widget build(BuildContext context) {
-    bool _showDropdown = false;
+    sidebarController.index.value = widget.status ?? 0;
     return Column(
       children: [
         Center(
@@ -44,6 +47,7 @@ class _SideNavState extends State<SideNav> {
                 icons: Icons.dashboard_outlined,
                 press: () {
                   sidebarController.index.value = 0;
+                  context.goNamed("/dashborad");
                 },
                 seleteds: sidebarController.index.value == 0,
               ),
@@ -77,57 +81,60 @@ class _SideNavState extends State<SideNav> {
             ],
           ),
         ),
-        Obx(() => _buildAddKnowledgeTile(sidebarController.dropdown.value)),
+        _showDropdown
+            ? Column(
+                children: [
+                  _buildMainKnowledgeListTile(context),
+                  _buildAddKnowledgeListTile(context),
+                ],
+              )
+            : SizedBox.shrink(),
       ],
     );
   }
 
-  Widget _buildAddKnowledgeTile(bool s) {
-    if (s == true) {
-      return Obx(() => Column(
-            children: [
-              ListTile(
-                onTap: () {
-                  sidebarController.index.value = 1;
-                  context.goNamed("/mainKnowledge");
-                },
-                contentPadding: EdgeInsets.only(left: 50),
-                title: Text(
-                  "หน้าหลักคลังความรู้",
-                  style: TextStyle(
-                      color: sidebarController.index.value == 1
-                          ? YPrimaryColor
-                          : WhiteColor,
-                      fontSize: 17),
-                ),
-                selected: sidebarController.index.value == 1,
-                selectedTileColor: sidebarController.index.value == 1
-                    ? WhiteColor.withOpacity(0.8)
-                    : null,
-              ),
-              ListTile(
-                onTap: () {
-                  sidebarController.index.value = 2;
-                },
-                contentPadding: EdgeInsets.only(left: 50),
-                title: Text(
-                  "เพิ่มคลังความรู้",
-                  style: TextStyle(
-                      color: sidebarController.index.value == 2
-                          ? YPrimaryColor
-                          : WhiteColor,
-                      fontSize: 17),
-                ),
-                selected: sidebarController.index.value == 2,
-                selectedTileColor: sidebarController.index.value == 2
-                    ? WhiteColor.withOpacity(0.8)
-                    : null,
-              ),
-            ],
-          ));
-    } else {
-      return SizedBox.shrink();
-    }
+  Widget _buildMainKnowledgeListTile(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        sidebarController.index.value = 1;
+        context.goNamed("/mainKnowledge");
+      },
+      contentPadding: EdgeInsets.only(left: 50),
+      title: Text(
+        "หน้าหลักคลังความรู้",
+        style: TextStyle(
+          color:
+              sidebarController.index.value == 1 ? YPrimaryColor : WhiteColor,
+          fontSize: 17,
+        ),
+      ),
+      selected: sidebarController.index.value == 1,
+      selectedTileColor: sidebarController.index.value == 1
+          ? WhiteColor.withOpacity(0.8)
+          : null,
+    );
+  }
+
+  Widget _buildAddKnowledgeListTile(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        sidebarController.index.value = 2;
+        context.goNamed("/addKnowledge");
+      },
+      contentPadding: EdgeInsets.only(left: 50),
+      title: Text(
+        "เพิ่มคลังความรู้",
+        style: TextStyle(
+          color:
+              sidebarController.index.value == 2 ? YPrimaryColor : WhiteColor,
+          fontSize: 17,
+        ),
+      ),
+      selected: sidebarController.index.value == 2,
+      selectedTileColor: sidebarController.index.value == 2
+          ? WhiteColor.withOpacity(0.8)
+          : null,
+    );
   }
 }
 

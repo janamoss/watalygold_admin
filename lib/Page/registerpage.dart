@@ -52,10 +52,7 @@ class _registerPageState extends State<registerPage> {
       "delete_at": null,
     };
 
-    await FirebaseFirestore.instance
-        .collection('Admin')
-        .doc(email)
-        .set(adminData);
+    await FirebaseFirestore.instance.collection('Admin').doc().set(adminData);
   }
 
   static EncryptAES(text) async {
@@ -97,7 +94,7 @@ class _registerPageState extends State<registerPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "สร้างบัญชี",
-                        style: TextStyle(fontSize: 30, color: G2PrimaryColor),
+                        style: TextStyle(fontSize: 30, color: GPrimaryColor),
                       ),
                     ),
                     Row(
@@ -374,7 +371,7 @@ class _registerPageState extends State<registerPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: G2PrimaryColor,
+                              backgroundColor: GPrimaryColor,
                               shape: ContinuousRectangleBorder(
                                   borderRadius: BorderRadius.circular(10))),
                           child: SizedBox(
@@ -431,7 +428,7 @@ class _registerPageState extends State<registerPage> {
         _FnameController.text,
         _LnameController.text,
         _phonenumberController.text);
-    User? user = await _auth.RegisterWithEmailandPassword(email, password);
+    User? user = await _auth.RegisterWithEmailandPassword(email, password,"${_FnameController.text} ${_LnameController.text}");
     print(user?.uid);
     if (user != null) {
       context.goNamed('/login');

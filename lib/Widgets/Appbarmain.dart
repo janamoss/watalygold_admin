@@ -1,12 +1,12 @@
-import 'package:beamer/beamer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:watalygold_admin/Page/loginpage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
-  const Appbarmain({super.key});
+  final User? users;
+  const Appbarmain({super.key, this.users});
 
   @override
   State<Appbarmain> createState() => _AppbarmainState();
@@ -25,15 +25,26 @@ class _AppbarmainState extends State<Appbarmain> {
       backgroundColor: Color(0xffFAFAFA),
       actions: [
         Padding(
+          padding: const EdgeInsets.only(right: 10.0),
+          child: Text(
+            widget.users?.displayName ?? "",
+            style: TextStyle(color: Colors.black, fontSize: 18.0),
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.only(right: 25),
           child: PopupMenuButton(
             color: GPrimaryColor,
             child: GestureDetector(
-              child: Image.asset(
-                "assets/images/watalygold_profile.png",
-                fit: BoxFit.cover,
-                width: 70,
-                height: 70,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/images/watalygold_profile.png",
+                    fit: BoxFit.cover,
+                    width: 50,
+                    height: 50,
+                  ),
+                ],
               ),
             ),
             itemBuilder: (context) {
@@ -43,7 +54,7 @@ class _AppbarmainState extends State<Appbarmain> {
                   child: ListTile(
                     onTap: () {
                       FirebaseAuth.instance.signOut();
-                      Beamer.of(context).popToNamed('/login');
+                      context.goNamed('/login');
                     },
                     leading: Icon(
                       Icons.logout_rounded,
