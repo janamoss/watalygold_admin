@@ -11,6 +11,7 @@ import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/dialogEdit.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
@@ -682,7 +683,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
           icons.keys.firstWhere((key) => icons[key].toString() == selectedValue,
               orElse: () => ''),
       "KnowledgeImg": imageUrl, // ใช้ imageUrl หรือค่าอื่น ๆ ที่ต้องการอัปเดต
-      "deleted_at": false,
+      "deleted_at": null,
       "update_at": Timestamp.now(),
       "Content": [],
     };
@@ -690,7 +691,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     await Databasemethods().updateKnowledge(updateknowledge, Id).then((value) {
       showDialog(
         context: context,
-        builder: (context) => const Addknowledgedialog(),
+        builder: (context) => const DialogEdit(),
       );
     }).catchError((error) {
       Fluttertoast.showToast(

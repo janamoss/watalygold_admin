@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-final Map<String, IconData> iconMap = {
+Map<String, IconData> iconMap = {
+  'บ้าน': Icons.home,
   'ดอกไม้': Icons.yard,
-  // เพิ่มไอคอนอื่น ๆ
+  'บุคคล': Icons.person,
+  'น้ำ': Icons.water_drop_outlined,
+  'ระวัง': Icons.warning_rounded
 };
 
 class Knowledge {

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
+
+
 import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Page/Knowlege/PageKnowledge.dart';
 import 'package:watalygold_admin/Widgets/Deleteddialogknowledge.dart';
@@ -13,36 +17,41 @@ class KnowledgeMain extends StatefulWidget {
   @override
   State<KnowledgeMain> createState() => _KnowledgeMainState();
 }
-Future<Contents> getContentsById(String documentId) async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final docRef = firestore.collection('Content').doc(documentId);
-    final doc = await docRef.get();
 
-    if (doc.exists) {
-      final data = doc.data();
-      return Contents(
-        ContentName: data!['ContentName'].toString(),
-        ContentDetail: data['ContentDetail'].toString(),
-        ImageURL: data['ImageUrl'].toString(),
-      );
-    } else {
-      throw Exception('Document not found with ID: $documentId');
-    }
+Future<Contents> getContentsById(String documentId) async {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final docRef = firestore.collection('Content').doc(documentId);
+  final doc = await docRef.get();
+
+  if (doc.exists) {
+    final data = doc.data();
+    return Contents(
+      ContentName: data!['ContentName'].toString(),
+      ContentDetail: data['ContentDetail'].toString(),
+      ImageURL: data['image_url'].toString(),
+    );
+  } else {
+    throw Exception('Document not found with ID: $documentId');
   }
-  
+}
 
 class _KnowledgeMainState extends State<KnowledgeMain> {
   List<Knowledge> knowledgelist = [];
 
   Future<List<Knowledge>> getKnowledges() async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final querySnapshot = await firestore
-        .collection("Knowledge")
-        .where("deleted_at", isEqualTo:false)
-        .get();
-    return querySnapshot.docs
-        .map((doc) => Knowledge.fromFirestore(doc))
-        .toList();
+    try {
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final querySnapshot = await firestore
+          .collection('Knowledge')
+          .where("deleted_at", isNull: true)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => Knowledge.fromFirestore(doc))
+          .toList();
+    } catch (error) {
+      print("Error getting knowledge: $error");
+      return []; // Or handle the error in another way
+    }
   }
 
   @override
@@ -80,9 +89,9 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
                       children: [
                         Icon(knowledge.knowledgeIcons),
                         Text(knowledge.knowledgeName),
-                        SizedBox(width: 50,),
-                       
-                     
+                        SizedBox(
+                          width: 50,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -91,9 +100,9 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => EditKnowlege(
-                                               knowledge: knowledge,
-                                               icons: knowledge.knowledgeIcons,
+                                        builder: (context) => EditMutiple(
+                                              knowledge: knowledge,
+                                              icons: knowledge.knowledgeIcons,
                                             )));
                               },
                               style: ElevatedButton.styleFrom(
@@ -113,6 +122,7 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
                                   context: context,
                                   builder: (context) => Deleteddialogknowledge(
                                     knowledgeName: knowledge.knowledgeName,
+                                    id: knowledge.id,
                                   ),
                                 );
                               },
@@ -139,6 +149,4 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
       ),
     );
   }
-
-
 }

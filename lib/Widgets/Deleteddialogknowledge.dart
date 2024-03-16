@@ -4,23 +4,49 @@ import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class Deleteddialogknowledge extends StatelessWidget {
-  const Deleteddialogknowledge({Key? key, required this.knowledgeName});
+  const Deleteddialogknowledge({
+    Key? key,
+    required this.knowledgeName,
+    required this.id,
+  });
 
   Future<void> deleteKnowledge() async {
-    try {
-      // อัปเดตเอกสารแทนการลบ
-      await FirebaseFirestore.instance
-          .collection("Knowledge")
-          .doc(this.knowledgeName)
-          .update({"deleted_at": Timestamp.now()});
-    } catch (e) {
-      // จัดการข้อผิดพลาดที่เกิดขึ้น
-      print("เกิดข้อผิดพลาดในการ Soft Delete เอกสาร: $e");
-      throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
-    }
+  try {
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      // อ่านข้อมูลของ Knowledge ที่ต้องการลบ
+      DocumentSnapshot knowledgeSnapshot = await transaction.get(
+        FirebaseFirestore.instance.collection("Knowledge").doc(this.id),
+      );
+
+      // ตรวจสอบว่ามีข้อมูลของ Knowledge หรือไม่
+      if (knowledgeSnapshot.exists) {
+        // ลบข้อมูลของ Knowledge
+        transaction.update(
+          FirebaseFirestore.instance.collection("Knowledge").doc(this.id),
+          {"deleted_at": Timestamp.now()},
+        );
+
+        // ตรวจสอบและลบข้อมูล content ที่อ้างถึงใน Knowledge
+        List<String> contentIds = List<String>.from(knowledgeSnapshot["Content"]);
+        for (String contentId in contentIds) {
+          // ลบข้อมูล content
+          transaction.update(
+            FirebaseFirestore.instance.collection("Content").doc(contentId),
+             {"deleted_at": Timestamp.now()},
+          );
+        }
+      }
+    });
+  } catch (e) {
+    // จัดการข้อผิดพลาดที่เกิดขึ้น
+    print("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
+    throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
   }
+}
+
 
   final String knowledgeName;
+  final String id;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +113,7 @@ class Deleteddialogknowledge extends StatelessWidget {
                   ),
                   onPressed: () {
                     deleteKnowledge();
-                    Navigator.pop(context);            
+                    Navigator.pop(context);
                   },
                   child: const Text("ยืนยัน"),
                 ),

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Contentcol.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
 import 'package:watalygold_admin/Page/Knowlege/Home.dart';
 import 'package:watalygold_admin/Page/Knowlege/HomeKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/mainKnowlege.dart';
@@ -14,12 +15,10 @@ class SidebarController extends GetxController {
 
   var pages = [
     // AddKnowlege(),
-    MainKnowlege(),
+    // Multiplecontent(),
     KnowledgeMain(),
     Add_Knowlege(),
-   
-
-    // MainKnowlege(),
+    MainKnowlege(),
     // mainKnowlege(),
     // AddKnowlege(),
     // MainKnowlege(),

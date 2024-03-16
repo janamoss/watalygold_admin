@@ -5,10 +5,27 @@ import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
 
 import 'package:watalygold_admin/Widgets/Color.dart';
+import 'package:watalygold_admin/service/content.dart';
+import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:web/helpers.dart';
 
+
+Map<String, IconData> icons = {
+  'บ้าน': Icons.home,
+  'ดอกไม้': Icons.yard,
+  'บุคคล': Icons.person,
+  'น้ำ': Icons.water_drop_outlined,
+  'ระวัง': Icons.warning_rounded
+}; 
+
+
 class Add_Knowlege extends StatefulWidget {
-  // const Add_Knowlege({super.key});
+    final Knowledge? knowledge;
+  final IconData? icons;
+  final Contents? contents;
+
+  const Add_Knowlege({super.key, this.knowledge, this.contents, this.icons});
+
   @override
   _Add_KnowlegeState createState() => _Add_KnowlegeState();
 }
@@ -103,6 +120,7 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                    
                     Singlecontent(),
                     Multiplecontent(),
+                    
                   ],
                 )),
                 SizedBox(height: 0,),

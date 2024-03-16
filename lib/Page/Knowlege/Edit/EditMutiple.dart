@@ -12,7 +12,9 @@ import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Deletedialog.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
+import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
+import 'package:watalygold_admin/service/knowledge.dart';
 
 Map<String, IconData> icons = {
   'บ้าน': Icons.home,
@@ -36,14 +38,18 @@ class ExpansionPanelData {
 
 List<ExpansionPanelData> _panelData = [];
 
-class Multiplecontent extends StatefulWidget {
-  const Multiplecontent({Key? key}) : super(key: key);
+class EditMutiple extends StatefulWidget {
+  final Knowledge? knowledge;
+  final IconData? icons;
+  final Contents? contents;
+
+  const EditMutiple({super.key, this.knowledge, this.contents, this.icons});
 
   @override
-  _MultiplecontentState createState() => _MultiplecontentState();
+  _EditMutipletState createState() => _EditMutipletState();
 }
 
-class _MultiplecontentState extends State<Multiplecontent> {
+class _EditMutipletState extends State<EditMutiple> {
   IconData? selectedIconData;
   String? _selectedValue;
 
@@ -68,6 +74,15 @@ class _MultiplecontentState extends State<Multiplecontent> {
       <XFile>[]; //ใช้ในการเก็บรูปภาพที่ผู้ใช้เลือกเพื่ออัปโหลด
   List<String> downloadUrl = <String>[]; //เก็บ url ภาพ
   bool uploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.knowledge != null) {
+      namecontroller.text = widget.knowledge!.knowledgeName;
+      contentcontroller.text = widget.knowledge!.knowledgeDetail;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +171,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                   color: GPrimaryColor,
                                                 )
                                               : SizedBox(),
-                                          SizedBox(width: 15),
+                                          SizedBox(width: 25),
                                           Text(
                                             value,
                                             style:
@@ -173,18 +188,26 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                   },
                                   hint: Row(
                                     children: [
-                                      Icon(
-                                        Icons.image_outlined,
-                                        color: G2PrimaryColor,
-                                      ), // ไอคอนที่ต้องการเพิ่ม
+                                      // ไอคอนที่ต้องการเพิ่ม
                                       SizedBox(
                                           width:
                                               10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                      Text(
-                                        "เลือกไอคอนสำหรับคลังความรู้",
-                                        style: TextStyle(
-                                            color: G2PrimaryColor,
-                                            fontSize: 17),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                              widget.icons ??
+                                                  Icons.question_mark_rounded,
+                                              color: GPrimaryColor,
+                                              size: 24),
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          Text(
+                                            "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
+                                            style:
+                                                TextStyle(color: GPrimaryColor),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -322,6 +345,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
                 SizedBox(
                   height: 30,
                 ),
+               
+
                 Padding(
                   padding: const EdgeInsets.only(right: 70),
                   child: ExpansionPanelList.radio(
@@ -1025,8 +1050,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
   Widget _displayedWidget = Container();
   Widget _displayedcontentWidget = Container();
 
- 
-
   Widget _displaycoverWidget() {
     return Padding(
       padding: const EdgeInsets.all(15),
@@ -1080,6 +1103,11 @@ class _MultiplecontentState extends State<Multiplecontent> {
       ),
     );
   }
+
+  List? contentItems;
+  List<bool> _showDropdown = [];
+
+ 
 
   Widget _displaycontentWidget() {
     return Scaffold(

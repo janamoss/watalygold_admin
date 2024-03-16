@@ -615,8 +615,8 @@ class _SinglecontentState extends State<Singlecontent> {
         "KnowledgeIcons": _selectedValue,
         "KnowledgeImg": imageUrl,
         "create_at":  Timestamp.now(),
-        "deleted_at": false,
-        "update_at": '',
+       "deleted_at": null,
+        "update_at": null,
         "Content": [],
       };
 
