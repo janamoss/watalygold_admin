@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'package:watalygold_admin/Page/Knowlege/PageKnowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/service/content.dart';
@@ -14,7 +15,6 @@ class Contentcol extends StatefulWidget {
 }
 
 class _ContentcolState extends State<Contentcol> {
-  
   Future<Contents> getContentsById(String documentId) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final docRef = firestore.collection('Content').doc(documentId);

@@ -113,7 +113,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                           children: [
                             Row(
                               children: [
-                                // Image.asset("assets/images/knowlege.png"),
+                                Image.asset("assets/images/knowlege.png"),
                                 SizedBox(width: 10),
                                 Text(
                                   "แก้ไขคลังความรู้",

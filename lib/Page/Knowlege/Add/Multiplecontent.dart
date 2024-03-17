@@ -26,11 +26,13 @@ class ExpansionPanelData {
   TextEditingController nameController;
   TextEditingController detailController;
   List<Widget> itemPhotosWidgetList;
+ 
 
   ExpansionPanelData({
     required this.nameController,
     required this.detailController,
     required this.itemPhotosWidgetList,
+  
   });
 }
 
@@ -56,6 +58,10 @@ class _MultiplecontentState extends State<Multiplecontent> {
   List<TextEditingController> contentNameControllers = [];
   List<TextEditingController> contentDetailControllers = [];
   final List<List<XFile>> _imagesForPanels = [];
+
+List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container());
+
+
 
   List<int> _deletedPanels = [];
 // List<Widget> itemPhotosWidgetList = [];
@@ -594,14 +600,12 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                           ),
                                           ElevatedButton(
                                             onPressed: () {
-                                              // pickPhotoFromGallery()
-                                              //     .then((newImageUrl) {
-                                              //   if (newImageUrl != null) {
-                                              //     setState(() {
-                                              //       addImage(); // เพิ่มภาพใหม่
-                                              //     });
-                                              //   }
-                                              // });
+                                              pickPhotoFromGallery(
+                                                  expansionPanelData);
+                                              setState(() {
+                                                // เรียกใช้ addImage เพื่อเพิ่มรูปภาพใหม่
+                                                addImage(expansionPanelData);
+                                              });
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: G2PrimaryColor,
@@ -619,7 +623,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                           SizedBox(height: 30),
                                           ElevatedButton(
                                             onPressed: () {
-                                              displaycontent(); // เรียกใช้งานเมื่อคลิกปุ่ม "แสดงผล"
+                                              displaycontent(expansionPanelData, index); 
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
@@ -1025,8 +1029,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
   Widget _displayedWidget = Container();
   Widget _displayedcontentWidget = Container();
 
- 
-
   Widget _displaycoverWidget() {
     return Padding(
       padding: const EdgeInsets.all(15),
@@ -1081,22 +1083,24 @@ class _MultiplecontentState extends State<Multiplecontent> {
     );
   }
 
-  Widget _displaycontentWidget() {
+  Widget _displaycontentWidget(
+      ExpansionPanelData expansionPanelData, int index) {
     return Scaffold(
       appBar: Appbarmain_no_botton(
         name: contentNameControllers.isNotEmpty
-            ? contentNameControllers[0].text
+            ? contentNameControllers[index].text
             : '',
       ),
       body: Stack(
         children: [
           ListView.builder(
-            itemCount: itemPhotosWidgetList.length,
-            itemBuilder: (BuildContext context, int index) {
+            itemCount: expansionPanelData.itemPhotosWidgetList.length,
+            itemBuilder: (BuildContext context, int photoIndex) {
               return Container(
                 width: 390, // กำหนดความกว้างของรูปภาพ
                 height: 253, // กำหนดความสูงของรูปภาพ
-                child: itemPhotosWidgetList[index], // ใส่รูปภาพลงใน Container
+                child: expansionPanelData.itemPhotosWidgetList[
+                    photoIndex], // ใส่รูปภาพลงใน Container
               );
             },
           ),
@@ -1125,16 +1129,13 @@ class _MultiplecontentState extends State<Multiplecontent> {
                       SizedBox(
                         width: 15,
                       ),
-                      for (int index = 0;
-                          index < contentNameControllers.length;
-                          index++)
-                        Text(
-                          contentNameControllers[index].text,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
-                        )
+                      Text(
+                        contentNameControllers[index].text,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -1143,18 +1144,15 @@ class _MultiplecontentState extends State<Multiplecontent> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      for (int index = 0;
-                          index < contentDetailControllers.length;
-                          index++)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            contentDetailControllers[index].text,
-                            style: TextStyle(color: Colors.black, fontSize: 15),
-                            textAlign: TextAlign.left,
-                            maxLines: null,
-                          ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          contentDetailControllers[index].text,
+                          style: TextStyle(color: Colors.black, fontSize: 15),
+                          textAlign: TextAlign.left,
+                          maxLines: null,
                         ),
+                      ),
                     ],
                   )
                 ],
@@ -1175,10 +1173,13 @@ class _MultiplecontentState extends State<Multiplecontent> {
     });
   }
 
-  void displaycontent() {
-    // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
-    setState(() {
-      _displayedcontentWidget = _displaycontentWidget();
-    });
-  }
+ void displaycontent(ExpansionPanelData expansionPanelData, int index) {
+  // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
+  setState(() {
+    if (index < _displayedContentWidgets.length) {
+  _displayedContentWidgets[index] = _displaycontentWidget(expansionPanelData, index);
+}
+
+  });
+}
 }

@@ -1,17 +1,15 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Deletedialog.dart';
-import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
@@ -36,23 +34,25 @@ class ExpansionPanelData {
   });
 }
 
-List<ExpansionPanelData> _panelData = [];
-
 class EditMutiple extends StatefulWidget {
   final Knowledge? knowledge;
   final IconData? icons;
   final Contents? contents;
 
+
   const EditMutiple({super.key, this.knowledge, this.contents, this.icons});
 
   @override
-  _EditMutipletState createState() => _EditMutipletState();
+  State<EditMutiple> createState() => _EditMutipleState();
 }
 
-class _EditMutipletState extends State<EditMutiple> {
+class _EditMutipleState extends State<EditMutiple> {
+  bool _customTileExpanded = false;
+  List<List<String>> allKnowledgeContents = [];
+
   IconData? selectedIconData;
   String? _selectedValue;
-
+  List<ExpansionPanelData> _panelData = [];
   int _currentExpandedIndex = -1;
   bool addedContent = false;
   TextEditingController contentcontroller = new TextEditingController();
@@ -74,6 +74,44 @@ class _EditMutipletState extends State<EditMutiple> {
       <XFile>[]; //ใช้ในการเก็บรูปภาพที่ผู้ใช้เลือกเพื่ออัปโหลด
   List<String> downloadUrl = <String>[]; //เก็บ url ภาพ
   bool uploading = false;
+  bool _isLoading = true;
+  List<List<String>> contentIdsList = [];
+  List<String> imageURLlist = [];
+  List? itemContent;
+
+  List<Knowledge> contentlist = [];
+  Future<List<Knowledge>> getKnowledges() async {
+    try {
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final querySnapshot = await firestore
+          .collection('Knowledge')
+          .where('deleted_at', isNull: true)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => Knowledge.fromFirestore(doc))
+          .toList();
+    } catch (error) {
+      print("Error getting knowledge: $error");
+      return []; // Or handle the error in another way
+    }
+  }
+
+  Future<Contents> getContentsById(String documentId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final docRef = firestore.collection('Content').doc(documentId);
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      return Contents(
+        ContentName: data!['ContentName'].toString(),
+        ContentDetail: data['ContentDetail'].toString(),
+        ImageURL: data['ImageUrl'].toString(),
+      );
+    } else {
+      throw Exception('Document not found with ID: $documentId');
+    }
+  }
 
   @override
   void initState() {
@@ -81,8 +119,45 @@ class _EditMutipletState extends State<EditMutiple> {
     if (widget.knowledge != null) {
       namecontroller.text = widget.knowledge!.knowledgeName;
       contentcontroller.text = widget.knowledge!.knowledgeDetail;
+      // กำหนดค่าให้กับ TextEditingController ของ TextField แต่ละช่อง
+      for (int i = 0; i < widget.knowledge!.contents.length; i++) {
+        // สร้าง TextEditingController และกำหนดค่าให้กับ TextField
+        contentNameControllers[i].text =
+            widget.knowledge!.contents[i].ContentName;
+        contentDetailControllers[i].text =
+            widget.knowledge!.contents[i].ContentDetail;
+      }
     }
+
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
+
+    getKnowledges().then((value) {
+      setState(() {
+        contentlist = value;
+      });
+      for (var knowledge in contentlist) {
+        print('Knowledge : ${knowledge.contents}');
+      }
+    });
+
+    // getKnowledges().then((value) {
+    //   setState(() {
+    //     contentlist = value;
+    //   });
+    //   for (var knowledge in contentlist) {
+    //     List<String> knowledgeContentIds =
+    //         knowledge.contents.map((content) => content.toString()).toList();
+    //     contentIdsList.add(knowledgeContentIds);
+    //   }
+    //   print(
+    //       'Number of content IDs in the knowledge list: ${contentIdsList.length}');
+    // });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +169,33 @@ class _EditMutipletState extends State<EditMutiple> {
             padding: EdgeInsets.only(left: 70),
             child: Column(
               children: [
+                SizedBox(
+                  height: 50,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.create_outlined,
+                        size: 30,
+                        color: GPrimaryColor,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "แก้ไขคลังความรู้ ",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontFamily: 'IBM Plex Sans Thai',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                ),
                 Row(
                   children: [
                     Container(
@@ -112,7 +214,7 @@ class _EditMutipletState extends State<EditMutiple> {
                                 Image.asset("assets/images/knowlege.png"),
                                 SizedBox(width: 10),
                                 Text(
-                                  "เพิ่มคลังความรู้",
+                                  "แก้ไขคลังความรู้",
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 18,
@@ -259,9 +361,8 @@ class _EditMutipletState extends State<EditMutiple> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 30),
                             SizedBox(
-                              height: 20.0,
+                              height: 10,
                             ),
                             ElevatedButton(
                               onPressed: display,
@@ -345,8 +446,17 @@ class _EditMutipletState extends State<EditMutiple> {
                 SizedBox(
                   height: 30,
                 ),
-               
-
+                Padding(
+                  padding: EdgeInsets.only(right: 40),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: buildList(),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(right: 70),
                   child: ExpansionPanelList.radio(
@@ -394,7 +504,6 @@ class _EditMutipletState extends State<EditMutiple> {
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
-                                fontFamily: 'IBM Plex Sans Thai',
                               ),
                             ),
                           );
@@ -717,7 +826,6 @@ class _EditMutipletState extends State<EditMutiple> {
                     }).toList(),
                   ),
                 ),
-                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(right: 70),
                   child: ElevatedButton(
@@ -759,60 +867,6 @@ class _EditMutipletState extends State<EditMutiple> {
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(right: 70.0, top: 50.0, bottom: 50),
-                  child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            clearAllFields();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xC5C5C5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            "ยกเลิก",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20.0,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // addKnowlege();
-                            uplaodImageAndSaveItemInfo();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 15.0),
-                            backgroundColor: GPrimaryColor,
-                          ),
-                          child: uploading
-                              ? SizedBox(
-                                  child: CircularProgressIndicator(),
-                                  height: 15.0,
-                                )
-                              : const Text(
-                                  "เพิ่ม",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -1104,11 +1158,6 @@ class _EditMutipletState extends State<EditMutiple> {
     );
   }
 
-  List? contentItems;
-  List<bool> _showDropdown = [];
-
- 
-
   Widget _displaycontentWidget() {
     return Scaffold(
       appBar: Appbarmain_no_botton(
@@ -1208,5 +1257,357 @@ class _EditMutipletState extends State<EditMutiple> {
     setState(() {
       _displayedcontentWidget = _displaycontentWidget();
     });
+  }
+
+//   Widget buildList() => ListView.builder(
+//   itemCount: widget.knowledge?.contents.length,
+//   itemBuilder: (context, index) {
+//     final content = widget.knowledge!.contents[index];
+//     return FutureBuilder<Contents>(
+//       future: getContentsById(widget.ContentID),
+//       builder: (context, snapshot) {
+//         final contents = snapshot.data!;
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return CircularProgressIndicator();
+//         } else if (snapshot.hasError) {
+//           return Text('Error: ${snapshot.error}');
+//         } else {
+//           final contentData = snapshot.data!;
+//           return buildListItem(index);
+//         }
+//       },
+//     );
+//   },
+// );
+
+  Widget buildList() => ListView.builder(
+        itemCount: widget.knowledge?.contents.length,
+        itemBuilder: (context, index) {
+          return buildListItem(index);
+        },
+      );
+
+  Widget buildListItem(int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 70),
+      child: Material(
+        elevation: 3, // กำหนดค่า elevation ที่ต้องการ
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              ExpansionTile(
+                // กำหนดสีพื้นหลังของ ExpansionTile
+                title: Text('เนื้อหาย่อยที่ ${index + 1}'),
+                leading: IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.cancel,
+                    color: Color(0xFFFF543E),
+                  ),
+                ),
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 0),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 490,
+                              height: 750,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(25.0),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 20),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 0.0, right: 0),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "ชื่อ",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                            Text(
+                                              "*",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 0.0, right: 0),
+                                      child: Container(
+                                        padding: EdgeInsets.only(left: 10.0),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Color(0xffCFD3D4)),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: TextField(
+                                          controller:
+                                              contentNameControllers[index],
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 0.0, right: 0),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "เนื้อหา",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                            Text(
+                                              "*",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 0.0, right: 0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Color(0xffCFD3D4)),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: TextField(
+                                          controller:
+                                              contentDetailControllers[index],
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: 5,
+                                          decoration: InputDecoration(
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 1,
+                                                      color: Colors.white))),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 0, right: 0),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "รูปภาพ",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                            Text(
+                                              "*",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 18,
+                                                fontFamily:
+                                                    'IBM Plex Sans Thai',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          color: Colors.white70,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.shade200,
+                                              offset: const Offset(0.0, 0.5),
+                                              blurRadius: 30.0,
+                                            )
+                                          ]),
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 200.0,
+                                      child: Center(
+                                        child: itemPhotosWidgetList.isEmpty
+                                            ? Center(
+                                                child: MaterialButton(
+                                                  onPressed: () {
+                                                    // pickPhotoFromGallery(
+                                                    //     _panelData[
+                                                    //         index]); // ส่งข้อมูลของแผงที่ต้องการไปยังฟังก์ชัน pickPhotoFromGallery
+                                                  },
+                                                  child: Container(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Center(
+                                                      child: Image.network(
+                                                        "https://static.thenounproject.com/png/3322766-200.png",
+                                                        height: 100.0,
+                                                        width: 100.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : SingleChildScrollView(
+                                                scrollDirection: Axis.vertical,
+                                                child: Wrap(
+                                                  spacing: 5.0,
+                                                  direction: Axis.horizontal,
+                                                  children:
+                                                      itemPhotosWidgetList,
+                                                  alignment:
+                                                      WrapAlignment.spaceEvenly,
+                                                  runSpacing: 10.0,
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // pickPhotoFromGallery(expansionPanelData);
+                                        // setState(() {
+                                        //   // เรียกใช้ addImage เพื่อเพิ่มรูปภาพใหม่
+                                        //   addImage(expansionPanelData);
+                                        // });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: G2PrimaryColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "เพิ่มรูปภาพ",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    SizedBox(height: 30),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // displaycontent(); // เรียกใช้งานเมื่อคลิกปุ่ม "แสดงผล"
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xffE69800),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "แสดงผล",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 490,
+                              height: 700,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(25.0),
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Container(
+                                      width: 390,
+                                      height: 600,
+                                      decoration: ShapeDecoration(
+                                        color: Color(0xFFE7E7E7),
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              width: 5,
+                                              color: Color(0xFF42BD41)),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      // child: Column(
+                                      //   children: [
+                                      //     Expanded(
+                                      //       child:
+                                      //           _displayedcontentWidget ??
+                                      //               Container(),
+                                      //     )
+                                      //   ],
+                                      // ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

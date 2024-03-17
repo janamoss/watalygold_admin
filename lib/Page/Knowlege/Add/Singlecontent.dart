@@ -50,7 +50,6 @@ class _SinglecontentState extends State<Singlecontent> {
   List<String> downloadUrl = <String>[];
   bool uploading = false;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,11 +115,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
-
                             Align(
                               alignment: Alignment.topLeft,
                               child: Container(
-                              
                                 child: DropdownButton(
                                   items: <String>[
                                     'บ้าน',
@@ -361,7 +358,6 @@ class _SinglecontentState extends State<Singlecontent> {
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-
                             SizedBox(
                               height: 50.0,
                             ),
@@ -528,7 +524,8 @@ class _SinglecontentState extends State<Singlecontent> {
   }
 
   void addImage() {
-    removeImage(); // ลบภาพเดิมก่อนที่จะเพิ่มภาพใหม่
+    itemPhotosWidgetList.clear();
+    // ลบภาพเดิมก่อนที่จะเพิ่มภาพใหม่
     for (var bytes in photo!) {
       itemPhotosWidgetList.add(Padding(
         padding: const EdgeInsets.all(0),
@@ -582,12 +579,6 @@ class _SinglecontentState extends State<Singlecontent> {
     return knowledgetId;
   }
 
-  void removeImage() {
-    setState(() {
-      itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
-    });
-  }
-
   uploadImageToStorage(PickedFile? pickedFile, String knowledgetId) async {
     String? kId = const Uuid().v4().substring(0, 10);
     Reference reference = FirebaseStorage.instance
@@ -601,33 +592,56 @@ class _SinglecontentState extends State<Singlecontent> {
     addKnowledge(imageUrl);
   }
 
-  Future<void> addKnowledge(String imageUrl) async {
-    if (nameController.text.isNotEmpty &&
-        contentController.text.isNotEmpty &&
-        _selectedValue!.isNotEmpty &&
-        imageUrl != null) {
+  bool _isKnowledgeAdded = false;
 
+  Future<void> addKnowledge(String imageUrl) async {
+    // ตรวจสอบว่ามีความรู้หรือยัง
+    if (!_isKnowledgeAdded) {
+      _isKnowledgeAdded =
+          true; // กำหนดให้ไม่สามารถเพิ่มความรู้อีกได้ระหว่างการดำเนินการ
+
+      // ตรวจสอบความสมบูรณ์ของข้อมูล
+      if (nameController.text.isEmpty ||
+          contentController.text.isEmpty ||
+          _selectedValue == null ||
+          imageUrl == null) {
+        // แสดงข้อความเตือนให้กรอกข้อมูลให้ครบ
+        Fluttertoast.showToast(
+          msg: "กรุณากรอกข้อมูลให้ครบ",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return;
+      }
+
+      // สร้าง ID ใหม่
       String Id = const Uuid().v4().substring(0, 10);
 
+      // สร้างข้อมูล Knowledge
       Map<String, dynamic> knowledgeMap = {
         "KnowledgeName": nameController.text,
         "KnowledgeDetail": contentController.text,
         "KnowledgeIcons": _selectedValue,
         "KnowledgeImg": imageUrl,
-        "create_at":  Timestamp.now(),
-       "deleted_at": null,
+        "create_at": Timestamp.now(),
+        "deleted_at": null,
         "update_at": null,
         "Content": [],
       };
 
       // เรียกใช้งานฟังก์ชัน addKnowledge จากคลาส DatabaseMethods
       await Databasemethods().addKnowlege(knowledgeMap, Id).then((value) {
-        
+        // แสดงกล่องโต้ตอบหลังการเพิ่มความรู้สำเร็จ
         showDialog(
           context: context,
           builder: (context) => const Addknowledgedialog(),
         );
       }).catchError((error) {
+        // แสดงข้อความเตือนเมื่อเกิดข้อผิดพลาดในการเพิ่มความรู้
         Fluttertoast.showToast(
           msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
           toastLength: Toast.LENGTH_SHORT,
@@ -638,16 +652,6 @@ class _SinglecontentState extends State<Singlecontent> {
           fontSize: 16.0,
         );
       });
-    } else {
-      Fluttertoast.showToast(
-        msg: "กรุณากรอกข้อมูลให้ครบ",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
     }
   }
 
@@ -739,10 +743,8 @@ class _SinglecontentState extends State<Singlecontent> {
               );
             },
           ),
-          
           Positioned(
-            
-         // ใช้ตัวแปร _positionY แทนค่า top
+            // ใช้ตัวแปร _positionY แทนค่า top
             bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
             left: 0.0,
             right: 0.0,
@@ -795,7 +797,6 @@ class _SinglecontentState extends State<Singlecontent> {
                 ],
               ),
               width: MediaQuery.of(context).size.width,
-             
             ),
           ),
         ],

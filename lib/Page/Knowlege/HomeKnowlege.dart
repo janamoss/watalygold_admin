@@ -3,19 +3,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
-
-
 import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Page/Knowlege/PageKnowledge.dart';
 import 'package:watalygold_admin/Widgets/Deleteddialogknowledge.dart';
+import 'package:watalygold_admin/Widgets/ExpansionTile.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 
-class KnowledgeMain extends StatefulWidget {
-  const KnowledgeMain({super.key});
+class HomeKnowledgeMain extends StatefulWidget {
+  const HomeKnowledgeMain({super.key});
 
   @override
-  State<KnowledgeMain> createState() => _KnowledgeMainState();
+  State<HomeKnowledgeMain> createState() => _KnowledgeMainState();
 }
 
 Future<Contents> getContentsById(String documentId) async {
@@ -35,9 +34,11 @@ Future<Contents> getContentsById(String documentId) async {
   }
 }
 
-class _KnowledgeMainState extends State<KnowledgeMain> {
+class _KnowledgeMainState extends State<HomeKnowledgeMain> {
   List<Knowledge> knowledgelist = [];
+  bool _isLoading = true;
 
+  List<String> imageURLlist = [];
   Future<List<Knowledge>> getKnowledges() async {
     try {
       final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -57,15 +58,32 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
   @override
   void initState() {
     super.initState();
-    getKnowledges().then((value) {
+    getKnowledges().then((value) async {
       setState(() {
         knowledgelist = value;
       });
+      if (knowledgelist.length == 0) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       for (var knowledge in knowledgelist) {
-        print('Knowledge : ${knowledge.contents}');
+        if (knowledge.knowledgeImg.isEmpty) {
+          // แสดง Loading indicator
+          final firstContent = knowledge.contents[0].toString();
+          final contents = await getContentsById(firstContent);
+          imageURLlist.add(contents.ImageURL);
+          setState(() {
+            _isLoading = false;
+          });
+          // ซ่อน Loading indicator
+        } else {
+          imageURLlist.add(knowledge.knowledgeImg);
+        }
       }
     });
   }
+  
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,13 +115,31 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
+                                if (knowledge.contents.isNotEmpty) {
+                                  // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => EditMutiple(
-                                              knowledge: knowledge,
-                                              icons: knowledge.knowledgeIcons,
-                                            )));
+                                      builder: (context) =>
+                                          EditMutiple(
+                                        knowledge: knowledge,
+                                        icons: knowledge.knowledgeIcons,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditKnowlege(
+                                        
+                                         knowledge: knowledge,
+                                        icons: knowledge.knowledgeIcons,
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xffE69800),
