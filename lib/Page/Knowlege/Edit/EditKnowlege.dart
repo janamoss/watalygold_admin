@@ -74,6 +74,76 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                 SizedBox(
                   height: 50,
                 ),
+                Column(
+                        children: [
+                          Container(
+                            width: 1000,
+                            height: 140,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  child: Container(
+                                    width: 1065,
+                                    height: 140,
+                                    decoration: ShapeDecoration(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 140,
+                                  top: 35,
+                                  child: Container(
+                                    width: 250,
+                                    height: 65,
+                                    decoration: ShapeDecoration(
+                                      color: Color(0xFF42BD41),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      
+                                    ),
+
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 210,
+                                  top: 70,
+                                  child: Text(
+                                    'เนื้อหาเดี่ยว',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      height: 0,
+                                    ),
+                                  ),
+                                ),
+                                
+                                Positioned(
+                                  left: 690,
+                                  top: 70,
+                                  child: Text(
+                                    'หลายเนื้อหา',
+                                    style: TextStyle(
+                                      color: Colors.black
+                                          .withOpacity(0.44999998807907104),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400,
+                                      height: 0,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                 Align(
                   alignment: Alignment.center,
                   child: Row(
@@ -727,7 +797,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Container(
-        width: 300,
+        width: 350,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: WhiteColor,
@@ -749,17 +819,17 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                 SizedBox(
                   width: 20,
                 ),
-                Text(
-                  nameController.text,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+               Expanded(
+                  child: Text(
+                    nameController.text,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                SizedBox(
-                  width: 20,
-                ),
-                Spacer(),
+              
                 Padding(
                   padding: const EdgeInsets.only(right: 9),
                   child: Icon(

@@ -314,6 +314,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                 ],
                               ),
                             ),
+
+                            
                             SizedBox(
                               height: 20,
                             ),
@@ -1014,7 +1016,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Container(
-        width: 300,
+        width: 350,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: WhiteColor,
@@ -1036,17 +1038,17 @@ class _MultiplecontentState extends State<Multiplecontent> {
                 SizedBox(
                   width: 20,
                 ),
-                Text(
-                  namecontroller.text,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+               Expanded(
+                  child: Text(
+                    namecontroller.text,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                SizedBox(
-                  width: 20,
-                ),
-                Spacer(),
+               
                 Padding(
                   padding: const EdgeInsets.only(right: 9),
                   child: Icon(

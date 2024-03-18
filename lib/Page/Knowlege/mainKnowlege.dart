@@ -31,7 +31,7 @@ class _KnowledgeMainState extends State<KnowledgeMain> {
         knowledgelist = value;
       });
       for (var knowledge in knowledgelist) {
-        // print('Knowledge : ${knowledge.contents}');
+        print('Knowledge : ${knowledge.contents}');
       }
     });
   }

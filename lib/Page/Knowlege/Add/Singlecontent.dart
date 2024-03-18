@@ -16,11 +16,12 @@ import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/database.dart';
 
 Map<String, IconData> icons = {
-  'บ้าน': Icons.home,
+  'สถิติ': Icons.analytics_outlined,
   'ดอกไม้': Icons.yard,
-  'บุคคล': Icons.person,
+  'หนังสือ': Icons.book,
   'น้ำ': Icons.water_drop_outlined,
-  'ระวัง': Icons.warning_rounded
+  'ระวัง': Icons.warning_rounded,
+  'คำถาม': Icons.quiz_outlined ,
 };
 
 String selectedImageUrl =
@@ -119,11 +120,12 @@ class _SinglecontentState extends State<Singlecontent> {
                               child: Container(
                                 child: DropdownButton(
                                   items: <String>[
-                                    'บ้าน',
+                                    'สถิติ',
                                     'ดอกไม้',
-                                    'บุคคล',
+                                    'หนังสือ',
                                     'น้ำ',
-                                    'ระวัง'
+                                    'ระวัง',
+                                    'คำถาม'
                                   ].map<DropdownMenuItem<String>>(
                                       (String value) {
                                     return DropdownMenuItem<String>(
@@ -675,7 +677,7 @@ class _SinglecontentState extends State<Singlecontent> {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Container(
-        width: 320,
+        width: 350,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: WhiteColor,
@@ -691,23 +693,22 @@ class _SinglecontentState extends State<Singlecontent> {
                 Icon(
                   icons[_selectedValue] ??
                       Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                  size: 24, // ขนาดของไอคอน
+                  size: 18, // ขนาดของไอคอน
                   color: GPrimaryColor, // สีของไอคอน
                 ),
                 SizedBox(
                   width: 20,
                 ),
-                Text(
-                  nameController.text,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+                Expanded(
+                  child: Text(
+                    nameController.text,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                SizedBox(
-                  width: 20,
-                ),
-                Spacer(),
                 Padding(
                   padding: const EdgeInsets.only(right: 9),
                   child: Icon(
@@ -767,13 +768,16 @@ class _SinglecontentState extends State<Singlecontent> {
                       SizedBox(
                         width: 15,
                       ),
-                      Text(
-                        nameController.text,
-                        style: TextStyle(
+                      Expanded(
+                        child: Text(
+                          nameController.text,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
                             color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      )
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(

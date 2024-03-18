@@ -62,6 +62,7 @@ dependencies:
   go_router: ^13.2.1
   beamer: ^1.6.1
   loading_animation_widget: ^1.2.1
+  vsc_quill_delta_to_html: ^1.0.4
 
 dev_dependencies:
   flutter_test:
