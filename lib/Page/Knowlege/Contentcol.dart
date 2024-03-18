@@ -23,9 +23,12 @@ class _ContentcolState extends State<Contentcol> {
     if (doc.exists) {
       final data = doc.data();
       return Contents(
+        id: doc.id,
         ContentName: data!['ContentName'].toString(),
         ContentDetail: data['ContentDetail'].toString(),
         ImageURL: data['ImageUrl'].toString(),
+         create_at:
+          doc['create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
       );
     } else {
       throw Exception('Document not found with ID: $documentId');

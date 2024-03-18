@@ -9,11 +9,16 @@ class Databasemethods {
         .set(knowledgeMap);
   }
 
-  Future addContent(Map<String, dynamic> contentMap, String id) async {
-    return await FirebaseFirestore.instance
-        .collection("Content")
-        .doc(id)
-        .set(contentMap);
+  Future<String> addContent(Map<String, dynamic> contentMap, String id) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("Content")
+          .doc(id)
+          .set(contentMap);
+      return id;
+    } catch (e) {
+      throw e;
+    }
   }
 
   Future updateKnowledge(
@@ -22,5 +27,34 @@ class Databasemethods {
         .collection("Knowledge")
         .doc(id)
         .update(updateknowledge);
+  }
+
+  Future updateContent(
+      Map<String, dynamic> updatecontent, String contentId , String contentName,
+      String contentDetail, String imageUrl) async {
+        print(" id ${contentId}");
+        print(" content ${updatecontent}");
+        print(" name ${contentName}");
+        print(" detail ${contentDetail}");
+        print(" url ${imageUrl}");
+    return await FirebaseFirestore.instance
+    
+        .collection("Content")
+        .doc(contentId)
+        .update(updatecontent);
+  }
+
+
+  Future<void> deleteContent(String contentId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final contentRef = firestore.collection('Content').doc(contentId);
+
+    try {
+      // อัปเดตฟิลด์ deleted_at เป็นเวลาปัจจุบันแทนการลบข้อมูลจริง
+      await contentRef.update({'deleted_at': Timestamp.now()});
+      print('Content deleted successfully');
+    } catch (e) {
+      print('Error deleting content: $e');
+    }
   }
 }

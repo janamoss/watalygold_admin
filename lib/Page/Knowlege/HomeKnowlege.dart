@@ -25,8 +25,12 @@ Future<Contents> getContentsById(String documentId) async {
   if (doc.exists) {
     final data = doc.data();
     return Contents(
+      id: doc.id,
       ContentName: data!['ContentName'].toString(),
       ContentDetail: data['ContentDetail'].toString(),
+      deleted_at: doc['deleted_at'],
+        create_at: data['create_at'] as Timestamp? ??
+            Timestamp.fromDate(DateTime.now()),
       ImageURL: data['image_url'].toString(),
     );
   } else {
@@ -133,7 +137,6 @@ class _KnowledgeMainState extends State<HomeKnowledgeMain> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => EditKnowlege(
-                                        
                                          knowledge: knowledge,
                                         icons: knowledge.knowledgeIcons,
                                       ),

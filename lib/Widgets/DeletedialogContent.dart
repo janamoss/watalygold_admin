@@ -1,62 +1,59 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-class Deleteddialogknowledge extends StatelessWidget {
-  const Deleteddialogknowledge({
+class DeletedialogContent extends StatelessWidget {
+  const DeletedialogContent({
     Key? key,
     required this.knowledgeName,
     required this.id,
   });
   
-void showToast(String message) {
-  Fluttertoast.showToast(
-    msg: message,
-    toastLength: Toast.LENGTH_SHORT,
-    gravity: ToastGravity.BOTTOM,
-    timeInSecForIosWeb: 1,
-    backgroundColor: Colors.grey[800],
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
-}
-  Future<void> deleteKnowledge() async {
+void deleteContentById(String documentId) async {
     try {
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        // อ่านข้อมูลของ Knowledge ที่ต้องการลบ
-        DocumentSnapshot knowledgeSnapshot = await transaction.get(
-          FirebaseFirestore.instance.collection("Knowledge").doc(this.id),
-        );
-
-        // ตรวจสอบว่ามีข้อมูลของ Knowledge หรือไม่
-        if (knowledgeSnapshot.exists) {
-          // ลบข้อมูลของ Knowledge
-          transaction.update(
-            FirebaseFirestore.instance.collection("Knowledge").doc(this.id),
-            {"deleted_at": Timestamp.now()},
-          );
-
-          // ตรวจสอบและลบข้อมูล content ที่อ้างถึงใน Knowledge
-          List<String> contentIds =
-              List<String>.from(knowledgeSnapshot["Content"]);
-          for (String contentId in contentIds) {
-            // ลบข้อมูล content
-            transaction.update(
-              FirebaseFirestore.instance.collection("Content").doc(contentId),
-              {"deleted_at": Timestamp.now()},
-            );
-          }
-        }
-      });
-      showToast("ลบข้อมูลเสร็จสิ้น");
+      await Databasemethods().deleteContent(documentId);
+     
     } catch (e) {
-      // จัดการข้อผิดพลาดที่เกิดขึ้น
-      print("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
-      throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
+      print('Error deleting content: $e');
     }
   }
+  
+  // Future<void> deleteContent() async {
+  //   try {
+  //     await FirebaseFirestore.instance.runTransaction((transaction) async {
+     
+  //       DocumentSnapshot contentSnapshot = await transaction.get(
+  //         FirebaseFirestore.instance.collection("Content").doc(this.id),
+  //       );
+
+  //       // ตรวจสอบว่ามีข้อมูลของ Knowledge หรือไม่
+  //       if (contentSnapshot.exists) {
+  //         // ลบข้อมูลของ Knowledge
+  //         transaction.update(
+  //           FirebaseFirestore.instance.collection("Knowledge").doc(this.id),
+  //           {"deleted_at": Timestamp.now()},
+  //         );
+
+  //         // ตรวจสอบและลบข้อมูล content ที่อ้างถึงใน Knowledge
+  //         List<String> contentIds =
+  //             List<String>.from(contentSnapshot["Content"]);
+  //         for (String contentId in contentIds) {
+  //           // ลบข้อมูล content
+  //           transaction.update(
+  //             FirebaseFirestore.instance.collection("Content").doc(contentId),
+  //             {"deleted_at": Timestamp.now()},
+  //           );
+  //         }
+  //       }
+  //     });
+  //   } catch (e) {
+  //     // จัดการข้อผิดพลาดที่เกิดขึ้น
+  //     print("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
+  //     throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
+  //   }
+  // }
 
   final String knowledgeName;
   final String id;
@@ -88,14 +85,14 @@ void showToast(String message) {
                 fontFamily: 'IBM Plex Sans Thai',
               ),
             ),
-            Text(
-              '$knowledgeName',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 24,
-                fontFamily: 'IBM Plex Sans Thai',
-              ),
-            ),
+            // Text(
+            //   '$knowledgeName',
+            //   style: TextStyle(
+            //     color: Colors.black,
+            //     fontSize: 24,
+            //     fontFamily: 'IBM Plex Sans Thai',
+            //   ),
+            // ),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +122,7 @@ void showToast(String message) {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    deleteKnowledge();
+                    deleteContentById;
                     Navigator.pop(context);
                   },
                   child: const Text("ยืนยัน"),

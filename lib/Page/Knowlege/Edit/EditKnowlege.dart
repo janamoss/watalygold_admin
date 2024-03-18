@@ -10,7 +10,7 @@ import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/DeletedialogContent.dart';
 import 'package:watalygold_admin/Widgets/dialogEdit.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
@@ -612,10 +612,10 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         uploading = false;
       });
     } else {
-      // ไม่มีการเพิ่มรูปภาพใหม่ ให้ส่ง imageUrl เดิมไปยัง updateKnowledges
-      updateKnowledges(widget.knowledge != null
-          ? widget.knowledge!.knowledgeImg
-          : widget.contents!.ImageURL);
+    
+      // updateKnowledges(widget.knowledge != null
+      //     ? widget.knowledge!.knowledgeImg
+      //     : widget.contents!.ImageURL);
     }
   }
 

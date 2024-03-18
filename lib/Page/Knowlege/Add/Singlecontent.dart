@@ -9,10 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:watalygold_admin/Page/Knowlege/Knowledgecolumn.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
-
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/DeletedialogContent.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/database.dart';
 

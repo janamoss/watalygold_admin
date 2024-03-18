@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/DeletedialogContent.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/database.dart';
 
@@ -26,13 +26,11 @@ class ExpansionPanelData {
   TextEditingController nameController;
   TextEditingController detailController;
   List<Widget> itemPhotosWidgetList;
- 
 
   ExpansionPanelData({
     required this.nameController,
     required this.detailController,
     required this.itemPhotosWidgetList,
-  
   });
 }
 
@@ -59,9 +57,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
   List<TextEditingController> contentDetailControllers = [];
   final List<List<XFile>> _imagesForPanels = [];
 
-List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container());
-
-
+  List<Widget> _displayedContentWidgets =
+      List.filled(_panelData.length, Container());
 
   List<int> _deletedPanels = [];
 // List<Widget> itemPhotosWidgetList = [];
@@ -74,6 +71,8 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
       <XFile>[]; //ใช้ในการเก็บรูปภาพที่ผู้ใช้เลือกเพื่ออัปโหลด
   List<String> downloadUrl = <String>[]; //เก็บ url ภาพ
   bool uploading = false;
+
+  List<String> ListimageUrl = [];
 
   @override
   Widget build(BuildContext context) {
@@ -344,6 +343,7 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
                     children: _panelData.map<ExpansionPanelRadio>(
                         (ExpansionPanelData expansionPanelData) {
                       final int index = _panelData.indexOf(expansionPanelData);
+                      
                       // สร้าง TextEditingController สำหรับชื่อเนื้อหาและรายละเอียดเนื้อหา
                       contentNameControllers.add(TextEditingController());
                       contentDetailControllers.add(TextEditingController());
@@ -359,11 +359,8 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
                               onPressed: () {
                                 setState(() {
                                   _deletedPanels.add(index);
+                                  _panelData.removeAt(index);
                                 });
-                                // showDialog(
-                                //   context: context,
-                                //   builder: (context) => const Deletedialog(),
-                                // );
                               },
                               icon: Icon(
                                 Icons.cancel,
@@ -375,7 +372,6 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
-                                fontFamily: 'IBM Plex Sans Thai',
                               ),
                             ),
                           );
@@ -623,7 +619,8 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
                                           SizedBox(height: 30),
                                           ElevatedButton(
                                             onPressed: () {
-                                              displaycontent(expansionPanelData, index); 
+                                              displaycontent(
+                                                  expansionPanelData, index);
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
@@ -890,12 +887,12 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
     String? contentId = const Uuid().v4().substring(0, 10);
     for (int i = 0; i < itemImagesList.length; i++) {
       file = File(itemImagesList[i].path);
+      print(itemImagesList[i].path);
       pickedFile = PickedFile(file!.path);
-
       await uploadImageToStorage(pickedFile, contentId, i);
     }
-    await addAllContent(
-        contentId); // เรียกใช้ addAllContentOnce เพื่อเพิ่มข้อมูลลง Firebase Firestore ครั้งเดียวเท่านั้น
+    await addAllContent(ListimageUrl);
+    // เรียกใช้ addAllContentOnce เพื่อเพิ่มข้อมูลลง Firebase Firestore ครั้งเดียวเท่านั้น
     setState(() {
       uploading = false;
     });
@@ -918,98 +915,82 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
       SettableMetadata(contentType: 'image/jpeg'),
     );
     String imageUrl = await reference.getDownloadURL();
-    addAllContent(imageUrl);
+    print(imageUrl);
+    print(ListimageUrl);
+    setState(() {
+      ListimageUrl.add(imageUrl);
+      print(ListimageUrl);
+    });
   }
 
-  Future<void> addAllContent(String imageUrl) async {
+  Future<void> addAllContent(List<String> imageUrl) async {
     // ตรวจสอบว่า addAllContent ถูกเรียกใช้ครั้งแรกหรือไม่
-    if (!addedContent) {
-      addedContent =
-          true; // ตั้งค่าให้ addedContent เป็น true เพื่อบอกว่า addAllContent ถูกเรียกใช้แล้วครั้งแรก
+    //// ตั้งค่าให้ addedContent เป็น true เพื่อบอกว่า addAllContent ถูกเรียกใช้แล้วครั้งแรก
 
-      // Validate user input
-      if (namecontroller.text.isEmpty ||
-          _selectedValue == null ||
-          imageUrl == null) {
-        Fluttertoast.showToast(
-          msg: "กรุณากรอกข้อมูลให้ครบ",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        return;
-      }
-
-      List<String> contentIds = [];
-
-      // Loop through content and add them to Firebase
-      for (int index = 0; index < contentNameControllers.length; index++) {
-        String contentName = contentNameControllers[index].text;
-        String contentDetail = contentDetailControllers[index].text;
-
-        if (contentName.isNotEmpty && contentDetail.isNotEmpty) {
-          String contentId =
-              await addContent(contentName, contentDetail, imageUrl);
-          contentIds.add(contentId);
-        }
-      }
-
-      // Generate a knowledge ID
-      String knowledgeId = const Uuid().v4().substring(0, 10);
-
-      // Prepare knowledge data
-      Map<String, dynamic> knowledgeMap = {
-        "KnowledgeName": namecontroller.text,
-        "KnowledgeIcons": _selectedValue,
-        "create_at": Timestamp.now(),
-        "deleted_at": null,
-        "update_at": null,
-        "Content": contentIds,
-      };
-
-      // Add knowledge to Firebase
-      await Databasemethods()
-          .addKnowlege(knowledgeMap, knowledgeId)
-          .then((value) {
-        showDialog(
-          context: context,
-          builder: (context) => const Addknowledgedialog(),
-        );
-      }).catchError((error) {
-        Fluttertoast.showToast(
-          msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      });
+    // Validate user input
+    if (namecontroller.text.isEmpty ||
+        _selectedValue == null ||
+        imageUrl == null) {
+      Fluttertoast.showToast(
+        msg: "กรุณากรอกข้อมูลให้ครบ",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
     }
-  }
 
-  Future<String> addContent(
-      String contentName, String contentDetail, String imageUrl) async {
-    Map<String, dynamic> contentMap = {
-      "ContentName": contentName,
-      "ContentDetail": contentDetail,
-      "image_url": imageUrl,
+    List<String> contentIds = [];
+    print("list ${ itemImagesList.length}");
+    // Loop through content and add them to Firebase
+    for (int index = 0; index < itemImagesList.length; index++) {
+      String contentName = contentNameControllers[index].text;
+      print(contentName);
+      String contentDetail = contentDetailControllers[index].text;
+      print(contentDetail);
+      String imageurl = ListimageUrl[index].toString();
+      print(" img ${imageurl}");
+
+      String contentId = await addContent(contentName, contentDetail, imageurl);
+      print("id ${contentId}");
+      contentIds.add(contentId);
+    }
+
+    // Generate a knowledge ID
+    String knowledgeId = const Uuid().v4().substring(0, 10);
+
+    // Prepare knowledge data
+    Map<String, dynamic> knowledgeMap = {
+      "KnowledgeName": namecontroller.text,
+      "KnowledgeIcons": _selectedValue,
       "create_at": Timestamp.now(),
       "deleted_at": null,
       "update_at": null,
+      "Content": contentIds,
     };
 
-    // Generate a unique ID (replace with your preferred method)
-    String contentId = const Uuid().v4().substring(0, 10);
-
-    // Add data using addKnowlege, passing both contentMap and generated ID
-    await Databasemethods().addContent(contentMap, contentId);
-
-    return contentId;
+    // Add knowledge to Firebase
+    await Databasemethods()
+        .addKnowlege(knowledgeMap, knowledgeId)
+        .then((value) {
+      showDialog(
+        context: context,
+        builder: (context) => const Addknowledgedialog(),
+      );
+    }).catchError((error) {
+      Fluttertoast.showToast(
+        msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    });
   }
 
   void clearAllFields() {
@@ -1173,13 +1154,32 @@ List<Widget> _displayedContentWidgets = List.filled(_panelData.length, Container
     });
   }
 
- void displaycontent(ExpansionPanelData expansionPanelData, int index) {
-  // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
-  setState(() {
-    if (index < _displayedContentWidgets.length) {
-  _displayedContentWidgets[index] = _displaycontentWidget(expansionPanelData, index);
+  void displaycontent(ExpansionPanelData expansionPanelData, int index) {
+    // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
+    setState(() {
+      if (index < _displayedContentWidgets.length) {
+        _displayedContentWidgets[index] =
+            _displaycontentWidget(expansionPanelData, index);
+      }
+    });
+  }
 }
 
-  });
-}
-}
+Future<String> addContent(
+      String contentName, String contentDetail, String imageUrl) async {
+    Map<String, dynamic> contentMap = {
+      "ContentName": contentName,
+      "ContentDetail": contentDetail,
+      "image_url": imageUrl,
+      "create_at": Timestamp.now(),
+      "deleted_at": null,
+      "update_at": null,
+    };
+
+    // Generate a unique ID (replace with your preferred method)
+    String contentId = const Uuid().v4().substring(0, 10);
+
+    // Add data using addKnowlege, passing both contentMap and generated ID
+    await Databasemethods().addContent(contentMap, contentId);
+    return contentId;
+  }

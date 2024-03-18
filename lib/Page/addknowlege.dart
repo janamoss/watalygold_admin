@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:random_string/random_string.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Deletedialog.dart';
+import 'package:watalygold_admin/Widgets/DeletedialogContent.dart';
 
 import 'package:watalygold_admin/service/database.dart';
 
