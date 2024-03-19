@@ -91,7 +91,7 @@ class _TabBar_ViewState extends State<TabBar_View>
                               color: Color(0xFF42BD41),
                               // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
                               borderRadius: BorderRadius.circular(10),
-                            )
+                            ),
                             tabs: [
                               Padding(
                                 padding: EdgeInsets.only(
@@ -117,18 +117,18 @@ class _TabBar_ViewState extends State<TabBar_View>
                   ),
                 ),
                 SizedBox(height: 50,),
-                // Expanded(
+                Expanded(
                   
-                //     child: TabBarView(
-                //       controller: tapController,
+                    child: TabBarView(
+                      controller: tapController,
                      
-                //   children: [
+                  children: [
                    
-                //     EditKnowlege(),
-                //     EditMutiple(),
+                    EditKnowlege(),
+                    EditMutiple(),
                     
-                //   ],
-                // )),
+                  ],
+                )),
                 SizedBox(height: 0,),
                 
               ],

@@ -40,7 +40,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   final List<Product> _products = Product.generateItems(8);
 
   String? _selectedValue;
- 
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
@@ -75,68 +74,88 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                   height: 50,
                 ),
                 Column(
+                children: [
+                  Center(
+                    child: Container(
+                      child: Stack(
                         children: [
-                          Container(
-                            width: 1000,
-                            height: 140,
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  left: 0,
-                                  top: 0,
-                                  child: Container(
-                                    width: 1065,
-                                    height: 140,
-                                    decoration: ShapeDecoration(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  ),
+                          FractionallySizedBox(
+                            widthFactor: 0.7,
+                            child: Container(
+                              width: 500,
+                              height: 120,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                Positioned(
-                                  left: 140,
-                                  top: 35,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 140,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.16,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.08,
                                   child: Container(
-                                    width: 250,
-                                    height: 65,
-                                    decoration: ShapeDecoration(
-                                      color: Color(0xFF42BD41),
+                                  decoration: ShapeDecoration(
+                                      color: GPrimaryColor,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       
                                     ),
-
+                                    child: Padding(padding: EdgeInsets.only(top: 20,left:70),
+                                    child: Text(
+                                      'เนื้อหาเดี่ยว',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    )
+                                     
+                                    
                                   ),
                                 ),
-                                Positioned(
-                                  left: 210,
-                                  top: 70,
-                                  child: Text(
-                                    'เนื้อหาเดี่ยว',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      height: 0,
-                                    ),
-                                  ),
+                                SizedBox(
+                                  width: 120,
                                 ),
-                                
-                                Positioned(
-                                  left: 690,
-                                  top: 70,
-                                  child: Text(
-                                    'หลายเนื้อหา',
-                                    style: TextStyle(
-                                      color: Colors.black
-                                          .withOpacity(0.44999998807907104),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.15,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                  child: Container(
+                                  decoration: ShapeDecoration(
+                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      
                                     ),
+                                   child: Padding(padding: EdgeInsets.only(top: 30,left:70),
+                                    child: Text(
+                                      'หลายเนื้อหา',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 20,
+                                        
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    )
+                                     
+                                    
                                   ),
                                 ),
                               ],
@@ -144,6 +163,11 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                           ),
                         ],
                       ),
+                    ),
+                  ),],),
+                  SizedBox(
+                  height: 50,
+                ),
                 Align(
                   alignment: Alignment.center,
                   child: Row(
@@ -682,7 +706,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         uploading = false;
       });
     } else {
-    
       // updateKnowledges(widget.knowledge != null
       //     ? widget.knowledge!.knowledgeImg
       //     : widget.contents!.ImageURL);
@@ -733,8 +756,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   }
 
   void updateKnowledges(String? imageUrl) async {
-    String Id = widget.knowledge!.id; 
-    
+    String Id = widget.knowledge!.id;
+
     String? selectedValue;
 
     selectedValue = widget.knowledge!.knowledgeIcons != null
@@ -747,7 +770,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
             : null;
 
     Map<String, dynamic> updateknowledge = {
-      "KnowledgeName": nameController.text ,
+      "KnowledgeName": nameController.text,
       "KnowledgeDetail": contentController.text,
       "KnowledgeIcons": _selectedValue ??
           icons.keys.firstWhere((key) => icons[key].toString() == selectedValue,
@@ -819,7 +842,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                 SizedBox(
                   width: 20,
                 ),
-               Expanded(
+                Expanded(
                   child: Text(
                     nameController.text,
                     overflow: TextOverflow.ellipsis,
@@ -829,7 +852,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     ),
                   ),
                 ),
-              
                 Padding(
                   padding: const EdgeInsets.only(right: 9),
                   child: Icon(

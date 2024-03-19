@@ -302,69 +302,89 @@ class _EditMutipleState extends State<EditMutiple> {
                       SizedBox(
                         height: 50,
                       ),
-                      Column(
+                       Column(
+                children: [
+                  Center(
+                    child: Container(
+                      child: Stack(
                         children: [
-                          Container(
-                            width: 1000,
-                            height: 140,
-                            child: Stack(
+                          FractionallySizedBox(
+                            widthFactor: 0.7,
+                            child: Container(
+                              width: 500,
+                              height: 120,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
                               children: [
-                                Positioned(
-                                  left: 0,
-                                  top: 0,
-                                  child: Container(
-                                    width: 1065,
-                                    height: 140,
-                                    decoration: ShapeDecoration(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  ),
+                                SizedBox(
+                                  width: 140,
                                 ),
-                                
-                                Positioned(
-                                  left: 210,
-                                  top: 70,
-                                  child: Text(
-                                    'เนื้อหาเดี่ยว',
-                                    style: TextStyle(
-                                      color: Colors.black
-                                          .withOpacity(0.44999998807907104),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 600,
-                                  top: 35,
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.16,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.08,
                                   child: Container(
-                                    width: 250,
-                                    height: 65,
-                                    decoration: ShapeDecoration(
-                                      color: Color(0xFF42BD41),
+                                  decoration: ShapeDecoration(
+                                      color: Color.fromARGB(255, 255, 255, 255),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       
                                     ),
-
+                                    child: Padding(padding: EdgeInsets.only(top: 20,left:70),
+                                    child: Text(
+                                      'เนื้อหาเดี่ยว',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    )
+                                     
+                                    
                                   ),
                                 ),
-                                Positioned(
-                                  left: 670,
-                                  top: 70,
-                                  child: Text(
-                                    'หลายเนื้อหา',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
+                                SizedBox(
+                                  width: 120,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.16,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.08,
+                                  child: Container(
+                                  decoration: ShapeDecoration(
+                                      color: GPrimaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      
                                     ),
+                                   child: Padding(padding: EdgeInsets.only(top: 20,left:70),
+                                    child: Text(
+                                      'หลายเนื้อหา',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    )
+                                     
+                                    
                                   ),
                                 ),
                               ],
@@ -372,6 +392,11 @@ class _EditMutipleState extends State<EditMutiple> {
                           ),
                         ],
                       ),
+                    ),
+                  ),],),
+                  SizedBox(
+                  height: 50,
+                ),
                       Align(
                         alignment: Alignment.center,
                         child: Row(
