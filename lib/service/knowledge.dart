@@ -2,11 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 Map<String, IconData> iconMap = {
-  'บ้าน': Icons.home,
+  'สถิติ': Icons.analytics_outlined,
   'ดอกไม้': Icons.yard,
-  'บุคคล': Icons.person,
+  'หนังสือ': Icons.book,
   'น้ำ': Icons.water_drop_outlined,
-  'ระวัง': Icons.warning_rounded
+  'ระวัง': Icons.warning_rounded,
+  'คำถาม': Icons.quiz_outlined,
 };
 
 class Knowledge {
@@ -17,7 +18,6 @@ class Knowledge {
   final IconData knowledgeIcons;
   late final String knowledgeImg;
   final Timestamp? create_at;
-
 
   Knowledge({
     required this.id,

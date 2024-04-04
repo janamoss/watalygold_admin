@@ -5,29 +5,16 @@ import 'package:watalygold_admin/Components/SidebarController.dart';
 
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-class SideNav extends StatefulWidget {
+class SideNav extends StatelessWidget {
   final bool? dropdown;
   final int? status;
   const SideNav({Key? key, this.status, this.dropdown}) : super(key: key);
 
   @override
-  State<SideNav> createState() => _SideNavState();
-}
-
-class _SideNavState extends State<SideNav> {
-  bool _showDropdown = false;
-  int selected = -1;
-  @override
-  @override
-  void initState() {
-    super.initState();
-    _showDropdown = widget.dropdown ?? false;
-  }
-
-  SidebarController sidebarController = Get.put(SidebarController());
-
   Widget build(BuildContext context) {
-    sidebarController.index.value = widget.status ?? 0;
+    final sidebarController = Get.put(SidebarController());
+    sidebarController.index.value = status ?? 0;
+    var showDropdown = dropdown ?? false;
     return Column(
       children: [
         Center(
@@ -53,9 +40,7 @@ class _SideNavState extends State<SideNav> {
               ),
               ListTile(
                 onTap: () {
-                  setState(() {
-                    _showDropdown = !_showDropdown;
-                  });
+                  showDropdown = !showDropdown;
                   sidebarController.dropdown.value =
                       !sidebarController.dropdown.value;
                 },
@@ -70,7 +55,7 @@ class _SideNavState extends State<SideNav> {
                 trailing: RotatedBox(
                   quarterTurns: 1,
                   child: Icon(
-                    _showDropdown
+                    showDropdown
                         ? Icons.keyboard_arrow_left_rounded
                         : Icons.keyboard_arrow_right_rounded,
                     color: WhiteColor,
@@ -81,11 +66,11 @@ class _SideNavState extends State<SideNav> {
             ],
           ),
         ),
-        _showDropdown
+        showDropdown
             ? Column(
                 children: [
-                  _buildMainKnowledgeListTile(context),
-                  _buildAddKnowledgeListTile(context),
+                  _buildMainKnowledgeListTile(context, sidebarController),
+                  _buildAddKnowledgeListTile(context, sidebarController),
                 ],
               )
             : SizedBox.shrink(),
@@ -93,7 +78,8 @@ class _SideNavState extends State<SideNav> {
     );
   }
 
-  Widget _buildMainKnowledgeListTile(BuildContext context) {
+  Widget _buildMainKnowledgeListTile(
+      BuildContext context, SidebarController sidebarController) {
     return ListTile(
       onTap: () {
         sidebarController.index.value = 1;
@@ -115,7 +101,8 @@ class _SideNavState extends State<SideNav> {
     );
   }
 
-  Widget _buildAddKnowledgeListTile(BuildContext context) {
+  Widget _buildAddKnowledgeListTile(
+      BuildContext context, SidebarController sidebarController) {
     return ListTile(
       onTap: () {
         sidebarController.index.value = 2;

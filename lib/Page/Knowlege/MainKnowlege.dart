@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
+import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
+import 'package:watalygold_admin/Widgets/Deleteddialogknowledge.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
-import 'package:watalygold_admin/service/knowlege.dart';
+import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -19,6 +26,8 @@ class MainKnowlege extends StatefulWidget {
 }
 
 class _MainKnowlegeState extends State<MainKnowlege> {
+  final sidebarController = Get.put(SidebarController());
+
   bool _isLoading = true;
   List<Knowledge> knowledgelist = [];
   List<String> imageURLlist = [];
@@ -50,6 +59,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
         ContentName: data!['ContentName'].toString(),
         ContentDetail: data['ContentDetail'].toString(),
         ImageURL: data['image_url'].toString(),
+        id: doc.id,
+        create_at: data['create_at'] as Timestamp? ??
+            Timestamp.fromDate(DateTime.now()),
       );
     } else {
       throw Exception('Document not found with ID: $documentId');
@@ -165,7 +177,10 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                         Align(
                             alignment: Alignment.topRight,
                             child: ElevatedButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                sidebarController.index.value = 2;
+                                context.goNamed("/addKnowledge");
+                              },
                               onHover: (value) {
                                 ElevatedButton.styleFrom(
                                     backgroundColor: GPrimaryColor);
@@ -208,6 +223,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                         i < knowledgelist.length;
                                         i++)
                                       KnowledgeContainer(
+                                        knowledge: knowledgelist[i],
+                                        sidebarController: sidebarController,
+                                        id: knowledgelist[i].id,
                                         title: knowledgelist[i].knowledgeName,
                                         icons: knowledgelist[i].knowledgeIcons,
                                         date: timestampToDateThai(
@@ -241,22 +259,33 @@ class _MainKnowlegeState extends State<MainKnowlege> {
   }
 }
 
-class KnowledgeContainer extends StatelessWidget {
+class KnowledgeContainer extends StatefulWidget {
+  final Knowledge? knowledge;
+  final id;
   final title;
   final icons;
   final image;
   final ontap;
   final date;
   final status;
+  final SidebarController? sidebarController;
   const KnowledgeContainer(
       {super.key,
+      this.id,
       this.title,
       this.icons,
       this.image,
       this.ontap,
       this.date,
-      this.status});
+      this.status,
+      this.sidebarController,
+      this.knowledge});
 
+  @override
+  State<KnowledgeContainer> createState() => _KnowledgeContainerState();
+}
+
+class _KnowledgeContainerState extends State<KnowledgeContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -285,7 +314,7 @@ class KnowledgeContainer extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                   image: DecorationImage(
                     image: NetworkImage(
-                      image,
+                      widget.image,
                     ),
                     fit: BoxFit.cover,
                   )),
@@ -299,7 +328,7 @@ class KnowledgeContainer extends StatelessWidget {
                       color: Color(0xffECFFEB),
                       borderRadius: BorderRadius.circular(10)),
                   child: Icon(
-                    icons,
+                    widget.icons,
                     color: GPrimaryColor,
                   ),
                 ),
@@ -316,14 +345,15 @@ class KnowledgeContainer extends StatelessWidget {
                         alignment: Alignment.topLeft,
                         child: Row(
                           children: [
-                            Text(
-                              title,
+                            Expanded(
+                                child: Text(
+                              widget.title,
                               style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
-                            ),
-                            Spacer(),
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            )),
                             Text(
-                              status,
+                              widget.status,
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -336,14 +366,34 @@ class KnowledgeContainer extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          "วันที่ $date",
+                          "วันที่ ${widget.date}",
                           style: TextStyle(color: GPrimaryColor, fontSize: 15),
                         ),
                         Spacer(),
                         Row(
                           children: [
                             ElevatedButton.icon(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (widget.status != "เนื้อหาเดียว") {
+                                    // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
+                                    context.goNamed(
+                                      '/editmultiKnowledge',
+                                      extra: {
+                                        'knowledge': widget.knowledge,
+                                        'icon': widget.icons,
+                                      },
+                                    );
+                                  } else {
+                                    // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
+                                    context.goNamed(
+                                      '/editKnowledge',
+                                      extra: {
+                                        'knowledge': widget.knowledge,
+                                        'icon': widget.icons,
+                                      },
+                                    );
+                                  }
+                                },
                                 icon: Icon(
                                   Icons.edit,
                                   color: WhiteColor,
@@ -363,7 +413,17 @@ class KnowledgeContainer extends StatelessWidget {
                               width: 15,
                             ),
                             ElevatedButton.icon(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        Deleteddialogknowledge(
+                                      knowledgeName: widget.title,
+                                      id: widget.id,
+                                    ),
+                                  ).then((value) => Navigator.popUntil(context,
+                                      ModalRoute.withName("/mainKnowledge")));
+                                },
                                 icon: Icon(
                                   Icons.delete_forever_rounded,
                                   color: WhiteColor,
