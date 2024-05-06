@@ -1,21 +1,16 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Card/card_chart.dart';
 import 'package:watalygold_admin/Widgets/Card/card_resultDetail.dart';
 import 'package:watalygold_admin/Widgets/Card/resultCard.dart';
-import 'package:watalygold_admin/Widgets/Chart/barchart.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
-import 'package:watalygold_admin/Widgets/drawer.dart';
-import 'package:watalygold_admin/service/result.dart';
+import 'package:flutter/scheduler.dart';
 
 class MainDash extends StatefulWidget {
   final User? users;
@@ -28,6 +23,7 @@ class MainDash extends StatefulWidget {
 class _MainDashState extends State<MainDash> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map<String, dynamic>> results = [];
+  List<Map<String, dynamic>> resultstoday = [];
   bool isLoading = true;
 
   @override
@@ -39,6 +35,7 @@ class _MainDashState extends State<MainDash> {
   Future<void> fetchAllResults() async {
     try {
       results = await fetchAllResultsAsMaps();
+      resultstoday = await fetchResultsForToday();
       // await countResult();
     } catch (e) {
       printInfo(info: 'Error: $e');
@@ -46,6 +43,27 @@ class _MainDashState extends State<MainDash> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchResultsForToday() async {
+    try {
+      final resultsCollection = FirebaseFirestore.instance.collection('Result');
+      DateTime now = DateTime.now();
+      DateTime startOfDay = DateTime(now.year, now.month, now.day);
+      DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+      final querySnapshot = await resultsCollection
+          .where('create_at', isGreaterThanOrEqualTo: startOfDay)
+          .where('create_at', isLessThanOrEqualTo: endOfDay)
+          .get();
+
+      final resultList = querySnapshot.docs.map((doc) => doc.data()).toList();
+      printInfo(info: "${resultList.length}");
+      return resultList;
+    } catch (error) {
+      printInfo(info: "Error fetching results: $error");
+      return [];
     }
   }
 
@@ -66,7 +84,6 @@ class _MainDashState extends State<MainDash> {
   Widget build(BuildContext context) {
     return Scaffold(
         // appBar: Appbarmain(),
-
         body: SafeArea(
             child: Row(
       children: [
@@ -96,12 +113,13 @@ class _MainDashState extends State<MainDash> {
                                   .start, // ให้ Column จัดวางวิดเจ็ตย่อยชิดซ้าย
                               children: [
                                 ResultCard(
-                                  results: results,
+                                  results: resultstoday,
                                 ),
                                 CardChart(
                                   results: results,
                                 ),
                                 CardResultDetail(
+                                  results: results,
                                   lefts: 20,
                                 )
                               ],
@@ -112,7 +130,7 @@ class _MainDashState extends State<MainDash> {
                                   .start, // ให้ Column จัดวางวิดเจ็ตย่อยชิดซ้าย
                               children: [
                                 ResultCard(
-                                  results: results,
+                                  results: resultstoday,
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment
@@ -120,18 +138,22 @@ class _MainDashState extends State<MainDash> {
                                   children: [
                                     Expanded(
                                       flex: 6,
-                                      child: CardChart(
-                                        results: results,
+                                      child: SizedBox(
+                                        height: 600,
+                                        child: CardChart(
+                                          results: results,
+                                        ),
                                       ),
                                     ),
                                     Expanded(
                                       flex: 3,
-                                      // child: Container(
-                                      //   width: MediaQuery.of(context).size.width,
-                                      //   height: MediaQuery.of(context).size.height,
-                                      //   color: Colors.blue,
-                                      // ),
-                                      child: CardResultDetail(),
+                                      child: SizedBox(
+                                        height:
+                                            600, // ใช้ chartHeight ที่อัปเดตแล้ว
+                                        child: CardResultDetail(
+                                          results: results,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

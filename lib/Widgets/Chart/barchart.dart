@@ -2,63 +2,25 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-// สร้างข้อมูลสำหรับกราฟแท่ง
-final barData = [
-  BarChartGroupData(
-    x: 0,
-    barRods: [
-      BarChartRodData(toY: 8, color: G2PrimaryColor),
-      BarChartRodData(toY: 6, color: Color(0xFF86BD41)),
-      BarChartRodData(toY: 7, color: Color(0xFFB6AC55)),
-      BarChartRodData(toY: 16, color: Color(0xFFB68955)),
-    ],
-  ),
-  BarChartGroupData(
-    x: 1,
-    barRods: [
-      BarChartRodData(toY: 8, color: G2PrimaryColor),
-      BarChartRodData(toY: 6, color: Color(0xFF86BD41)),
-      BarChartRodData(toY: 7, color: Color(0xFFB6AC55)),
-      BarChartRodData(toY: 16, color: Color(0xFFB68955)),
-    ],
-  ),
-  BarChartGroupData(
-    x: 2,
-    barRods: [
-      BarChartRodData(toY: 8, color: G2PrimaryColor),
-      BarChartRodData(toY: 6, color: Color(0xFF86BD41)),
-      BarChartRodData(toY: 7, color: Color(0xFFB6AC55)),
-      BarChartRodData(toY: 16, color: Color(0xFFB68955)),
-    ],
-  ),
-  BarChartGroupData(
-    x: 3,
-    barRods: [
-      BarChartRodData(toY: 16, color: Colors.orangeAccent),
-    ],
-  ),
-  BarChartGroupData(
-    x: 4,
-    barRods: [
-      BarChartRodData(toY: 16, color: Colors.orangeAccent),
-    ],
-  ),
-  BarChartGroupData(
-    x: 5,
-    barRods: [
-      BarChartRodData(toY: 16, color: Colors.orangeAccent),
-    ],
-  ),
-  BarChartGroupData(
-    x: 6,
-    barRods: [
-      BarChartRodData(toY: 16, color: Colors.orangeAccent),
-    ],
-  ),
+// เดือนทั้งหมด
+List<String> months = [
+  "มกราคม",
+  "กุมภาพันธ์",
+  "มีนาคม",
+  "เมษายน",
+  "พฤษภาคม",
+  "มิถุนายน",
+  "กรกฎาคม",
+  "สิงหาคม",
+  "กันยายน",
+  "ตุลาคม",
+  "พฤศจิกายน",
+  "ธันวาคม"
 ];
 
 // สร้าง BarChart widget
-Widget buildBarChart(BuildContext context) {
+Widget buildBarChart(BuildContext context, List<BarChartGroupData> bargroups,
+    List<String> dateLabels) {
   return SizedBox(
     height: 400,
     width: MediaQuery.of(context).size.width,
@@ -72,12 +34,13 @@ Widget buildBarChart(BuildContext context) {
               color: G2PrimaryColor, width: 4), // เพิ่ม border ด้านล่าง
         ),
       ),
-      barGroups: barData,
+      barGroups: bargroups,
       gridData: FlGridData(
           show: true, drawHorizontalLine: true, drawVerticalLine: false),
       alignment: BarChartAlignment.spaceAround,
-      maxY: 20, // กำหนดค่าสูงสุดของแกน Y เพื่อป้องกันข้อผิดพลาด Infinity
+      maxY: 30, // กำหนดค่าสูงสุดของแกน Y เพื่อป้องกันข้อผิดพลาด Infinity
       titlesData: FlTitlesData(
+        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         rightTitles: AxisTitles(
           sideTitles: SideTitles(
             getTitlesWidget: (value, meta) {
@@ -94,9 +57,14 @@ Widget buildBarChart(BuildContext context) {
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: (value, meta) {
+              // value จะเป็น index ของ bar group
+              final barGroupIndex = value.toInt();
               return SideTitleWidget(
                 axisSide: meta.axisSide,
-                child: Text('เดือน $value'),
+                child: Text(
+                  dateLabels[barGroupIndex],
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                ),
               );
             },
           ),
