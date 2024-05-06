@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -25,8 +26,9 @@ class Add_Knowlege extends StatefulWidget {
   final Knowledge? knowledge;
   final IconData? icons;
   final Contents? contents;
+  final User? users;
 
-  const Add_Knowlege({super.key, this.knowledge, this.contents, this.icons});
+  const Add_Knowlege({super.key, this.knowledge, this.contents, this.icons, this.users});
 
   @override
   _Add_KnowlegeState createState() => _Add_KnowlegeState();

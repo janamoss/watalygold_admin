@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:beamer/beamer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
@@ -166,6 +171,9 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           _login();
+                          // final prefs = await SharedPreferences.getInstance();
+                          // prefs.setString("UserID", user.uid);
+                          // print(user.uid);
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: GPrimaryColor,
@@ -212,14 +220,12 @@ class _LoginPageState extends State<LoginPage> {
   void _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
-
-    User? user = await _auth.LoginWithEmailandPassword(email, password);
-    
-    if (user != null) {
-      context.pushNamed('/dashborad',extra: user);
-    } else {
-      print("error someting");
-    }
+    final user = await _auth.LoginWithEmailandPassword(email, password);
+    final prefs = SharedPreferences.getInstance();
+    log(user!.uid.toString());
+    prefs.then((prefs) => prefs.setString("UserID", user!.uid.toString()));
+    context.goNamed(
+        '/dashboard'); // Navigate ไปยัง /dashborad หลังจากตั้งค่า "UserID" แล้ว
   }
 }
 

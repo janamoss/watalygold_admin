@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
@@ -17,6 +18,8 @@ class registerPage extends StatefulWidget {
 }
 
 class _registerPageState extends State<registerPage> {
+  final logger = Logger();
+
   bool _obscureText = true;
   bool _obscureText2 = true;
 
@@ -428,12 +431,13 @@ class _registerPageState extends State<registerPage> {
         _FnameController.text,
         _LnameController.text,
         _phonenumberController.text);
-    User? user = await _auth.RegisterWithEmailandPassword(email, password,"${_FnameController.text} ${_LnameController.text}");
-    print(user?.uid);
+    User? user = await _auth.RegisterWithEmailandPassword(
+        email, password, "${_FnameController.text} ${_LnameController.text}");
+    logger.d(user?.uid);
     if (user != null) {
       context.goNamed('/login');
     } else {
-      print("error someting");
+      logger.d("error someting");
     }
   }
 }

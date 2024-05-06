@@ -1,22 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class DeletedialogContent extends StatelessWidget {
-  const DeletedialogContent({
+  DeletedialogContent({
     Key? key,
     required this.knowledgeName,
     required this.id,
   });
+
+  final logger = Logger();
   
 void deleteContentById(String documentId) async {
     try {
       await Databasemethods().deleteContent(documentId);
      
     } catch (e) {
-      print('Error deleting content: $e');
+      logger.d('Error deleting content: $e');
     }
   }
   

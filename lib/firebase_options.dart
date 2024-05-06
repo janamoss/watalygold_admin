@@ -62,4 +62,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'watalygold.appspot.com',
     measurementId: 'G-8XEDQLLKFB',
   );
+
 }

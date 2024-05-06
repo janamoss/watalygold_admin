@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -49,6 +50,8 @@ class EditMutiple extends StatefulWidget {
 }
 
 class _EditMutipleState extends State<EditMutiple> {
+  final logger = Logger();
+
   bool _customTileExpanded = false;
   List<List<String>> allKnowledgeContents = [];
   TextEditingController contentNameController = TextEditingController();
@@ -99,7 +102,7 @@ class _EditMutipleState extends State<EditMutiple> {
           .map((doc) => Knowledge.fromFirestore(doc))
           .toList();
     } catch (error) {
-      print("Error getting knowledge: $error");
+      logger.d("Error getting knowledge: $error");
       return []; // Or handle the error in another way
     }
   }
@@ -121,7 +124,7 @@ class _EditMutipleState extends State<EditMutiple> {
       await Databasemethods().deleteContent(documentId);
       showToast("ลบข้อมูลเสร็จสิ้น");
     } catch (e) {
-      print('Error deleting content: $e');
+      logger.d('Error deleting content: $e');
     }
   }
 
@@ -148,7 +151,7 @@ class _EditMutipleState extends State<EditMutiple> {
 
   Future<void> updateContent(List<String> imageUrl) async {
     String? selectedValue;
-    print("start");
+    logger.d("start");
     selectedValue = widget.knowledge!.knowledgeIcons != null
         ? widget.knowledge!.knowledgeIcons.toString()
         : widget.icons != null
@@ -158,7 +161,7 @@ class _EditMutipleState extends State<EditMutiple> {
               )
             : null;
     try {
-      print("start loop");
+      logger.d("start loop");
       final knowledgeDocRef = FirebaseFirestore.instance
           .collection('Knowledge')
           .doc(widget.knowledge!.id);
@@ -172,10 +175,10 @@ class _EditMutipleState extends State<EditMutiple> {
                 orElse: () => ''),
         'update_at': Timestamp.now()
       });
-      print(contentList);
-      print(ListimageUrl);
-      print(contentNameControllers.length);
-      print(contentDetailControllers.length);
+      logger.d(contentList);
+      logger.d(ListimageUrl);
+      logger.d(contentNameControllers.length);
+      logger.d(contentDetailControllers.length);
       List<String> contentIds = [];
       for (int index = 0; index < contentList.length; index++) {
         String contentName = contentNameControllers[index].text;
@@ -183,14 +186,14 @@ class _EditMutipleState extends State<EditMutiple> {
         String imageUrl = ListimageUrl[index].toString();
         String contentId = contentList[index].id;
 
-        print(" id ${contentId}");
-        print(" name ${contentName}");
-        print(" detail ${contentDetail}");
-        print(" url ${imageUrl}");
+        logger.d(" id ${contentId}");
+        logger.d(" name ${contentName}");
+        logger.d(" detail ${contentDetail}");
+        logger.d(" url ${imageUrl}");
 
         await upContent(contentId, contentName, contentDetail, imageUrl);
       }
-      print("3");
+      logger.d("3");
 // Check if there are new contents to be added
       if (itemImagesList.isNotEmpty) {
         for (int index = contentList.length;
@@ -211,17 +214,17 @@ class _EditMutipleState extends State<EditMutiple> {
             contentIds.add(contentId);
           }
 
-          print(" id ${contentId}");
-          print(" name ${contentName}");
-          print(" detail ${contentDetail}");
-          print(" url ${imageUrl}");
+          logger.d(" id ${contentId}");
+          logger.d(" name ${contentName}");
+          logger.d(" detail ${contentDetail}");
+          logger.d(" url ${imageUrl}");
         }
       }
-      print(contentIds);
+      logger.d(contentIds);
       await knowledgeDocRef
           .update({'Content': contentIds, 'update_at': Timestamp.now()});
     } catch (error) {
-      print("Error getting knowledge: $error");
+      logger.d("Error getting knowledge: $error");
       // Or handle the error in another way
     }
   }
@@ -235,10 +238,10 @@ class _EditMutipleState extends State<EditMutiple> {
       "deleted_at": null,
       "update_at": Timestamp.now(),
     };
-    print(" id ${contentId}");
-    print(" name ${contentName}");
-    print(" detail ${contentDetail}");
-    print(" url ${imageUrl}");
+    logger.d(" id ${contentId}");
+    logger.d(" name ${contentName}");
+    logger.d(" detail ${contentDetail}");
+    logger.d(" url ${imageUrl}");
     // Update the existing content document with the provided contentId
     await Databasemethods().updateContent(
         updatecontent, contentId, contentName, contentDetail, imageUrl);
@@ -264,9 +267,9 @@ class _EditMutipleState extends State<EditMutiple> {
         });
       }
 
-      print(contents.deleted_at);
-      print(contentList);
-      print(contents.ContentName);
+      logger.d(contents.deleted_at);
+      logger.d(contentList);
+      logger.d(contents.ContentName);
     }
     setState(() {
       _isLoading = false;
@@ -1439,11 +1442,11 @@ class _EditMutipleState extends State<EditMutiple> {
       SettableMetadata(contentType: 'image/jpeg'),
     );
     String imageUrl = await reference.getDownloadURL();
-    // print(imageUrl);
-    // print(ListimageUrl);
+    // logger.d(imageUrl);
+    // logger.d(ListimageUrl);
     setState(() {
       ListimageUrl.add(imageUrl);
-      // print(ListimageUrl);
+      // logger.d(ListimageUrl);
     });
   }
 
@@ -1456,16 +1459,16 @@ class _EditMutipleState extends State<EditMutiple> {
     for (int i = 0; i < contentList.length + itemImagesList.length; i++) {
       if (itemImagesList.length == 0) {
         ListimageUrl.add(contentList[i].ImageURL);
-        print(ListimageUrl);
+        logger.d(ListimageUrl);
       } else {
         for (int i = 0; i < itemImagesList.length; i++) {
           file = File(itemImagesList[i].path);
-          print(itemImagesList[i].path);
+          logger.d(itemImagesList[i].path);
           pickedFile = PickedFile(file!.path);
           await uploadImageToStorage(pickedFile, contentIdnew, i);
         }
         ListimageUrl.add(contentList[i].ImageURL);
-        print(ListimageUrl);
+        logger.d(ListimageUrl);
       }
     }
     await updateContent(ListimageUrl);
@@ -1507,18 +1510,18 @@ class _EditMutipleState extends State<EditMutiple> {
   //           : null;
 
   //   List<String> contentIds = [];
-  //   print("list ${contentNameControllers.length}");
+  //   logger.d("list ${contentNameControllers.length}");
   //   // Loop through content and add them to Firebase
   //   for (int index = 0; index < itemImagesList.length; index++) {
   //     String contentName = contentNameControllers[index].text;
-  //     print(contentName);
+  //     logger.d(contentName);
   //     String contentDetail = contentDetailControllers[index].text;
-  //     print(contentDetail);
+  //     logger.d(contentDetail);
   //     String imageurl = ListimageUrl[index].toString();
-  //     print(" img ${imageurl}");
+  //     logger.d(" img ${imageurl}");
 
   //     String contentId = await addContents(contentName, contentDetail, imageurl);
-  //     print("id ${contentId}");
+  //     logger.d("id ${contentId}");
   //     contentIds.add(contentId);
   //   }
 

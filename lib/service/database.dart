@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class Databasemethods {
+  final logger = Logger();
+  
   Future addKnowlege(Map<String, dynamic> knowledgeMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("Knowledge")
@@ -32,11 +35,11 @@ class Databasemethods {
   Future updateContent(
       Map<String, dynamic> updatecontent, String contentId , String contentName,
       String contentDetail, String imageUrl) async {
-        print(" id ${contentId}");
-        print(" content ${updatecontent}");
-        print(" name ${contentName}");
-        print(" detail ${contentDetail}");
-        print(" url ${imageUrl}");
+        logger.d(" id ${contentId}");
+        logger.d(" content ${updatecontent}");
+        logger.d(" name ${contentName}");
+        logger.d(" detail ${contentDetail}");
+        logger.d(" url ${imageUrl}");
     return await FirebaseFirestore.instance
     
         .collection("Content")
@@ -52,9 +55,9 @@ class Databasemethods {
     try {
       // อัปเดตฟิลด์ deleted_at เป็นเวลาปัจจุบันแทนการลบข้อมูลจริง
       await contentRef.update({'deleted_at': Timestamp.now()});
-      print('Content deleted successfully');
+      logger.d('Content deleted successfully');
     } catch (e) {
-      print('Error deleting content: $e');
+      logger.d('Error deleting content: $e');
     }
   }
 }

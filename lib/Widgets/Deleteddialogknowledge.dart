@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class Deleteddialogknowledge extends StatelessWidget {
+  
   const Deleteddialogknowledge({
     Key? key,
     required this.knowledgeName,
@@ -24,6 +26,7 @@ class Deleteddialogknowledge extends StatelessWidget {
   }
 
   Future<void> deleteKnowledge() async {
+    final logger = Logger();
     try {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         // อ่านข้อมูลของ Knowledge ที่ต้องการลบ
@@ -54,7 +57,7 @@ class Deleteddialogknowledge extends StatelessWidget {
       showToast("ลบข้อมูลเสร็จสิ้น");
     } catch (e) {
       // จัดการข้อผิดพลาดที่เกิดขึ้น
-      print("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
+      logger.d("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
       throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
     }
   }

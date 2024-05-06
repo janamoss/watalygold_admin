@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logger/logger.dart';
 import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditMutiple.dart';
@@ -19,13 +21,17 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 class MainKnowlege extends StatefulWidget {
-  const MainKnowlege({super.key});
+  final User? users;
+  const MainKnowlege({super.key, this.users});
 
   @override
   State<MainKnowlege> createState() => _MainKnowlegeState();
 }
 
 class _MainKnowlegeState extends State<MainKnowlege> {
+  final logger = Logger();
+  // late User? _user;
+
   final sidebarController = Get.put(SidebarController());
 
   bool _isLoading = true;
@@ -43,7 +49,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
           .map((doc) => Knowledge.fromFirestore(doc))
           .toList();
     } catch (error) {
-      print("Error getting knowledge: $error");
+      logger.d("Error getting knowledge: $error");
       return []; // Or handle the error in another way
     }
   }
@@ -131,7 +137,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
               flex: 4,
               child: Scaffold(
                 backgroundColor: Color(0xffF1F1F1),
-                appBar: Appbarmain(),
+                appBar: Appbarmain(
+                  users: widget.users,
+                ),
                 body: SingleChildScrollView(
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 25, horizontal: 60),

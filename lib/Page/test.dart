@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:logger/logger.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import 'dart:ui_web';
 
@@ -11,6 +12,7 @@ class testss extends StatefulWidget {
 }
 
 class _testssState extends State<testss> {
+  final logger = Logger();
   QuillController _controller = QuillController.basic();
   String _html = '';
   @override
@@ -40,13 +42,12 @@ class _testssState extends State<testss> {
           ElevatedButton(
               onPressed: () {
                 final deltaJson = _controller.document.toDelta().toJson();
-                print(deltaJson);
-
+                logger.d(deltaJson);
                 final converter = QuillDeltaToHtmlConverter(
                   List.castFrom(deltaJson),
                 );
                 _html = converter.convert();
-                print(_html);
+                logger.d(_html);
               },
               child: Text("dsdsd"))
         ],

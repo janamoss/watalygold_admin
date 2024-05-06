@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
 class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
@@ -17,12 +19,16 @@ class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppbarmainState extends State<Appbarmain> {
+  final logger = Logger();
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      elevation: 4,
       automaticallyImplyLeading: false,
       toolbarHeight: 100,
       backgroundColor: Color(0xffFAFAFA),
+      surfaceTintColor: Color(0xffFAFAFA),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 10.0),
@@ -52,7 +58,9 @@ class _AppbarmainState extends State<Appbarmain> {
                 PopupMenuItem<int>(
                   value: 0,
                   child: ListTile(
-                    onTap: () {
+                    onTap: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
                       FirebaseAuth.instance.signOut();
                       context.goNamed('/login');
                     },
@@ -70,9 +78,9 @@ class _AppbarmainState extends State<Appbarmain> {
             },
             onSelected: (value) {
               if (value == 0) {
-                print("Log out menu is selected.");
+                logger.d("Log out menu is selected.");
               } else
-                print("another menu is selected.");
+                logger.d("another menu is selected.");
             },
             offset: Offset(0, 75),
           ),

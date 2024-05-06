@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
 import 'package:watalygold_admin/Components/SidebarController.dart';
 
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-class SideNav extends StatelessWidget {
+class SideNav extends StatefulWidget {
   final bool? dropdown;
   final int? status;
   const SideNav({Key? key, this.status, this.dropdown}) : super(key: key);
 
   @override
+  State<SideNav> createState() => _SideNavState();
+}
+
+class _SideNavState extends State<SideNav> {
+  final logger = Logger();
+
+  final sidebarController = Get.put(SidebarController());
+  var showDropdown;
+
+  @override
+  void initState() {
+    super.initState();
+    sidebarController.index.value = widget.status ?? 0;
+    showDropdown = widget.dropdown ?? false;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final sidebarController = Get.put(SidebarController());
-    sidebarController.index.value = status ?? 0;
-    var showDropdown = dropdown ?? false;
     return Column(
       children: [
         Center(
@@ -34,13 +49,16 @@ class SideNav extends StatelessWidget {
                 icons: Icons.dashboard_outlined,
                 press: () {
                   sidebarController.index.value = 0;
-                  context.goNamed("/dashborad");
+                  context.goNamed("/dashboard");
                 },
                 seleteds: sidebarController.index.value == 0,
               ),
               ListTile(
                 onTap: () {
-                  showDropdown = !showDropdown;
+                  logger.d(showDropdown);
+                  setState(() {
+                    showDropdown = !showDropdown;
+                  });
                   sidebarController.dropdown.value =
                       !sidebarController.dropdown.value;
                 },

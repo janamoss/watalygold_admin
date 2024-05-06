@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'package:watalygold_admin/Widgets/Addknowledgedialog.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
@@ -45,6 +46,8 @@ class Multiplecontent extends StatefulWidget {
 }
 
 class _MultiplecontentState extends State<Multiplecontent> {
+  final logger = Logger();
+
   IconData? selectedIconData;
   String? _selectedValue;
 
@@ -891,7 +894,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
     String? contentId = const Uuid().v4().substring(0, 10);
     for (int i = 0; i < itemImagesList.length; i++) {
       file = File(itemImagesList[i].path);
-      print(itemImagesList[i].path);
+      logger.d(itemImagesList[i].path);
       pickedFile = PickedFile(file!.path);
       await uploadImageToStorage(pickedFile, contentId, i);
     }
@@ -919,11 +922,11 @@ class _MultiplecontentState extends State<Multiplecontent> {
       SettableMetadata(contentType: 'image/jpeg'),
     );
     String imageUrl = await reference.getDownloadURL();
-    print(imageUrl);
-    print(ListimageUrl);
+    logger.d(imageUrl);
+    logger.d(ListimageUrl);
     setState(() {
       ListimageUrl.add(imageUrl);
-      print(ListimageUrl);
+      logger.d(ListimageUrl);
     });
   }
 
@@ -948,18 +951,18 @@ class _MultiplecontentState extends State<Multiplecontent> {
     }
 
     List<String> contentIds = [];
-    print("list ${itemImagesList.length}");
+    logger.d("list ${itemImagesList.length}");
     // Loop through content and add them to Firebase
     for (int index = 0; index < itemImagesList.length; index++) {
       String contentName = contentNameControllers[index].text;
-      print(contentName);
+      logger.d(contentName);
       String contentDetail = contentDetailControllers[index].text;
-      print(contentDetail);
+      logger.d(contentDetail);
       String imageurl = ListimageUrl[index].toString();
-      print(" img ${imageurl}");
+      logger.d(" img ${imageurl}");
 
       String contentId = await addContent(contentName, contentDetail, imageurl);
-      print("id ${contentId}");
+      logger.d("id ${contentId}");
       contentIds.add(contentId);
     }
 
