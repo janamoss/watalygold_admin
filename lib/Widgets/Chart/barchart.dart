@@ -2,22 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
-// เดือนทั้งหมด
-List<String> months = [
-  "มกราคม",
-  "กุมภาพันธ์",
-  "มีนาคม",
-  "เมษายน",
-  "พฤษภาคม",
-  "มิถุนายน",
-  "กรกฎาคม",
-  "สิงหาคม",
-  "กันยายน",
-  "ตุลาคม",
-  "พฤศจิกายน",
-  "ธันวาคม"
-];
-
 // สร้าง BarChart widget
 Widget buildBarChart(BuildContext context, List<BarChartGroupData> bargroups,
     List<String> dateLabels) {

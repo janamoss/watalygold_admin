@@ -10,8 +10,8 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 import 'package:web/helpers.dart';
-
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -28,7 +28,8 @@ class Add_Knowlege extends StatefulWidget {
   final Contents? contents;
   final User? users;
 
-  const Add_Knowlege({super.key, this.knowledge, this.contents, this.icons, this.users});
+  const Add_Knowlege(
+      {super.key, this.knowledge, this.contents, this.icons, this.users});
 
   @override
   _Add_KnowlegeState createState() => _Add_KnowlegeState();
@@ -52,22 +53,35 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
 
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
-            Expanded(
-              child: Container(
-                color: GPrimaryColor,
-                child: SideNav(
-                  status: 2,
-                  dropdown: true,
-                ),
-              ),
-            ),
+            screenSize == ScreenSize.minidesktop
+                ? const SizedBox.shrink()
+                : Expanded(
+                    child: Container(
+                      color: GPrimaryColor,
+                      child: SideNav(
+                        status: 2,
+                        dropdown: true,
+                      ),
+                    ),
+                  ),
             Expanded(
               flex: 4,
               child: Scaffold(
+                drawer: screenSize == ScreenSize.minidesktop
+                    ? Container(
+                        color: GPrimaryColor,
+                        width: 300,
+                        child: SideNav(
+                          status: 2,
+                          dropdown: true,
+                        ),
+                      )
+                    : null,
                 appBar: Appbarmain(),
                 backgroundColor: GrayColor,
                 body: SingleChildScrollView(

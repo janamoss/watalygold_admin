@@ -9,6 +9,7 @@ import 'package:logger/logger.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 class registerPage extends StatefulWidget {
   const registerPage({super.key});
@@ -67,7 +68,16 @@ class _registerPageState extends State<registerPage> {
   }
 
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
+      drawer: screenSize == ScreenSize.minidesktop
+          ? SizedBox(
+              width: 300,
+              child: Menutop_darwer(
+                numpage: 0,
+              ),
+            )
+          : null,
       body: DecoratedBox(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -86,7 +96,9 @@ class _registerPageState extends State<registerPage> {
                   borderRadius: BorderRadius.circular(10.0),
                   color: WhiteColor,
                 ),
-                width: MediaQuery.of(context).size.width * 0.4,
+                width: screenSize == ScreenSize.minidesktop
+                    ? MediaQuery.of(context).size.width
+                    : MediaQuery.of(context).size.width * 0.4,
                 margin: const EdgeInsets.all(30),
                 padding: const EdgeInsets.all(30),
                 child: Column(
@@ -184,24 +196,104 @@ class _registerPageState extends State<registerPage> {
                         ),
                       ],
                     ),
-                    Container(
-                      width: 600,
-                      margin: const EdgeInsetsDirectional.only(top: 15),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "อีเมล",
-                                style: const TextStyle(fontSize: 18),
+                    Center(
+                      child: Container(
+                        width: 600,
+                        margin: const EdgeInsetsDirectional.only(top: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "อีเมล",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
                               ),
-                            ),
-                            TextField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
+                              TextField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 0,
+                                        style: BorderStyle.none,
+                                      ),
+                                    ),
+                                    hintText: "อีเมล",
+                                    fillColor: const Color(0xFFD9D9D9)
+                                        .withOpacity(0.29),
+                                    filled: true,
+                                    labelStyle: const TextStyle(fontSize: 20)),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                        width: 600,
+                        margin: const EdgeInsetsDirectional.only(top: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "เบอร์โทรศัพท์",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              TextField(
+                                controller: _phonenumberController,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 0,
+                                        style: BorderStyle.none,
+                                      ),
+                                    ),
+                                    hintText: "เบอร์โทรศัพท์",
+                                    fillColor: const Color(0xFFD9D9D9)
+                                        .withOpacity(0.29),
+                                    filled: true,
+                                    labelStyle: const TextStyle(fontSize: 20)),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                        width: 600,
+                        margin: const EdgeInsetsDirectional.only(top: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "รหัสผ่าน",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              TextField(
+                                controller: _passwordController,
+                                obscureText: _obscureText,
+                                decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(
@@ -209,34 +301,51 @@ class _registerPageState extends State<registerPage> {
                                       style: BorderStyle.none,
                                     ),
                                   ),
-                                  hintText: "อีเมล",
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureText = !_obscureText;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      _obscureText
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  hintText: "รหัสผ่าน",
                                   fillColor:
                                       const Color(0xFFD9D9D9).withOpacity(0.29),
                                   filled: true,
-                                  labelStyle: const TextStyle(fontSize: 20)),
-                            )
-                          ],
+                                  labelStyle: const TextStyle(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: 600,
-                      margin: const EdgeInsetsDirectional.only(top: 15),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "เบอร์โทรศัพท์",
-                                style: const TextStyle(fontSize: 18),
+                    Center(
+                      child: Container(
+                        width: 600,
+                        margin: const EdgeInsetsDirectional.only(top: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "ยืนยันรหัสผ่าน",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
                               ),
-                            ),
-                            TextField(
-                              controller: _phonenumberController,
-                              decoration: InputDecoration(
+                              TextField(
+                                controller: _passwordenterController,
+                                obscureText: _obscureText2,
+                                decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(
@@ -244,117 +353,28 @@ class _registerPageState extends State<registerPage> {
                                       style: BorderStyle.none,
                                     ),
                                   ),
-                                  hintText: "เบอร์โทรศัพท์",
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureText2 = !_obscureText2;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      _obscureText2
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  hintText: "รหัสผ่าน",
                                   fillColor:
                                       const Color(0xFFD9D9D9).withOpacity(0.29),
                                   filled: true,
-                                  labelStyle: const TextStyle(fontSize: 20)),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 600,
-                      margin: const EdgeInsetsDirectional.only(top: 15),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "รหัสผ่าน",
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                            ),
-                            TextField(
-                              controller: _passwordController,
-                              obscureText: _obscureText,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(
-                                    width: 0,
-                                    style: BorderStyle.none,
-                                  ),
+                                  labelStyle: const TextStyle(fontSize: 20),
                                 ),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    _obscureText
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                hintText: "รหัสผ่าน",
-                                fillColor:
-                                    const Color(0xFFD9D9D9).withOpacity(0.29),
-                                filled: true,
-                                labelStyle: const TextStyle(fontSize: 20),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 600,
-                      margin: const EdgeInsetsDirectional.only(top: 15),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "ยืนยันรหัสผ่าน",
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                            ),
-                            TextField(
-                              controller: _passwordenterController,
-                              obscureText: _obscureText2,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(
-                                    width: 0,
-                                    style: BorderStyle.none,
-                                  ),
-                                ),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText2 = !_obscureText2;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    _obscureText2
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                hintText: "รหัสผ่าน",
-                                fillColor:
-                                    const Color(0xFFD9D9D9).withOpacity(0.29),
-                                filled: true,
-                                labelStyle: const TextStyle(fontSize: 20),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

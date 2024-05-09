@@ -13,6 +13,7 @@ import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 
 Map<String, IconData> icons = {
@@ -80,6 +81,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
       backgroundColor: GrayColor,
       body: SingleChildScrollView(

@@ -11,6 +11,7 @@ import 'package:watalygold_admin/Widgets/Card/resultCard.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainDash extends StatefulWidget {
   final User? users;
@@ -21,7 +22,6 @@ class MainDash extends StatefulWidget {
 }
 
 class _MainDashState extends State<MainDash> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map<String, dynamic>> results = [];
   List<Map<String, dynamic>> resultstoday = [];
   bool isLoading = true;
@@ -82,33 +82,32 @@ class _MainDashState extends State<MainDash> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    ScreenSize screenSize = getScreenSize(context);
+
+    if (screenSize == ScreenSize.minidesktop) {
+      return Scaffold(
         // appBar: Appbarmain(),
         body: SafeArea(
-            child: Row(
-      children: [
-        Expanded(
-          child: Container(
-            color: GPrimaryColor,
-            child: const SideNav(
-              status: 0,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 4,
-          child: Scaffold(
-              backgroundColor: Color(0xffF1F1F1),
-              appBar: Appbarmain(
-                  // users: widget.users,
-                  ),
-              body: isLoading // ตรวจสอบสถานะการโหลด
-                  ? Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (constraints.maxWidth < 950) {
-                            return Column(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 4,
+                child: Scaffold(
+                    drawer: Container(
+                      width: 300,
+                      color: GPrimaryColor,
+                      child: const SideNav(
+                        status: 0,
+                      ),
+                    ),
+                    backgroundColor: Color(0xffF1F1F1),
+                    appBar: Appbarmain(
+                        // users: widget.users,
+                        ),
+                    body: isLoading // ตรวจสอบสถานะการโหลด
+                        ? Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment
                                   .start, // ให้ Column จัดวางวิดเจ็ตย่อยชิดซ้าย
                               children: [
@@ -123,48 +122,78 @@ class _MainDashState extends State<MainDash> {
                                   lefts: 20,
                                 )
                               ],
-                            );
-                          } else {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .start, // ให้ Column จัดวางวิดเจ็ตย่อยชิดซ้าย
-                              children: [
-                                ResultCard(
-                                  results: resultstoday,
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .start, // ให้ Row จัดวางวิดเจ็ตย่อยชิดด้านบน
-                                  children: [
-                                    Expanded(
-                                      flex: 6,
-                                      child: SizedBox(
-                                        height: 600,
-                                        child: CardChart(
-                                          results: results,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: SizedBox(
-                                        height:
-                                            600, // ใช้ chartHeight ที่อัปเดตแล้ว
-                                        child: CardResultDetail(
-                                          results: results,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          }
-                        },
+                            ),
+                          )),
+              )
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        // appBar: Appbarmain(),
+        body: SafeArea(
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  color: GPrimaryColor,
+                  child: const SideNav(
+                    status: 0,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Scaffold(
+                  backgroundColor: Color(0xffF1F1F1),
+                  appBar: Appbarmain(
+                      // users: widget.users,
                       ),
-                    )),
-        )
-      ],
-    )));
+                  body: isLoading // ตรวจสอบสถานะการโหลด
+                      ? Center(child: CircularProgressIndicator())
+                      : SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // ให้ Column จัดวางวิดเจ็ตย่อยชิดซ้าย
+                            children: [
+                              ResultCard(
+                                results: resultstoday,
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment
+                                    .start, // ให้ Row จัดวางวิดเจ็ตย่อยชิดด้านบน
+                                children: [
+                                  Expanded(
+                                    flex: 6,
+                                    child: SizedBox(
+                                      height: 600,
+                                      child: CardChart(
+                                        results: results,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: SizedBox(
+                                      height:
+                                          600, // ใช้ chartHeight ที่อัปเดตแล้ว
+                                      child: CardResultDetail(
+                                        results: results,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
   }
 }

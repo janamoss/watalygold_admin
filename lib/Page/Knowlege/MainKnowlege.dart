@@ -19,6 +19,7 @@ import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainKnowlege extends StatefulWidget {
   final User? users;
@@ -120,150 +121,306 @@ class _MainKnowlegeState extends State<MainKnowlege> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              color: GPrimaryColor,
-              child: SideNav(
-                status: 1,
-                dropdown: true,
-              ),
-            ),
-          ),
-          Expanded(
-              flex: 4,
-              child: Scaffold(
-                backgroundColor: Color(0xffF1F1F1),
-                appBar: Appbarmain(
-                  users: widget.users,
-                ),
-                body: SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 60),
-                    child: Column(
-                      children: [
-                        Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              "หน้าหลักคลังความรู้",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 25),
-                            )),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              "มีคลังความรู้ทั้งหมด",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(0xff1D1D1D).withOpacity(0.43)),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                "${knowledgelist.length}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: GPrimaryColor),
-                              ),
-                            ),
-                            Text(
-                              "เรื่อง",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(0xff1D1D1D).withOpacity(0.43)),
-                            ),
-                          ],
-                        ),
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                sidebarController.index.value = 2;
-                                context.goNamed("/addKnowledge");
-                              },
-                              onHover: (value) {
-                                ElevatedButton.styleFrom(
-                                    backgroundColor: GPrimaryColor);
-                              },
-                              icon: Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: WhiteColor,
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: GPrimaryColor,
-                                  shape: ContinuousRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  shadowColor: Colors.black,
-                                  elevation: 5),
-                              label: Text(
-                                "เพิ่มคลังความรู้",
-                                style:
-                                    TextStyle(color: WhiteColor, fontSize: 20),
-                              ),
-                            )),
-                        _isLoading
-                            ? Center(
-                                child: LoadingAnimationWidget.discreteCircle(
-                                  color: WhiteColor,
-                                  secondRingColor: GPrimaryColor,
-                                  thirdRingColor: YPrimaryColor,
-                                  size: 200,
-                                ),
-                              )
-                            : Container(
-                                margin: EdgeInsets.symmetric(vertical: 15),
-                                decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: Wrap(
-                                  direction: Axis.horizontal,
-                                  children: [
-                                    for (var i = 0;
-                                        i < knowledgelist.length;
-                                        i++)
-                                      KnowledgeContainer(
-                                        knowledge: knowledgelist[i],
-                                        sidebarController: sidebarController,
-                                        id: knowledgelist[i].id,
-                                        title: knowledgelist[i].knowledgeName,
-                                        icons: knowledgelist[i].knowledgeIcons,
-                                        date: timestampToDateThai(
-                                            knowledgelist[i].create_at!),
-                                        image: imageURLlist[i].toString(),
-                                        status: knowledgelist[i]
-                                                .knowledgeImg
-                                                .isEmpty
-                                            ? "หลายเนื้อหา"
-                                            : "เนื้อหาเดียว",
-                                      ),
-                                    knowledgelist.length == 0
-                                        ? Text(
-                                            "ไม่มีเนื้อหา",
-                                            style: TextStyle(
-                                                color: GPrimaryColor,
-                                                fontSize: 18),
-                                          )
-                                        : SizedBox(),
-                                  ],
-                                ),
-                              )
-                      ],
+    ScreenSize screenSize = getScreenSize(context);
+
+    if (screenSize == ScreenSize.minidesktop) {
+      return Scaffold(
+        body: SafeArea(
+            child: Row(
+          children: [
+            Expanded(
+                flex: 4,
+                child: Scaffold(
+                  drawer: Container(
+                    width: 300,
+                    color: GPrimaryColor,
+                    child: SideNav(
+                      status: 1,
+                      dropdown: true,
                     ),
                   ),
+                  backgroundColor: Color(0xffF1F1F1),
+                  appBar: Appbarmain(
+                    users: widget.users,
+                  ),
+                  body: SingleChildScrollView(
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 25, horizontal: 60),
+                      child: Column(
+                        children: [
+                          Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "หน้าหลักคลังความรู้",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 25),
+                              )),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "มีคลังความรู้ทั้งหมด",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color(0xff1D1D1D).withOpacity(0.43)),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                  "${knowledgelist.length}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: GPrimaryColor),
+                                ),
+                              ),
+                              Text(
+                                "เรื่อง",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color(0xff1D1D1D).withOpacity(0.43)),
+                              ),
+                            ],
+                          ),
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  sidebarController.index.value = 2;
+                                  context.goNamed("/addKnowledge");
+                                },
+                                onHover: (value) {
+                                  ElevatedButton.styleFrom(
+                                      backgroundColor: GPrimaryColor);
+                                },
+                                icon: Icon(
+                                  Icons.add_circle_outline_rounded,
+                                  color: WhiteColor,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: GPrimaryColor,
+                                    shape: ContinuousRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    shadowColor: Colors.black,
+                                    elevation: 5),
+                                label: Text(
+                                  "เพิ่มคลังความรู้",
+                                  style: TextStyle(
+                                      color: WhiteColor, fontSize: 20),
+                                ),
+                              )),
+                          _isLoading
+                              ? Center(
+                                  child: LoadingAnimationWidget.discreteCircle(
+                                    color: WhiteColor,
+                                    secondRingColor: GPrimaryColor,
+                                    thirdRingColor: YPrimaryColor,
+                                    size: 200,
+                                  ),
+                                )
+                              : Container(
+                                  margin: EdgeInsets.symmetric(vertical: 15),
+                                  decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Wrap(
+                                    direction: Axis.horizontal,
+                                    children: [
+                                      for (var i = 0;
+                                          i < knowledgelist.length;
+                                          i++)
+                                        KnowledgeContainer(
+                                          knowledge: knowledgelist[i],
+                                          sidebarController: sidebarController,
+                                          id: knowledgelist[i].id,
+                                          title: knowledgelist[i].knowledgeName,
+                                          icons:
+                                              knowledgelist[i].knowledgeIcons,
+                                          date: timestampToDateThai(
+                                              knowledgelist[i].create_at!),
+                                          image: i < imageURLlist.length
+                                              ? imageURLlist[i].toString()
+                                              : '', // ตรวจสอบขนาดของ imageURLlist ก่อนเข้าถึงค่า
+                                          status: knowledgelist[i]
+                                                  .knowledgeImg
+                                                  .isEmpty
+                                              ? "หลายเนื้อหา"
+                                              : "เนื้อหาเดียว",
+                                        ),
+                                      knowledgelist.length == 0
+                                          ? Text(
+                                              "ไม่มีเนื้อหา",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 18),
+                                            )
+                                          : SizedBox(),
+                                    ],
+                                  ),
+                                )
+                        ],
+                      ),
+                    ),
+                  ),
+                ))
+          ],
+        )),
+      );
+    } else {
+      return Scaffold(
+        body: SafeArea(
+            child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                color: GPrimaryColor,
+                child: SideNav(
+                  status: 1,
+                  dropdown: true,
                 ),
-              ))
-        ],
-      )),
-    );
+              ),
+            ),
+            Expanded(
+                flex: 4,
+                child: Scaffold(
+                  backgroundColor: Color(0xffF1F1F1),
+                  appBar: Appbarmain(
+                    users: widget.users,
+                  ),
+                  body: SingleChildScrollView(
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 25, horizontal: 60),
+                      child: Column(
+                        children: [
+                          Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "หน้าหลักคลังความรู้",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 25),
+                              )),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "มีคลังความรู้ทั้งหมด",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color(0xff1D1D1D).withOpacity(0.43)),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                  "${knowledgelist.length}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: GPrimaryColor),
+                                ),
+                              ),
+                              Text(
+                                "เรื่อง",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color(0xff1D1D1D).withOpacity(0.43)),
+                              ),
+                            ],
+                          ),
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  sidebarController.index.value = 2;
+                                  context.goNamed("/addKnowledge");
+                                },
+                                onHover: (value) {
+                                  ElevatedButton.styleFrom(
+                                      backgroundColor: GPrimaryColor);
+                                },
+                                icon: Icon(
+                                  Icons.add_circle_outline_rounded,
+                                  color: WhiteColor,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: GPrimaryColor,
+                                    shape: ContinuousRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    shadowColor: Colors.black,
+                                    elevation: 5),
+                                label: Text(
+                                  "เพิ่มคลังความรู้",
+                                  style: TextStyle(
+                                      color: WhiteColor, fontSize: 20),
+                                ),
+                              )),
+                          _isLoading
+                              ? Center(
+                                  child: LoadingAnimationWidget.discreteCircle(
+                                    color: WhiteColor,
+                                    secondRingColor: GPrimaryColor,
+                                    thirdRingColor: YPrimaryColor,
+                                    size: 200,
+                                  ),
+                                )
+                              : Container(
+                                  margin: EdgeInsets.symmetric(vertical: 15),
+                                  decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Wrap(
+                                    direction: Axis.horizontal,
+                                    children: [
+                                      for (var i = 0;
+                                          i < knowledgelist.length;
+                                          i++)
+                                        KnowledgeContainer(
+                                          knowledge: knowledgelist[i],
+                                          sidebarController: sidebarController,
+                                          id: knowledgelist[i].id,
+                                          title: knowledgelist[i].knowledgeName,
+                                          icons:
+                                              knowledgelist[i].knowledgeIcons,
+                                          date: timestampToDateThai(
+                                              knowledgelist[i].create_at!),
+                                          image: i < imageURLlist.length
+                                              ? imageURLlist[i].toString()
+                                              : '', // ตรวจสอบขนาดของ imageURLlist ก่อนเข้าถึงค่า
+                                          status: knowledgelist[i]
+                                                  .knowledgeImg
+                                                  .isEmpty
+                                              ? "หลายเนื้อหา"
+                                              : "เนื้อหาเดียว",
+                                        ),
+                                      knowledgelist.length == 0
+                                          ? Text(
+                                              "ไม่มีเนื้อหา",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 18),
+                                            )
+                                          : SizedBox(),
+                                    ],
+                                  ),
+                                )
+                        ],
+                      ),
+                    ),
+                  ),
+                ))
+          ],
+        )),
+      );
+    }
   }
 }
 
@@ -296,10 +453,12 @@ class KnowledgeContainer extends StatefulWidget {
 class _KnowledgeContainerState extends State<KnowledgeContainer> {
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
+
     return Container(
       margin: EdgeInsets.all(30),
       width: MediaQuery.of(context).size.width * 0.3,
-      height: 200,
+      height: screenSize == ScreenSize.minidesktop ? 300 : 200,
       decoration: BoxDecoration(
         color: WhiteColor,
         borderRadius: BorderRadius.circular(15),
@@ -371,15 +530,15 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                           ],
                         )),
                     Spacer(),
-                    Row(
-                      children: [
-                        Text(
-                          "วันที่ ${widget.date}",
-                          style: TextStyle(color: GPrimaryColor, fontSize: 15),
-                        ),
-                        Spacer(),
-                        Row(
-                          children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "วันที่ ${widget.date}",
+                        style: TextStyle(color: GPrimaryColor, fontSize: 15),
+                      ),
+                    ),
+                    screenSize == ScreenSize.minidesktop
+                        ? Column(children: [
                             ElevatedButton.icon(
                                 onPressed: () {
                                   if (widget.status != "เนื้อหาเดียว") {
@@ -418,7 +577,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                   style: TextStyle(color: WhiteColor),
                                 )),
                             SizedBox(
-                              width: 15,
+                              height: 15,
                             ),
                             ElevatedButton.icon(
                                 onPressed: () {
@@ -444,11 +603,79 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                     shadowColor: Colors.black,
                                     elevation: 1),
                                 label: Text("ลบ",
-                                    style: TextStyle(color: WhiteColor)))
-                          ],
-                        ),
-                      ],
-                    ),
+                                    style: TextStyle(color: WhiteColor))),
+                          ])
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    if (widget.status != "เนื้อหาเดียว") {
+                                      // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
+                                      context.goNamed(
+                                        '/editmultiKnowledge',
+                                        extra: {
+                                          'knowledge': widget.knowledge,
+                                          'icon': widget.icons,
+                                        },
+                                      );
+                                    } else {
+                                      // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
+                                      context.goNamed(
+                                        '/editKnowledge',
+                                        extra: {
+                                          'knowledge': widget.knowledge,
+                                          'icon': widget.icons,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: WhiteColor,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.yellow.shade400,
+                                      shape: ContinuousRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      shadowColor: Colors.black,
+                                      elevation: 1),
+                                  label: Text(
+                                    "แก้ไข",
+                                    style: TextStyle(color: WhiteColor),
+                                  )),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          Deleteddialogknowledge(
+                                        knowledgeName: widget.title,
+                                        id: widget.id,
+                                      ),
+                                    ).then((value) => Navigator.popUntil(
+                                        context,
+                                        ModalRoute.withName("/mainKnowledge")));
+                                  },
+                                  icon: Icon(
+                                    Icons.delete_forever_rounded,
+                                    color: WhiteColor,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red.shade400,
+                                      shape: ContinuousRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      shadowColor: Colors.black,
+                                      elevation: 1),
+                                  label: Text("ลบ",
+                                      style: TextStyle(color: WhiteColor)))
+                            ],
+                          )
                   ],
                 ),
               ))

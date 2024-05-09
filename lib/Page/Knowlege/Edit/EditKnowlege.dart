@@ -15,6 +15,7 @@ import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -62,22 +63,35 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   }
 
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
-            Expanded(
-              child: Container(
-                color: GPrimaryColor,
-                child: SideNav(
-                  status: 1,
-                  dropdown: true,
-                ),
-              ),
-            ),
+            screenSize == ScreenSize.minidesktop
+                ? const SizedBox.shrink()
+                : Expanded(
+                    child: Container(
+                      color: GPrimaryColor,
+                      child: SideNav(
+                        status: 1,
+                        dropdown: true,
+                      ),
+                    ),
+                  ),
             Expanded(
               flex: 4,
               child: Scaffold(
+                drawer: screenSize == ScreenSize.minidesktop
+                    ? Container(
+                        width: 300,
+                        color: GPrimaryColor,
+                        child: SideNav(
+                          status: 1,
+                          dropdown: true,
+                        ),
+                      )
+                    : null,
                 appBar: Appbarmain(),
                 backgroundColor: GrayColor,
                 body: SingleChildScrollView(

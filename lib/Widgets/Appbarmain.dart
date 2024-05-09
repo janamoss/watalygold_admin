@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
   final User? users;
@@ -23,7 +24,22 @@ class _AppbarmainState extends State<Appbarmain> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
+
     return AppBar(
+      leading: screenSize == ScreenSize.minidesktop
+          ? InkWell(
+              onTap: () => Scaffold.of(context).openDrawer(),
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  Icons.menu_rounded,
+                  color: GPrimaryColor,
+                  size: 40,
+                ),
+              ),
+            )
+          : null,
       elevation: 4,
       automaticallyImplyLeading: false,
       toolbarHeight: 100,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,12 @@ class CardChart extends StatefulWidget {
 }
 
 class _CardChartState extends State<CardChart> {
+  String? selectedMonth;
+  String? selectedYear;
+
+  final dateLabels = <String>[];
+  final yearLabels = <String>[];
+
   Map<String, Map<String, int>> groupDataByDayMonthYear() {
     Map<String, Map<String, int>> result = {};
     for (var item in widget.results) {
@@ -40,53 +48,83 @@ class _CardChartState extends State<CardChart> {
     return result;
   }
 
-  final dateLabels = <String>[];
-
-  List<BarChartGroupData> getBarData() {
+  void _populateYearLabels() {
     final groupedData = groupDataByDayMonthYear();
     final sortedEntries = groupedData.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
+
+    for (var entry in sortedEntries) {
+      final dateKey = entry.key;
+      final dateParts = dateKey.split('-');
+      final year = int.parse(dateParts[0]);
+      final thaiYear = year + 543;
+
+      if (!yearLabels.contains(thaiYear.toString())) {
+        yearLabels.add(thaiYear.toString());
+      }
+    }
+  }
+
+  List<BarChartGroupData?> getBarData(String? month, String? year) {
+    final groupedData = groupDataByDayMonthYear();
+    final sortedEntries = groupedData.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
     return sortedEntries.map((entry) {
       final dateKey = entry.key;
       final qualityCounts = entry.value;
       final dateParts = dateKey.split('-');
-      final year = int.parse(dateParts[0]);
-      final month = int.parse(dateParts[1]);
+      final entryYear = int.parse(dateParts[0]);
+      final entryMonth = int.parse(dateParts[1]);
       final day = int.parse(dateParts[2]);
-      final thaiYear = year + 543; // แปลงเป็น พ.ศ.
-      final dateString = '$day ${months[month - 1]} $thaiYear';
-      printInfo(info: dateString);
-      dateLabels.add(dateString);
-      return BarChartGroupData(
-        x: dateLabels.indexOf(dateString),
-        barRods: [
-          BarChartRodData(
-              width: 10,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(2), topRight: Radius.circular(2)),
-              toY: qualityCounts['ขั้นพิเศษ']?.toDouble() ?? 0,
-              color: G2PrimaryColor),
-          BarChartRodData(
-              width: 10,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(2), topRight: Radius.circular(2)),
-              toY: qualityCounts['ขั้นที่ 1']?.toDouble() ?? 0,
-              color: Color(0xFF86BD41)),
-          BarChartRodData(
-              width: 10,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(2), topRight: Radius.circular(2)),
-              toY: qualityCounts['ขั้นที่ 2']?.toDouble() ?? 0,
-              color: Color(0xFFB6AC55)),
-          BarChartRodData(
-              width: 10,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(2), topRight: Radius.circular(2)),
-              toY: qualityCounts['ไม่เข้าข่าย']?.toDouble() ?? 0,
-              color: Color(0xFFB68955)),
-        ],
-      );
-    }).toList();
+      final thaiYear = entryYear + 543; // แปลงเป็น พ.ศ.
+
+      // ตรวจสอบเงื่อนไขการกรอง
+      if ((month == null || months[entryMonth - 1] == month) &&
+          (year == null || thaiYear.toString() == year)) {
+        final dateString = '$day ${months[entryMonth - 1]} $thaiYear';
+        printInfo(info: dateString);
+        dateLabels.add(dateString);
+        return BarChartGroupData(
+          x: dateLabels.indexOf(dateString),
+          barRods: [
+            BarChartRodData(
+                width: 10,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(2), topRight: Radius.circular(2)),
+                toY: qualityCounts['ขั้นพิเศษ']?.toDouble() ?? 0,
+                color: G2PrimaryColor),
+            BarChartRodData(
+                width: 10,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(2), topRight: Radius.circular(2)),
+                toY: qualityCounts['ขั้นที่ 1']?.toDouble() ?? 0,
+                color: Color(0xFF86BD41)),
+            BarChartRodData(
+                width: 10,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(2), topRight: Radius.circular(2)),
+                toY: qualityCounts['ขั้นที่ 2']?.toDouble() ?? 0,
+                color: Color(0xFFB6AC55)),
+            BarChartRodData(
+                width: 10,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(2), topRight: Radius.circular(2)),
+                toY: qualityCounts['ไม่เข้าข่าย']?.toDouble() ?? 0,
+                color: Color(0xFFB68955)),
+          ],
+        );
+      } else {
+        return null; // ไม่แสดงข้อมูลที่ไม่ตรงเงื่อนไข
+      }
+    }).toList()
+      ..removeWhere((element) => element == null);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _populateYearLabels();
   }
 
   List<String> months = [
@@ -104,9 +142,10 @@ class _CardChartState extends State<CardChart> {
     "ธันวาคม"
   ];
 
+  List<BarChartGroupData?> barData = [];
+
   @override
   Widget build(BuildContext context) {
-    final barData = getBarData();
     return Padding(
       padding: const EdgeInsets.only(
         left: 20,
@@ -167,6 +206,19 @@ class _CardChartState extends State<CardChart> {
                     menuStyle: MenuStyle(
                       elevation: MaterialStatePropertyAll(2),
                     ),
+                    onSelected: (value) {
+                      setState(() {
+                        selectedMonth = value;
+                        if (selectedMonth != null && selectedYear != null) {
+                          barData = getBarData(selectedMonth, selectedYear)
+                              .cast<BarChartGroupData?>();
+                          log("ทำงาน barData");
+                        } else {
+                          barData = [];
+                          log("ไม่ทำงาน barData");
+                        }
+                      });
+                    },
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
@@ -188,24 +240,37 @@ class _CardChartState extends State<CardChart> {
                       ),
                     ),
                     label: Text("เลือกปี"),
-                    dropdownMenuEntries: [
-                      DropdownMenuEntry(
-                        value: null,
-                        label: "2024",
-                        style: ButtonStyle(
-                          elevation: MaterialStatePropertyAll(2),
-                          maximumSize: MaterialStatePropertyAll(
-                            Size.fromHeight(kTextTabBarHeight),
-                          ),
-                        ),
-                      ),
-                    ],
+                    dropdownMenuEntries: yearLabels
+                        .map((year) =>
+                            DropdownMenuEntry(value: year, label: year))
+                        .toList(),
+                    onSelected: (value) {
+                      setState(() {
+                        selectedYear = value;
+                        if (selectedMonth != null && selectedYear != null) {
+                          barData = getBarData(selectedMonth, selectedYear)
+                              .cast<BarChartGroupData?>();
+                          barData.whereType<BarChartGroupData>().toList();
+                          log("ทำงาน barData");
+                        } else {
+                          barData = [];
+                          log("ไม่ทำงาน barData");
+                        }
+                      });
+                    },
                   ),
                 ],
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15.0),
-                child: buildBarChart(context, barData, dateLabels),
+                child: Column(
+                  children: [
+                    buildBarChart(
+                        context,
+                        barData.whereType<BarChartGroupData>().toList(),
+                        dateLabels),
+                  ],
+                ),
               ),
             ],
           ),
