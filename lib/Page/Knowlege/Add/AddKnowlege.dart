@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -11,7 +10,6 @@ import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
-import 'package:web/helpers.dart';
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -26,10 +24,8 @@ class Add_Knowlege extends StatefulWidget {
   final Knowledge? knowledge;
   final IconData? icons;
   final Contents? contents;
-  final User? users;
 
-  const Add_Knowlege(
-      {super.key, this.knowledge, this.contents, this.icons, this.users});
+  const Add_Knowlege({super.key, this.knowledge, this.contents, this.icons});
 
   @override
   _Add_KnowlegeState createState() => _Add_KnowlegeState();
@@ -38,11 +34,17 @@ class Add_Knowlege extends StatefulWidget {
 class _Add_KnowlegeState extends State<Add_Knowlege>
     with SingleTickerProviderStateMixin {
   late TabController tapController;
+  // final List<bool> _tabEnabled = [false, true];
 
   @override
   void initState() {
-    tapController = TabController(length: 2, vsync: this);
+    tapController = TabController(length: 2, vsync: this, initialIndex: 0);
     super.initState();
+    // เปลี่ยนค่า _tabEnabled เพื่อให้ Tab 'เนื้อหาเดียว' ไม่แสดงผล
+    // setState(() {
+    //   _tabEnabled[0] = false;
+    //   _tabEnabled[1] = true;
+    // });
   }
 
   @override
@@ -53,13 +55,15 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
 
   @override
   Widget build(BuildContext context) {
+    // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
     ScreenSize screenSize = getScreenSize(context);
+
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
             screenSize == ScreenSize.minidesktop
-                ? const SizedBox.shrink()
+                ? SizedBox.shrink()
                 : Expanded(
                     child: Container(
                       color: GPrimaryColor,
@@ -72,6 +76,9 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
             Expanded(
               flex: 4,
               child: Scaffold(
+                appBar: Appbarmain(
+                    // users: widget.users,
+                    ),
                 drawer: screenSize == ScreenSize.minidesktop
                     ? Container(
                         color: GPrimaryColor,
@@ -82,87 +89,100 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                         ),
                       )
                     : null,
-                appBar: Appbarmain(),
                 backgroundColor: GrayColor,
                 body: SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     child: Container(
                       height: MediaQuery.of(context).size.height,
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Center(
-                            child: Container(
-                              // height: 140,
-                              width: 1000,
-                              // width: MediaQuery.of(context).size.height,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(30),
-                                    child: TabBar(
-                                      unselectedLabelColor: Colors.black45,
-                                      controller: tapController,
-                                      labelStyle: TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'IBM Plex Sans Thai',
-                                          color: Colors.white),
-                                      dividerColor: Colors.transparent,
-                                      // indicatorWeight: 10,
-                                      indicator: BoxDecoration(
-                                        color: GPrimaryColor,
-                                        // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
-                                        borderRadius: BorderRadius.circular(10),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Center(
+                              child: Container(
+                                height: 140,
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(30),
+                                      child: TabBar(
+                                        unselectedLabelColor: Colors.black45,
+                                        controller: tapController,
+                                        labelStyle: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                        dividerColor: Colors.transparent,
+                                        // indicatorWeight: 10,
+                                        indicator: BoxDecoration(
+                                          color: GPrimaryColor,
+                                          // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        tabs: [
+                                          Tab(
+                                            child: screenSize ==
+                                                    ScreenSize.minidesktop
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text('เนื้อหาเดียว'),
+                                                    ],
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 60),
+                                                    child: Text('เนื้อหาเดียว'),
+                                                  ),
+                                          ),
+                                          Tab(
+                                            child: screenSize ==
+                                                    ScreenSize.minidesktop
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text('หลายเนื้อหา'),
+                                                    ],
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 60),
+                                                    child: Text('หลายเนื้อหา'),
+                                                  ),
+                                          ),
+                                        ],
                                       ),
-                                      tabs: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 10,
-                                              left: 80,
-                                              right: 80),
-                                          // padding: EdgeInsets.symmetri60c(horizontal: 60),
-                                          child: Tab(
-                                            text: 'เนื้อหาเดียว',
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 10,
-                                              left: 80,
-                                              right: 80),
-                                          // padding: EdgeInsets.symmetri60c(horizontal: 60),
-                                          child: Tab(
-                                            text: 'หลายเนื้อหา',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Expanded(
-                              child: TabBarView(
-                            controller: tapController,
-                            children: [
-                              Singlecontent(),
-                              Multiplecontent(),
-                            ],
-                          )),
-                          SizedBox(
-                            height: 0,
+                          Center(
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.7,
+                              width: MediaQuery.of(context).size.width *
+                                  0.7, // ปรับความสูงตามที่ต้องการ
+                              child: Expanded(
+                                child: TabBarView(
+                                  controller: tapController,
+                                  children: [
+                                    Singlecontent(),
+                                    Multiplecontent(),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
