@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -17,6 +16,7 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogCancle.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -43,7 +43,7 @@ class ExpansionPanelData {
 List<ExpansionPanelData> _panelData = [];
 
 class Multiplecontent extends StatefulWidget {
-  const Multiplecontent({Key? key}) : super(key: key);
+  const Multiplecontent({super.key});
 
   @override
   _MultiplecontentState createState() => _MultiplecontentState();
@@ -55,7 +55,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
   int _currentExpandedIndex = -1;
   bool addedContent = false;
-  TextEditingController contentcontroller = new TextEditingController();
+  TextEditingController contentcontroller = TextEditingController();
   TextEditingController namecontroller = TextEditingController();
   TextEditingController contentdetailcontroller = TextEditingController();
   TextEditingController contentnamecontroller = TextEditingController();
@@ -64,17 +64,17 @@ class _MultiplecontentState extends State<Multiplecontent> {
   List<List<XFile>> expansionPanelImagesList = [];
 
   // final QuillController _contentController = QuillController.basic();
-  List<QuillController> _contentController = [QuillController.basic()];
+  final List<QuillController> _contentController = [QuillController.basic()];
 
   String _html = '';
   List<String> htmlList = [];
   List<List<String>> htmlLists = [];
 
-  List<Widget> _displayedContentWidgets =
+  final List<Widget> _displayedContentWidgets =
       List.filled(_panelData.length, Container());
 
-  List<bool> _showPreview = [];
-  List<int> _deletedPanels = [];
+  final List<bool> _showPreview = [];
+  final List<int> _deletedPanels = [];
 // List<Widget> itemPhotosWidgetList = [];
   List<Widget> itemPhotosWidgetList = <Widget>[]; //แสดงตัวอย่างรูปภาพ
   final ImagePicker _picker = ImagePicker();
@@ -94,6 +94,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
   @override
   Widget build(BuildContext context) {
+    // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
       backgroundColor: GrayColor,
       body: SingleChildScrollView(
@@ -102,263 +104,536 @@ class _MultiplecontentState extends State<Multiplecontent> {
             padding: const EdgeInsets.only(left: 0),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.34,
-                      height: 400,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Column(
-                          children: [
-                            const Row(
-                              children: [
-                                FaIcon(
-                                  FontAwesomeIcons.bookOpen,
-                                  color: GPrimaryColor,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "เพิ่มคลังความรู้",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
+                // เอาไว้เปลี่ยน layout จากตอนแรก Row เป็น Column ถ้าหน้าจอย่อลง
+                screenSize == ScreenSize.minidesktop
+                    ? Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 400,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 30),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "ไอคอน ",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    Text(
-                                      "*",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Container(
-                                child: DropdownButton(
-                                  items: <String>[
-                                    'สถิติ',
-                                    'ดอกไม้',
-                                    'หนังสือ',
-                                    'น้ำ',
-                                    'ระวัง',
-                                    'คำถาม'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Row(
-                                        children: [
-                                          icons[value] != null
-                                              ? Icon(
-                                                  icons[value]!,
-                                                  color: GPrimaryColor,
-                                                )
-                                              : const SizedBox(),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            value,
-                                            style: const TextStyle(
-                                                color: GPrimaryColor),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedValue = value;
-                                    });
-                                  },
-                                  hint: const Row(
+                            child: Padding(
+                              padding: const EdgeInsets.all(25.0),
+                              child: Column(
+                                children: [
+                                  const Row(
                                     children: [
-                                      Icon(
-                                        Icons.image_outlined,
+                                      FaIcon(
+                                        FontAwesomeIcons.bookOpen,
                                         color: GPrimaryColor,
-                                      ), // ไอคอนที่ต้องการเพิ่ม
-                                      SizedBox(
-                                          width:
-                                              10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                      ),
+                                      SizedBox(width: 10),
                                       Text(
-                                        "เลือกไอคอนสำหรับคลังความรู้",
+                                        "เพิ่มคลังความรู้",
                                         style: TextStyle(
-                                            color: GPrimaryColor, fontSize: 17),
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  value: _selectedValue,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "ชื่อ",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
+                                  const SizedBox(height: 30),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "ไอคอน ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Text(
-                                      "*",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 0.0, right: 0),
-                              child: Container(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: const Color(0xffCFD3D4)),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: TextField(
-                                  controller: namecontroller,
-                                  maxLength: 30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
                                   ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Container(
+                                      child: DropdownButton(
+                                        items: <String>[
+                                          'สถิติ',
+                                          'ดอกไม้',
+                                          'หนังสือ',
+                                          'น้ำ',
+                                          'ระวัง',
+                                          'คำถาม'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                icons[value] != null
+                                                    ? Icon(
+                                                        icons[value]!,
+                                                        color: GPrimaryColor,
+                                                      )
+                                                    : const SizedBox(),
+                                                const SizedBox(width: 15),
+                                                Text(
+                                                  value,
+                                                  style: const TextStyle(
+                                                      color: GPrimaryColor),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedValue = value;
+                                          });
+                                        },
+                                        hint: const Row(
+                                          children: [
+                                            Icon(
+                                              Icons.image_outlined,
+                                              color: GPrimaryColor,
+                                            ), // ไอคอนที่ต้องการเพิ่ม
+                                            SizedBox(
+                                                width:
+                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                            Text(
+                                              "เลือกไอคอนสำหรับคลังความรู้",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
+                                        ),
+                                        value: _selectedValue,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20.0,
-                            ),
-                            ElevatedButton(
-                              onPressed: display,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xffE69800),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: const Text(
-                                "แสดงผล",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20), // SizedBox
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.34,
-                      height: 400,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Column(
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.light_mode_rounded,
-                                  color: Color(0xffFFEE58),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "แสดงผล",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                            Container(
-                              width: 390,
-                              height: 100,
-                              decoration: ShapeDecoration(
-                                color: const Color(0xFFE7E7E7),
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      width: 5, color: GPrimaryColor),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: _displayedWidget ?? Container(),
-                                  )
+                                  const SizedBox(height: 30),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "ชื่อ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 0.0, right: 0),
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: const Color(0xffCFD3D4)),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: TextField(
+                                        controller: namecontroller,
+                                        maxLength:
+                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: display,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xffE69800),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "แสดงผล",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            const SizedBox(
-                              height: 20,
+                          ),
+                          const SizedBox(height: 20), // SizedBox
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 400,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
                             ),
-                          ],
-                        ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(25.0),
+                              child: Column(
+                                children: [
+                                  const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.light_mode_rounded,
+                                        color: Color(0xffFFEE58),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "แสดงผล",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 40,
+                                  ),
+                                  Container(
+                                    width: 390,
+                                    height: 100,
+                                    decoration: ShapeDecoration(
+                                      color: const Color(0xFFE7E7E7),
+                                      shape: RoundedRectangleBorder(
+                                        side: const BorderSide(
+                                            width: 5, color: GPrimaryColor),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                          child:
+                                              _displayedWidget ?? Container(),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Container
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.34,
+                            height: 400,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(25.0),
+                              child: Column(
+                                children: [
+                                  const Row(
+                                    children: [
+                                      FaIcon(
+                                        FontAwesomeIcons.bookOpen,
+                                        color: GPrimaryColor,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "เพิ่มคลังความรู้",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 30),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "ไอคอน ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Container(
+                                      child: DropdownButton(
+                                        items: <String>[
+                                          'สถิติ',
+                                          'ดอกไม้',
+                                          'หนังสือ',
+                                          'น้ำ',
+                                          'ระวัง',
+                                          'คำถาม'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                icons[value] != null
+                                                    ? Icon(
+                                                        icons[value]!,
+                                                        color: GPrimaryColor,
+                                                      )
+                                                    : const SizedBox(),
+                                                const SizedBox(width: 15),
+                                                Text(
+                                                  value,
+                                                  style: const TextStyle(
+                                                      color: GPrimaryColor),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedValue = value;
+                                          });
+                                        },
+                                        hint: const Row(
+                                          children: [
+                                            Icon(
+                                              Icons.image_outlined,
+                                              color: GPrimaryColor,
+                                            ), // ไอคอนที่ต้องการเพิ่ม
+                                            SizedBox(
+                                                width:
+                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                            Text(
+                                              "เลือกไอคอนสำหรับคลังความรู้",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
+                                        ),
+                                        value: _selectedValue,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 30),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "ชื่อ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 0.0, right: 0),
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: const Color(0xffCFD3D4)),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: TextField(
+                                        controller: namecontroller,
+                                        maxLength:
+                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: display,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xffE69800),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "แสดงผล",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20), // SizedBox
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.34,
+                            height: 400,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(25.0),
+                              child: Column(
+                                children: [
+                                  const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.light_mode_rounded,
+                                        color: Color(0xffFFEE58),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "แสดงผล",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 40,
+                                  ),
+                                  Container(
+                                    width: 390,
+                                    height: 100,
+                                    decoration: ShapeDecoration(
+                                      color: const Color(0xFFE7E7E7),
+                                      shape: RoundedRectangleBorder(
+                                        side: const BorderSide(
+                                            width: 5, color: GPrimaryColor),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                          child:
+                                              _displayedWidget ?? Container(),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Container
+                        ],
                       ),
-                    ),
-                    // Container
-                  ],
-                ),
                 const SizedBox(
                   height: 30,
                 ),
@@ -382,7 +657,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                         final int index =
                             _panelData.indexOf(expansionPanelData);
                         _showPreview.add(false);
-                        print(index);
+                        debugPrint("$index");
                         // สร้าง TextEditingController สำหรับชื่อเนื้อหาและรายละเอียดเนื้อหา
                         contentNameControllers.add(TextEditingController());
                         _contentController.add(QuillController.basic());
@@ -418,436 +693,853 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 0),
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.34,
-                                      height: 1100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(25.0),
-                                        child: Column(
-                                          children: [
-                                            const SizedBox(height: 20),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "ชื่อ",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "*",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
+                                // เอาไว้เปลี่ยน layout จากตอนแรก Row เป็น Column ถ้าหน้าจอย่อลง
+                                screenSize == ScreenSize.minidesktop
+                                    ? Column(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 1100,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white,
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10.0),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: const Color(
-                                                          0xffCFD3D4)),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child: TextField(
-                                                  controller:
-                                                      contentNameControllers[
-                                                          index],
-                                                  maxLength: 30,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                          border:
-                                                              InputBorder.none),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 30),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "เนื้อหา",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "*",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            // Padding(
-                                            //   padding: const EdgeInsets.only(
-                                            //       left: 0.0, right: 0),
-                                            //   child: Container(
-                                            //     decoration: BoxDecoration(
-                                            //         border: Border.all(
-                                            //             color:
-                                            //                 Color(0xffCFD3D4)),
-                                            //         borderRadius:
-                                            //             BorderRadius.circular(
-                                            //                 5)),
-                                            //     child: TextField(
-                                            //       controller:
-                                            //           contentDetailControllers[
-                                            //               index],
-                                            //       keyboardType:
-                                            //           TextInputType.multiline,
-                                            //       maxLines: 5,
-                                            //       decoration: InputDecoration(
-                                            //           focusedBorder:
-                                            //               OutlineInputBorder(
-                                            //                   borderSide: BorderSide(
-                                            //                       width: 1,
-                                            //                       color: Colors
-                                            //                           .white))),
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                            SizedBox(
-                                              height: 400,
-                                              child: Expanded(
-                                                  child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    QuillToolbar.simple(
-                                                      configurations:
-                                                          QuillSimpleToolbarConfigurations(
-                                                        controller:
-                                                            _contentController[
-                                                                index],
-                                                        sharedConfigurations:
-                                                            const QuillSharedConfigurations(
-                                                          locale: Locale('de'),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: QuillEditor.basic(
-                                                        configurations:
-                                                            QuillEditorConfigurations(
-                                                          controller:
-                                                              _contentController[
-                                                                  index],
-                                                          placeholder:
-                                                              'เขียนข้อความที่นี่...',
-                                                          readOnly: false,
-                                                          sharedConfigurations:
-                                                              const QuillSharedConfigurations(
-                                                            locale:
-                                                                Locale('de'),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )),
-                                            ),
-                                            const SizedBox(height: 30),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "รูปภาพ",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "*",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          12.0),
-                                                  color: Colors.white70,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color:
-                                                          Colors.grey.shade200,
-                                                      offset: const Offset(
-                                                          0.0, 0.5),
-                                                      blurRadius: 30.0,
-                                                    )
-                                                  ]),
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              height: 200.0,
-                                              child: Center(
-                                                child: expansionPanelData
-                                                        .itemPhotosWidgetList
-                                                        .isEmpty
-                                                    ? Center(
-                                                        child: MaterialButton(
-                                                          onPressed: () =>
-                                                              pickPhotoFromGallery(
-                                                                  index),
-                                                          child: SizedBox(
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            height: 200.0,
-                                                            child: AspectRatio(
-                                                              aspectRatio:
-                                                                  1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
-                                                              child: expansionPanelImagesList
-                                                                              .length >
-                                                                          index &&
-                                                                      expansionPanelImagesList[
-                                                                              index]
-                                                                          .isNotEmpty
-                                                                  ? kIsWeb
-                                                                      ? Image
-                                                                          .network(
-                                                                          expansionPanelImagesList[index]
-                                                                              .first
-                                                                              .path,
-                                                                          fit: BoxFit
-                                                                              .cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                        )
-                                                                      : Image
-                                                                          .file(
-                                                                          File(expansionPanelImagesList[index]
-                                                                              .first
-                                                                              .path),
-                                                                          fit: BoxFit
-                                                                              .cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                        )
-                                                                  : Image
-                                                                      .network(
-                                                                      "https://static.thenounproject.com/png/3322766-200.png",
-                                                                      width: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
-                                                                          0.01,
-                                                                      height:
-                                                                          200.0,
-                                                                    ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(25.0),
+                                              child: Column(
+                                                children: [
+                                                  const SizedBox(height: 20),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "ชื่อ",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
                                                             ),
                                                           ),
-                                                        ),
-                                                      )
-                                                    : SingleChildScrollView(
-                                                        scrollDirection:
-                                                            Axis.vertical,
-                                                        child: Wrap(
-                                                          spacing: 5.0,
-                                                          direction:
-                                                              Axis.horizontal,
-                                                          alignment:
-                                                              WrapAlignment
-                                                                  .spaceEvenly,
-                                                          runSpacing: 10.0,
-                                                          children: (expansionPanelImagesList
-                                                                          .length >
-                                                                      index &&
-                                                                  expansionPanelImagesList[
-                                                                          index]
-                                                                      .isNotEmpty)
-                                                              ? expansionPanelImagesList[
-                                                                      index]
-                                                                  .map<Widget>(
-                                                                    (XFile xFile) =>
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets
-                                                                              .all(
-                                                                              0),
-                                                                      child:
-                                                                          SizedBox(
-                                                                        height:
-                                                                            200.0,
-                                                                        child:
-                                                                            AspectRatio(
-                                                                          aspectRatio:
-                                                                              16 / 9,
-                                                                          child: kIsWeb
-                                                                              ? Image.network(xFile.path)
-                                                                              : Image.file(File(xFile.path)),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  )
-                                                                  .toList()
-                                                              : itemPhotosWidgetList,
-                                                        ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () =>
-                                                  pickPhotoFromGallery(index),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: GPrimaryColor,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                "เพิ่มรูปภาพ",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 30),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                displaycontent(
-                                                    expansionPanelData, index);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xffE69800),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                "แสดงผล",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.34,
-                                      height: 1100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(25.0),
-                                        child: Column(
-                                          children: [
-                                            const SizedBox(height: 20),
-                                            Container(
-                                              width: 390,
-                                              height: 750,
-                                              decoration: ShapeDecoration(
-                                                color: const Color(0xFFE7E7E7),
-                                                shape: RoundedRectangleBorder(
-                                                  side: const BorderSide(
-                                                      width: 5,
-                                                      color: GPrimaryColor),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              child: SingleChildScrollView(
-                                                child: Column(
-                                                  children: [
-                                                    SizedBox(
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              2,
-                                                      child: Expanded(
-                                                        child: _previewWidget(
-                                                            expansionPanelData,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 0.0,
+                                                            right: 0),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10.0),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: const Color(
+                                                                0xffCFD3D4)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
+                                                      child: TextField(
+                                                        controller:
+                                                            contentNameControllers[
+                                                                index],
+                                                        maxLength: 30,
+                                                        decoration:
+                                                            const InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "เนื้อหา",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                
+                                                  SizedBox(
+                                                    height: 400,
+                                                    child: Expanded(
+                                                        child: Container(
+                                                      child: Column(
+                                                        children: [
+                                                          QuillToolbar.simple(
+                                                            configurations:
+                                                                QuillSimpleToolbarConfigurations(
+                                                              controller:
+                                                                  _contentController[
+                                                                      index],
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'de'),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: QuillEditor
+                                                                .basic(
+                                                              configurations:
+                                                                  QuillEditorConfigurations(
+                                                                controller:
+                                                                    _contentController[
+                                                                        index],
+                                                                placeholder:
+                                                                    'เขียนข้อความที่นี่...',
+                                                                readOnly: false,
+                                                                sharedConfigurations:
+                                                                    const QuillSharedConfigurations(
+                                                                  locale:
+                                                                      Locale(
+                                                                          'de'),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "รูปภาพ",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12.0),
+                                                        color: Colors.white70,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors
+                                                                .grey.shade200,
+                                                            offset:
+                                                                const Offset(
+                                                                    0.0, 0.5),
+                                                            blurRadius: 30.0,
+                                                          )
+                                                        ]),
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    height: 200.0,
+                                                    child: Center(
+                                                      child: expansionPanelData
+                                                              .itemPhotosWidgetList
+                                                              .isEmpty
+                                                          ? Center(
+                                                              child:
+                                                                  MaterialButton(
+                                                                onPressed: () =>
+                                                                    pickPhotoFromGallery(
+                                                                        index),
+                                                                child: SizedBox(
+                                                                  width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width,
+                                                                  height: 200.0,
+                                                                  child:
+                                                                      AspectRatio(
+                                                                    aspectRatio:
+                                                                        1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
+                                                                    child: expansionPanelImagesList.length >
+                                                                                index &&
+                                                                            expansionPanelImagesList[index]
+                                                                                .isNotEmpty
+                                                                        ? kIsWeb
+                                                                            ? Image
+                                                                                .network(
+                                                                                expansionPanelImagesList[index].first.path,
+                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
+                                                                              )
+                                                                            : Image
+                                                                                .file(
+                                                                                File(expansionPanelImagesList[index].first.path),
+                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
+                                                                              )
+                                                                        : Image
+                                                                            .network(
+                                                                            "https://static.thenounproject.com/png/3322766-200.png",
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width * 0.01,
+                                                                            height:
+                                                                                200.0,
+                                                                          ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : SingleChildScrollView(
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              child: Wrap(
+                                                                spacing: 5.0,
+                                                                direction: Axis
+                                                                    .horizontal,
+                                                                alignment:
+                                                                    WrapAlignment
+                                                                        .spaceEvenly,
+                                                                runSpacing:
+                                                                    10.0,
+                                                                children: (expansionPanelImagesList.length >
+                                                                            index &&
+                                                                        expansionPanelImagesList[index]
+                                                                            .isNotEmpty)
+                                                                    ? expansionPanelImagesList[
+                                                                            index]
+                                                                        .map<
+                                                                            Widget>(
+                                                                          (XFile xFile) =>
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.all(0),
+                                                                            child:
+                                                                                SizedBox(
+                                                                              height: 200.0,
+                                                                              child: AspectRatio(
+                                                                                aspectRatio: 16 / 9,
+                                                                                child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                        .toList()
+                                                                    : itemPhotosWidgetList,
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () =>
+                                                        pickPhotoFromGallery(
                                                             index),
-                                                        // _displayedcontentWidget ??
-                                                        //     Container(),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          GPrimaryColor,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
                                                       ),
-                                                    )
-                                                  ],
-                                                ),
+                                                    ),
+                                                    child: const Text(
+                                                      "เพิ่มรูปภาพ",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      displaycontent(
+                                                          expansionPanelData,
+                                                          index);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xffE69800),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child: const Text(
+                                                      "แสดงผล",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            const SizedBox(
-                                              height: 20,
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 1100,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white,
                                             ),
-                                          ],
-                                        ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(25.0),
+                                              child: Column(
+                                                children: [
+                                                  const SizedBox(height: 20),
+                                                  Container(
+                                                    width: 390,
+                                                    height: 750,
+                                                    decoration: ShapeDecoration(
+                                                      color: const Color(
+                                                          0xFFE7E7E7),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        side: const BorderSide(
+                                                            width: 5,
+                                                            color:
+                                                                GPrimaryColor),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                2,
+                                                            child: Expanded(
+                                                              child: _previewWidget(
+                                                                  expansionPanelData,
+                                                                  index),
+                                                              
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.34,
+                                            height: 1100,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white,
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(25.0),
+                                              child: Column(
+                                                children: [
+                                                  const SizedBox(height: 20),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "ชื่อ",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 0.0,
+                                                            right: 0),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10.0),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: const Color(
+                                                                0xffCFD3D4)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
+                                                      child: TextField(
+                                                        controller:
+                                                            contentNameControllers[
+                                                                index],
+                                                        maxLength: 30,
+                                                        decoration:
+                                                            const InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "เนื้อหา",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                               
+                                                  SizedBox(
+                                                    height: 400,
+                                                    child: Expanded(
+                                                        child: Container(
+                                                      child: Column(
+                                                        children: [
+                                                          QuillToolbar.simple(
+                                                            configurations:
+                                                                QuillSimpleToolbarConfigurations(
+                                                              controller:
+                                                                  _contentController[
+                                                                      index],
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'de'),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: QuillEditor
+                                                                .basic(
+                                                              configurations:
+                                                                  QuillEditorConfigurations(
+                                                                controller:
+                                                                    _contentController[
+                                                                        index],
+                                                                placeholder:
+                                                                    'เขียนข้อความที่นี่...',
+                                                                readOnly: false,
+                                                                sharedConfigurations:
+                                                                    const QuillSharedConfigurations(
+                                                                  locale:
+                                                                      Locale(
+                                                                          'de'),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0, right: 0),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                            "รูปภาพ",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "*",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12.0),
+                                                        color: Colors.white70,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors
+                                                                .grey.shade200,
+                                                            offset:
+                                                                const Offset(
+                                                                    0.0, 0.5),
+                                                            blurRadius: 30.0,
+                                                          )
+                                                        ]),
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    height: 200.0,
+                                                    child: Center(
+                                                      child: expansionPanelData
+                                                              .itemPhotosWidgetList
+                                                              .isEmpty
+                                                          ? Center(
+                                                              child:
+                                                                  MaterialButton(
+                                                                onPressed: () =>
+                                                                    pickPhotoFromGallery(
+                                                                        index),
+                                                                child: SizedBox(
+                                                                  width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width,
+                                                                  height: 200.0,
+                                                                  child:
+                                                                      AspectRatio(
+                                                                    aspectRatio:
+                                                                        1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
+                                                                    child: expansionPanelImagesList.length >
+                                                                                index &&
+                                                                            expansionPanelImagesList[index]
+                                                                                .isNotEmpty
+                                                                        ? kIsWeb
+                                                                            ? Image
+                                                                                .network(
+                                                                                expansionPanelImagesList[index].first.path,
+                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
+                                                                              )
+                                                                            : Image
+                                                                                .file(
+                                                                                File(expansionPanelImagesList[index].first.path),
+                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
+                                                                              )
+                                                                        : Image
+                                                                            .network(
+                                                                            "https://static.thenounproject.com/png/3322766-200.png",
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width * 0.01,
+                                                                            height:
+                                                                                200.0,
+                                                                          ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : SingleChildScrollView(
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              child: Wrap(
+                                                                spacing: 5.0,
+                                                                direction: Axis
+                                                                    .horizontal,
+                                                                alignment:
+                                                                    WrapAlignment
+                                                                        .spaceEvenly,
+                                                                runSpacing:
+                                                                    10.0,
+                                                                children: (expansionPanelImagesList.length >
+                                                                            index &&
+                                                                        expansionPanelImagesList[index]
+                                                                            .isNotEmpty)
+                                                                    ? expansionPanelImagesList[
+                                                                            index]
+                                                                        .map<
+                                                                            Widget>(
+                                                                          (XFile xFile) =>
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.all(0),
+                                                                            child:
+                                                                                SizedBox(
+                                                                              height: 200.0,
+                                                                              child: AspectRatio(
+                                                                                aspectRatio: 16 / 9,
+                                                                                child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                        .toList()
+                                                                    : itemPhotosWidgetList,
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () =>
+                                                        pickPhotoFromGallery(
+                                                            index),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          GPrimaryColor,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child: const Text(
+                                                      "เพิ่มรูปภาพ",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 30),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      displaycontent(
+                                                          expansionPanelData,
+                                                          index);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xffE69800),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child: const Text(
+                                                      "แสดงผล",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.34,
+                                            height: 1100,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white,
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(25.0),
+                                              child: Column(
+                                                children: [
+                                                  const SizedBox(height: 20),
+                                                  Container(
+                                                    width: 390,
+                                                    height: 750,
+                                                    decoration: ShapeDecoration(
+                                                      color: const Color(
+                                                          0xFFE7E7E7),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        side: const BorderSide(
+                                                            width: 5,
+                                                            color:
+                                                                GPrimaryColor),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                2,
+                                                            child: Expanded(
+                                                              child: _previewWidget(
+                                                                  expansionPanelData,
+                                                                  index),
+                                                              // _displayedcontentWidget ??
+                                                              //     Container(),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                           ),
@@ -880,9 +1572,10 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             itemPhotosWidgetList:
                                 expansionPanelImagesList, // ให้รายการรูปภาพใน ExpansionPanelData เป็นรายการว่าง
                           ));
-                          print("_panelData.length = ${_panelData.length}");
-                          print(
-                              "expansionPanelImagesList = ${expansionPanelImagesList}");
+                          debugPrint(
+                              "_panelData.length = ${_panelData.length}");
+                          debugPrint(
+                              "expansionPanelImagesList = $expansionPanelImagesList");
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -927,7 +1620,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xC5C5C5),
+                            backgroundColor: const Color(0x00c5c5c5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -949,7 +1642,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                   .document
                                   .toDelta()
                                   .toJson();
-                              print(deltaJson);
+                              debugPrint("$deltaJson");
 
                               final converter = QuillDeltaToHtmlConverter(
                                 List.castFrom(deltaJson),
@@ -957,26 +1650,26 @@ class _MultiplecontentState extends State<Multiplecontent> {
                               _html = converter.convert();
 
                               htmlList.add(_html);
-                              print(htmlList);
+                              debugPrint("$htmlList");
                             }
 
                             // htmlLists.add(htmlList);
-                            print(htmlLists);
+                            debugPrint("$htmlLists");
                             // int index = 0;
                             // int selectedIndex = 0;
                             // final deltaJson = _contentController[selectedIndex]
                             //     .document
                             //     .toDelta()
                             //     .toJson();
-                            // print(deltaJson);
+                            // debugPrint(deltaJson);
 
                             // final converter = QuillDeltaToHtmlConverter(
                             //   List.castFrom(deltaJson),
                             // );
                             // _html = converter.convert();
                             // htmlList.add(_html);
-                            // print(_html);
-                            // print(htmlList);
+                            // debugPrint(_html);
+                            // debugPrint(htmlList);
                             uploadImageAndSaveItemInfo();
                           },
                           style: ElevatedButton.styleFrom(
@@ -989,8 +1682,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
                           ),
                           child: uploading
                               ? const SizedBox(
-                                  child: CircularProgressIndicator(),
                                   height: 15.0,
+                                  child: CircularProgressIndicator(),
                                 )
                               : const Text(
                                   "เพิ่ม",
@@ -1018,20 +1711,18 @@ class _MultiplecontentState extends State<Multiplecontent> {
   // }
 
   Future<void> pickPhotoFromGallery(int index) async {
-    print("srr");
+    debugPrint("srr");
     List<XFile>? newPhotos = await _picker.pickMultiImage();
-    if (newPhotos != null) {
-      setState(() {
-        print("srr11");
-        if (expansionPanelImagesList.length <= index) {
-          expansionPanelImagesList.add(newPhotos);
-          print(expansionPanelImagesList);
-        } else {
-          expansionPanelImagesList[index] = newPhotos;
-        }
-        print(expansionPanelImagesList[index]);
-      });
-    }
+    setState(() {
+      debugPrint("srr11");
+      if (expansionPanelImagesList.length <= index) {
+        expansionPanelImagesList.add(newPhotos);
+        debugPrint("$expansionPanelImagesList");
+      } else {
+        expansionPanelImagesList[index] = newPhotos;
+      }
+      debugPrint("${expansionPanelImagesList[index]}");
+    });
   }
 
   Future<void> uploadImageAndSaveItemInfo() async {
@@ -1043,7 +1734,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
         panelIndex < expansionPanelImagesList.length;
         panelIndex++) {
       List<XFile> panelImages = expansionPanelImagesList[panelIndex];
-      print(panelImages);
+      debugPrint("$panelImages");
       String? contentId = const Uuid().v4().substring(0, 10);
 
       for (int i = 0; i < panelImages.length; i++) {
@@ -1071,12 +1762,12 @@ class _MultiplecontentState extends State<Multiplecontent> {
     );
 
     String imageUrl = await reference.getDownloadURL();
-    print(imageUrl);
-    print(ListimageUrl);
+    debugPrint(imageUrl);
+    debugPrint("$ListimageUrl");
 
     setState(() {
       ListimageUrl.add(imageUrl);
-      // print(ListimageUrl);
+      // debugPrint(ListimageUrl);
     });
   }
 
@@ -1094,16 +1785,14 @@ class _MultiplecontentState extends State<Multiplecontent> {
     String contentId = const Uuid().v4().substring(0, 10);
     // Add data using addKnowlege, passing both contentMap and generated ID
     await Databasemethods().addContent(contentMap, contentId);
-    print("addContent success");
-    print("contentName ${contentName}");
-    print("ContentDetail ${contentDetail}");
+    debugPrint("addContent success");
+    debugPrint("contentName $contentName");
+    debugPrint("ContentDetail $contentDetail");
     return contentId;
   }
 
   Future<void> addAllContent(List<String> imageUrl) async {
-    if (namecontroller.text.isEmpty ||
-        _selectedValue == null ||
-        imageUrl == null) {
+    if (namecontroller.text.isEmpty || _selectedValue == null) {
       Fluttertoast.showToast(
         msg: "กรุณากรอกข้อมูลให้ครบ",
         toastLength: Toast.LENGTH_SHORT,
@@ -1116,7 +1805,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
       return;
     }
     List<String> contentIds = [];
-    print("list ${itemImagesList.length}");
+    debugPrint("list ${itemImagesList.length}");
 
     for (int panelIndex = 0;
         panelIndex < expansionPanelImagesList.length;
@@ -1131,7 +1820,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
         String contentId =
             await addContent(contentName, contentDetail, imageurl);
-        // print("contentNameControllers ${contentNameControllers}");
+        // debugPrint("contentNameControllers ${contentNameControllers}");
         contentIds.add(contentId);
       }
     }
@@ -1158,9 +1847,9 @@ class _MultiplecontentState extends State<Multiplecontent> {
       "update_at": null,
       "Content": contentIds,
     };
-    print("addKnowledge success");
-    print("KnowledgeName ${namecontroller.text}");
-    print("contentId ${contentIds}");
+    debugPrint("addKnowledge success");
+    debugPrint("KnowledgeName ${namecontroller.text}");
+    debugPrint("contentId $contentIds");
 
     // Add knowledge to Firebase
     await Databasemethods()
@@ -1194,14 +1883,14 @@ class _MultiplecontentState extends State<Multiplecontent> {
       if (expansionPanelImagesList.isNotEmpty &&
           expansionPanelImagesList[index].isNotEmpty) {
         expansionPanelImagesList[index].clear();
-         expansionPanelImagesList.removeAt(index);
+        expansionPanelImagesList.removeAt(index);
       }
       _deletedPanels.add(index);
       _panelData.removeAt(index);
       contentNameControllers.removeAt(index);
       _contentController.removeAt(index);
       _showPreview.removeAt(index);
-      print(expansionPanelImagesList);
+      debugPrint("$expansionPanelImagesList");
     });
   }
 

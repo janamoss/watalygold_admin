@@ -4,12 +4,11 @@ import 'package:flutter/widgets.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
-
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
-import 'package:web/helpers.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -55,88 +54,128 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
 
   @override
   Widget build(BuildContext context) {
+    // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
+    ScreenSize screenSize = getScreenSize(context);
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
-            Expanded(
-              child: Container(
-                color: GPrimaryColor,
-                child: SideNav(
-                  status: 2,
-                  dropdown: true,
-                ),
-              ),
-            ),
+            screenSize == ScreenSize.minidesktop
+                ? SizedBox.shrink()
+                : Expanded(
+                    child: Container(
+                      color: GPrimaryColor,
+                      child: SideNav(
+                        status: 2,
+                        dropdown: true,
+                      ),
+                    ),
+                  ),
             Expanded(
               flex: 4,
               child: Scaffold(
+                appBar: Appbarmain(
+                    // users: widget.users,
+                    ),
+                drawer: screenSize == ScreenSize.minidesktop
+                    ? Container(
+                        color: GPrimaryColor,
+                        width: 300,
+                        child: SideNav(
+                          status: 2,
+                          dropdown: true,
+                        ),
+                      )
+                    : null,
                 backgroundColor: GrayColor,
                 body: SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     child: Container(
                       height: MediaQuery.of(context).size.height,
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Center(
-                            child: Container(
-                              height: 140,
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(30),
-                                    child: TabBar(
-                                      unselectedLabelColor: Colors.black45,
-                                      controller: tapController,
-                                      labelStyle: TextStyle(
-                                          fontSize: 20, color: Colors.white),
-                                      dividerColor: Colors.transparent,
-                                      // indicatorWeight: 10,
-                                      indicator: BoxDecoration(
-                                        color: GPrimaryColor,
-                                        // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
-                                        borderRadius: BorderRadius.circular(10),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Center(
+                              child: Container(
+                                height: 140,
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(30),
+                                      child: TabBar(
+                                        unselectedLabelColor: Colors.black45,
+                                        controller: tapController,
+                                        labelStyle: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                            labelPadding: EdgeInsets.symmetric(vertical: 15), 
+                                        dividerColor: Colors.transparent,
+                                        // indicatorWeight: 30,
+                                        indicator: BoxDecoration(
+                                          
+                                          color: GPrimaryColor,
+                                          
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        // indicatorPadding: EdgeInsets.symmetric(horizontal: 100),
+                                        tabs: [
+                                          Tab(
+                                            child: screenSize ==
+                                                    ScreenSize.minidesktop
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text('เนื้อหาเดียว'),
+                                                    ],
+                                                  )
+                                                  
+                                                : 
+                                                  Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 90),
+                                              //                  padding: EdgeInsets.only(
+                                              // top: 10,
+                                              // bottom: 0,
+                                              // left: 80,
+                                              // right: 80),
+                                                      child: Text('เนื้อหาเดียว'),
+                                                    
+                                                ),
+                                          ),
+                                          Tab(
+                                            child: screenSize ==
+                                                    ScreenSize.minidesktop
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text('หลายเนื้อหา'),
+                                                    ],
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 90),
+                                                    child: Text('หลายเนื้อหา'),
+                                                  ),
+                                          ),
+                                        ],
                                       ),
-                                      tabs: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 17,
-                                              bottom: 10,
-                                              left: 80,
-                                              right: 80),
-                                          // padding: EdgeInsets.symmetri60c(horizontal: 60),
-                                          child: Tab(
-                                            text: 'เนื้อหาเดียว',
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 10,
-                                              left: 80,
-                                              right: 80),
-                                          // padding: EdgeInsets.symmetri60c(horizontal: 60),
-                                          child: Tab(
-                                            text: 'หลายเนื้อหา',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 50,
                           ),
                           Center(
                             child: Container(
@@ -153,9 +192,6 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 0,
                           ),
                         ],
                       ),
