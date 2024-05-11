@@ -737,16 +737,14 @@ class _EditMutipleState extends State<EditMutiple> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
-                      decoration: BoxDecoration(
-                        color: GPrimaryColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       child: Center(
+                        // padding:
+                        //     EdgeInsets.only(top: 22, bottom: 10, left: 80, right: 80),
                         child: Text(
                           'เนื้อหาเดียว',
                           style: TextStyle(
                             fontSize: 20,
-                            color: Colors.white,
+                            color: Colors.black45,
                           ),
                         ),
                       ),
@@ -754,14 +752,16 @@ class _EditMutipleState extends State<EditMutiple> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
+                      decoration: BoxDecoration(
+                        color: GPrimaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Center(
-                        // padding:
-                        //     EdgeInsets.only(top: 22, bottom: 10, left: 80, right: 80),
                         child: Text(
                           'หลายเนื้อหา',
                           style: TextStyle(
                             fontSize: 20,
-                            color: Colors.black45,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -786,7 +786,7 @@ class _EditMutipleState extends State<EditMutiple> {
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 2,
+                        status: 1,
                         dropdown: true,
                       ),
                     ),
@@ -802,7 +802,7 @@ class _EditMutipleState extends State<EditMutiple> {
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 2,
+                          status: 1,
                           dropdown: true,
                         ),
                       )
@@ -1692,9 +1692,9 @@ class _EditMutipleState extends State<EditMutiple> {
                                                       children: [
                                                         Container(
                                                           width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width ,
+                                                                  context)
+                                                              .size
+                                                              .width,
                                                           height: 1000,
                                                           decoration:
                                                               BoxDecoration(
@@ -2079,9 +2079,9 @@ class _EditMutipleState extends State<EditMutiple> {
                                                         ),
                                                         Container(
                                                           width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width ,
+                                                                  context)
+                                                              .size
+                                                              .width,
                                                           height: 1000,
                                                           decoration:
                                                               BoxDecoration(
@@ -3769,7 +3769,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-                                         
+
                                               SizedBox(height: 30),
                                               Padding(
                                                 padding: const EdgeInsets.only(
