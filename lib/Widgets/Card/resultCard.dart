@@ -104,24 +104,45 @@ class _ResultCardState extends State<ResultCard> {
               LayoutBuilder(
                 builder: (context, constraints) {
                   if (constraints.maxWidth < 900) {
-                    return GridView.builder(
-                      itemCount: 4,
-                      physics: const ScrollPhysics(),
-                      shrinkWrap: true,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 6 / 3,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 12.0),
-                      itemBuilder: (context, index) => CardDetail(
-                        color: list_color[index],
-                        name: list_name[index],
-                        number:
-                            (qualityCountMap[list_name[index]] ?? 0).toInt(),
-                        svgurl: list_image[index],
-                      ),
-                    );
+                    if (constraints.maxWidth < 550) {
+                      return GridView.builder(
+                        itemCount: 4,
+                        physics: const ScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 1,
+                                childAspectRatio: 5 / 2,
+                                crossAxisSpacing: 15,
+                                mainAxisSpacing: 12.0),
+                        itemBuilder: (context, index) => CardDetail(
+                          color: list_color[index],
+                          name: list_name[index],
+                          number:
+                              (qualityCountMap[list_name[index]] ?? 0).toInt(),
+                          svgurl: list_image[index],
+                        ),
+                      );
+                    } else {
+                      return GridView.builder(
+                        itemCount: 4,
+                        physics: const ScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 6 / 3,
+                                crossAxisSpacing: 15,
+                                mainAxisSpacing: 12.0),
+                        itemBuilder: (context, index) => CardDetail(
+                          color: list_color[index],
+                          name: list_name[index],
+                          number:
+                              (qualityCountMap[list_name[index]] ?? 0).toInt(),
+                          svgurl: list_image[index],
+                        ),
+                      );
+                    }
                   } else {
                     return GridView.builder(
                       itemCount: 4,

@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
-
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
@@ -57,7 +56,6 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
   Widget build(BuildContext context) {
     // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
     ScreenSize screenSize = getScreenSize(context);
-
     return Scaffold(
       body: SafeArea(
         child: Row(
@@ -115,14 +113,17 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                         controller: tapController,
                                         labelStyle: TextStyle(
                                             fontSize: 20, color: Colors.white),
+                                            labelPadding: EdgeInsets.symmetric(vertical: 15), 
                                         dividerColor: Colors.transparent,
-                                        // indicatorWeight: 10,
+                                        // indicatorWeight: 30,
                                         indicator: BoxDecoration(
+                                          
                                           color: GPrimaryColor,
-                                          // color: tapController.index == 1 ? Colors.blue : Color(0xFF42BD41),
+                                          
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
+                                        // indicatorPadding: EdgeInsets.symmetric(horizontal: 100),
                                         tabs: [
                                           Tab(
                                             child: screenSize ==
@@ -135,12 +136,20 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                                       Text('เนื้อหาเดียว'),
                                                     ],
                                                   )
-                                                : Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 60),
-                                                    child: Text('เนื้อหาเดียว'),
-                                                  ),
+                                                  
+                                                : 
+                                                  Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 90),
+                                              //                  padding: EdgeInsets.only(
+                                              // top: 10,
+                                              // bottom: 0,
+                                              // left: 80,
+                                              // right: 80),
+                                                      child: Text('เนื้อหาเดียว'),
+                                                    
+                                                ),
                                           ),
                                           Tab(
                                             child: screenSize ==
@@ -156,7 +165,7 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                                 : Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
-                                                            horizontal: 60),
+                                                            horizontal: 90),
                                                     child: Text('หลายเนื้อหา'),
                                                   ),
                                           ),
