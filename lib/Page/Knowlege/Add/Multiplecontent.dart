@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +18,8 @@ import 'package:watalygold_admin/Widgets/Dialog/dialogCancle.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
+import 'package:image_picker_platform_interface/src/types/image_source.dart'
+    as pickerImageSource;
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -52,7 +55,7 @@ class Multiplecontent extends StatefulWidget {
 class _MultiplecontentState extends State<Multiplecontent> {
   IconData? selectedIconData;
   String? _selectedValue;
-
+  final CarouselController _controller = CarouselController();
   int _currentExpandedIndex = -1;
   bool addedContent = false;
   TextEditingController contentcontroller = TextEditingController();
@@ -62,7 +65,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
   List<TextEditingController> contentNameControllers = [];
   List<TextEditingController> contentDetailControllers = [];
   List<List<XFile>> expansionPanelImagesList = [];
-
+  int _current = 0;
   // final QuillController _contentController = QuillController.basic();
   final List<QuillController> _contentController = [QuillController.basic()];
 
@@ -657,7 +660,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                         final int index =
                             _panelData.indexOf(expansionPanelData);
                         _showPreview.add(false);
-                        debugPrint("$index");
+                        print("$index");
                         // สร้าง TextEditingController สำหรับชื่อเนื้อหาและรายละเอียดเนื้อหา
                         contentNameControllers.add(TextEditingController());
                         _contentController.add(QuillController.basic());
@@ -820,7 +823,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                       ),
                                                     ),
                                                   ),
-                                                
                                                   SizedBox(
                                                     height: 400,
                                                     child: Expanded(
@@ -893,111 +895,161 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                     ),
                                                   ),
                                                   Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
-                                                        color: Colors.white70,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors
-                                                                .grey.shade200,
-                                                            offset:
-                                                                const Offset(
-                                                                    0.0, 0.5),
-                                                            blurRadius: 30.0,
-                                                          )
-                                                        ]),
+                                                   
                                                     width:
                                                         MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    height: 200.0,
+                                                                .size
+                                                                .width *
+                                                            1,
+                                                    height: 250.0,
                                                     child: Center(
                                                       child: expansionPanelData
                                                               .itemPhotosWidgetList
                                                               .isEmpty
-                                                          ? Center(
-                                                              child:
-                                                                  MaterialButton(
-                                                                onPressed: () =>
-                                                                    pickPhotoFromGallery(
-                                                                        index),
-                                                                child: SizedBox(
-                                                                  width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width,
-                                                                  height: 200.0,
-                                                                  child:
-                                                                      AspectRatio(
-                                                                    aspectRatio:
-                                                                        1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
-                                                                    child: expansionPanelImagesList.length >
-                                                                                index &&
-                                                                            expansionPanelImagesList[index]
-                                                                                .isNotEmpty
-                                                                        ? kIsWeb
-                                                                            ? Image
-                                                                                .network(
-                                                                                expansionPanelImagesList[index].first.path,
-                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                              )
-                                                                            : Image
-                                                                                .file(
-                                                                                File(expansionPanelImagesList[index].first.path),
-                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                              )
-                                                                        : Image
-                                                                            .network(
-                                                                            "https://static.thenounproject.com/png/3322766-200.png",
-                                                                            width:
-                                                                                MediaQuery.of(context).size.width * 0.01,
+                                                          ? SizedBox(
+                                                              child: expansionPanelImagesList
+                                                                              .length >
+                                                                          index &&
+                                                                      expansionPanelImagesList[
+                                                                              index]
+                                                                          .isNotEmpty
+                                                                  ? Column(
+                                                                      children: [
+                                                                        CarouselSlider(
+                                                                          options:
+                                                                              CarouselOptions(
                                                                             height:
                                                                                 200.0,
+                                                                            viewportFraction:
+                                                                                1,
+                                                                            enlargeCenterPage:
+                                                                                true,
+                                                                            enableInfiniteScroll:
+                                                                                false,
+                                                                            onPageChanged:
+                                                                                (index, reason) {
+                                                                              setState(() {
+                                                                                _current = index;
+                                                                              });
+                                                                            },
                                                                           ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              child: Wrap(
-                                                                spacing: 5.0,
-                                                                direction: Axis
-                                                                    .horizontal,
-                                                                alignment:
-                                                                    WrapAlignment
-                                                                        .spaceEvenly,
-                                                                runSpacing:
-                                                                    10.0,
-                                                                children: (expansionPanelImagesList.length >
-                                                                            index &&
-                                                                        expansionPanelImagesList[index]
-                                                                            .isNotEmpty)
-                                                                    ? expansionPanelImagesList[
-                                                                            index]
-                                                                        .map<
-                                                                            Widget>(
-                                                                          (XFile xFile) =>
-                                                                              Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.all(0),
-                                                                            child:
-                                                                                SizedBox(
-                                                                              height: 200.0,
-                                                                              child: AspectRatio(
-                                                                                aspectRatio: 16 / 9,
-                                                                                child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
+                                                                          items: expansionPanelImagesList[index]
+                                                                              .asMap()
+                                                                              .entries
+                                                                              .map<Widget>((entry) {
+                                                                            int imageIndex =
+                                                                                entry.key;
+                                                                            XFile
+                                                                                xFile =
+                                                                                entry.value;
+                                                                            return Stack(
+                                                                              children: [
+                                                                                Container(
+                                                                                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                                                  child: ClipRRect(
+                                                                                    child: SizedBox(
+                                                                                      height: 200.0,
+                                                                                      child: kIsWeb
+                                                                                          ? Image.network(
+                                                                                              xFile.path,
+                                                                                              fit: BoxFit.cover,
+                                                                                            )
+                                                                                          : Image.file(
+                                                                                              File(xFile.path),
+                                                                                              fit: BoxFit.cover,
+                                                                                            ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Positioned(
+                                                                                  bottom: 8.0,
+                                                                                  right: 8.0,
+                                                                                  child: Row(
+                                                                                    children: [
+                                                                                      IconButton(
+                                                                                        onPressed: () {
+                                                                                          editImage(index, imageIndex);
+                                                                                        },
+                                                                                        icon: Container(
+                                                                                          decoration: const BoxDecoration(
+                                                                                            shape: BoxShape.circle,
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                          padding: EdgeInsets.all(8.0),
+                                                                                          child: const Icon(
+                                                                                            Icons.edit,
+                                                                                            color: Colors.yellow,
+                                                                                            size: 20.0,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      IconButton(
+                                                                                        onPressed: () => deleteImage(index, imageIndex),
+                                                                                        icon: Container(
+                                                                                          decoration: const BoxDecoration(
+                                                                                            shape: BoxShape.circle,
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                          padding: EdgeInsets.all(8.0),
+                                                                                          child: const Icon(
+                                                                                            Icons.delete_forever_rounded,
+                                                                                            color: Colors.red,
+                                                                                            size: 20.0,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            );
+                                                                          }).toList(),
+                                                                        ),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: expansionPanelImagesList[index]
+                                                                              .asMap()
+                                                                              .entries
+                                                                              .map((entry) {
+                                                                            return GestureDetector(
+                                                                              onTap: () => _controller.animateToPage(entry.key),
+                                                                              child: Container(
+                                                                                width: 8.0,
+                                                                                height: 8.0,
+                                                                                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                                                                decoration: BoxDecoration(
+                                                                                  shape: BoxShape.circle,
+                                                                                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : GPrimaryColor).withOpacity(_current == entry.key ? 0.9 : 0.4),
+                                                                                ),
                                                                               ),
-                                                                            ),
-                                                                          ),
-                                                                        )
-                                                                        .toList()
-                                                                    : itemPhotosWidgetList,
-                                                              ),
-                                                            ),
+                                                                            );
+                                                                          }).toList(),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : MaterialButton(
+                                                                      height:
+                                                                          250.0,
+                                                                      onPressed:
+                                                                          () =>
+                                                                              pickPhotoFromGallery(index),
+                                                                      child:
+                                                                          Container(
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.5, // Set width of Container to half of screen width
+                                                                        child: Image
+                                                                            .network(
+                                                                          "https://static.thenounproject.com/png/3322766-200.png",
+                                                                          height:
+                                                                              100.0,
+                                                                          width:
+                                                                              100.0,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                            )
+                                                          : Container(),
                                                     ),
                                                   ),
                                                   const SizedBox(
@@ -1100,7 +1152,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                               child: _previewWidget(
                                                                   expansionPanelData,
                                                                   index),
-                                                              
                                                             ),
                                                           )
                                                         ],
@@ -1242,7 +1293,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                       ),
                                                     ),
                                                   ),
-                                               
                                                   SizedBox(
                                                     height: 400,
                                                     child: Expanded(
@@ -1314,112 +1364,176 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                       ),
                                                     ),
                                                   ),
+                                                  SizedBox(
+                                                    height: 20.0,
+                                                  ),
                                                   Container(
                                                     decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
-                                                        color: Colors.white70,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors
-                                                                .grey.shade200,
-                                                            offset:
-                                                                const Offset(
-                                                                    0.0, 0.5),
-                                                            blurRadius: 30.0,
-                                                          )
-                                                        ]),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12.0),
+                                                      // color: Colors.red,
+                                                      boxShadow: [
+                                                        // BoxShadow(
+                                                        //   color: Colors.grey.shade200,
+                                                        //   offset: const Offset(0.0, 0.5),
+                                                        // )
+                                                      ],
+                                                    ),
                                                     width:
                                                         MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    height: 200.0,
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                    height: 250.0,
                                                     child: Center(
                                                       child: expansionPanelData
                                                               .itemPhotosWidgetList
                                                               .isEmpty
-                                                          ? Center(
-                                                              child:
-                                                                  MaterialButton(
-                                                                onPressed: () =>
-                                                                    pickPhotoFromGallery(
-                                                                        index),
-                                                                child: SizedBox(
-                                                                  width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width,
-                                                                  height: 200.0,
-                                                                  child:
-                                                                      AspectRatio(
-                                                                    aspectRatio:
-                                                                        1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
-                                                                    child: expansionPanelImagesList.length >
-                                                                                index &&
-                                                                            expansionPanelImagesList[index]
-                                                                                .isNotEmpty
-                                                                        ? kIsWeb
-                                                                            ? Image
-                                                                                .network(
-                                                                                expansionPanelImagesList[index].first.path,
-                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                              )
-                                                                            : Image
-                                                                                .file(
-                                                                                File(expansionPanelImagesList[index].first.path),
-                                                                                fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                              )
-                                                                        : Image
-                                                                            .network(
-                                                                            "https://static.thenounproject.com/png/3322766-200.png",
-                                                                            width:
-                                                                                MediaQuery.of(context).size.width * 0.01,
+                                                          ? SizedBox(
+                                                              child: expansionPanelImagesList
+                                                                              .length >
+                                                                          index &&
+                                                                      expansionPanelImagesList[
+                                                                              index]
+                                                                          .isNotEmpty
+                                                                  ? Column(
+                                                                      children: [
+                                                                        CarouselSlider(
+                                                                          options:
+                                                                              CarouselOptions(
                                                                             height:
                                                                                 200.0,
+                                                                            viewportFraction:
+                                                                                1,
+                                                                            enlargeCenterPage:
+                                                                                true,
+                                                                            enableInfiniteScroll:
+                                                                                false,
+                                                                            onPageChanged:
+                                                                                (index, reason) {
+                                                                              setState(() {
+                                                                                _current = index;
+                                                                              });
+                                                                            },
                                                                           ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              child: Wrap(
-                                                                spacing: 5.0,
-                                                                direction: Axis
-                                                                    .horizontal,
-                                                                alignment:
-                                                                    WrapAlignment
-                                                                        .spaceEvenly,
-                                                                runSpacing:
-                                                                    10.0,
-                                                                children: (expansionPanelImagesList.length >
-                                                                            index &&
-                                                                        expansionPanelImagesList[index]
-                                                                            .isNotEmpty)
-                                                                    ? expansionPanelImagesList[
-                                                                            index]
-                                                                        .map<
-                                                                            Widget>(
-                                                                          (XFile xFile) =>
-                                                                              Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.all(0),
-                                                                            child:
-                                                                                SizedBox(
-                                                                              height: 200.0,
-                                                                              child: AspectRatio(
-                                                                                aspectRatio: 16 / 9,
-                                                                                child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
+                                                                          items: expansionPanelImagesList[index]
+                                                                              .asMap()
+                                                                              .entries
+                                                                              .map<Widget>((entry) {
+                                                                            int imageIndex =
+                                                                                entry.key;
+                                                                            XFile
+                                                                                xFile =
+                                                                                entry.value;
+                                                                            return Stack(
+                                                                              children: [
+                                                                                Container(
+                                                                                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                                                  child: ClipRRect(
+                                                                                    child: SizedBox(
+                                                                                      height: 200.0,
+                                                                                      child: kIsWeb
+                                                                                          ? Image.network(
+                                                                                              xFile.path,
+                                                                                              fit: BoxFit.cover,
+                                                                                            )
+                                                                                          : Image.file(
+                                                                                              File(xFile.path),
+                                                                                              fit: BoxFit.cover,
+                                                                                            ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Positioned(
+                                                                                  bottom: 8.0,
+                                                                                  right: 8.0,
+                                                                                  child: Row(
+                                                                                    children: [
+                                                                                      IconButton(
+                                                                                        onPressed: () {
+                                                                                          editImage(index, imageIndex);
+                                                                                        },
+                                                                                        icon: Container(
+                                                                                          decoration: const BoxDecoration(
+                                                                                            shape: BoxShape.circle,
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                          padding: EdgeInsets.all(8.0),
+                                                                                          child: const Icon(
+                                                                                            Icons.edit,
+                                                                                            color: Colors.yellow,
+                                                                                            size: 20.0,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      IconButton(
+                                                                                        onPressed: () => deleteImage(index, imageIndex),
+                                                                                        icon: Container(
+                                                                                          decoration: const BoxDecoration(
+                                                                                            shape: BoxShape.circle,
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                          padding: EdgeInsets.all(8.0),
+                                                                                          child: const Icon(
+                                                                                            Icons.delete_forever_rounded,
+                                                                                            color: Colors.red,
+                                                                                            size: 20.0,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            );
+                                                                          }).toList(),
+                                                                        ),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: expansionPanelImagesList[index]
+                                                                              .asMap()
+                                                                              .entries
+                                                                              .map((entry) {
+                                                                            return GestureDetector(
+                                                                              onTap: () => _controller.animateToPage(entry.key),
+                                                                              child: Container(
+                                                                                width: 8.0,
+                                                                                height: 8.0,
+                                                                                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                                                                decoration: BoxDecoration(
+                                                                                  shape: BoxShape.circle,
+                                                                                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : GPrimaryColor).withOpacity(_current == entry.key ? 0.9 : 0.4),
+                                                                                ),
                                                                               ),
-                                                                            ),
-                                                                          ),
-                                                                        )
-                                                                        .toList()
-                                                                    : itemPhotosWidgetList,
-                                                              ),
-                                                            ),
+                                                                            );
+                                                                          }).toList(),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : MaterialButton(
+                                                                      height:
+                                                                          250.0,
+                                                                      onPressed:
+                                                                          () =>
+                                                                              pickPhotoFromGallery(index),
+                                                                      child:
+                                                                          Container(
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.5, // Set width of Container to half of screen width
+                                                                        child: Image
+                                                                            .network(
+                                                                          "https://static.thenounproject.com/png/3322766-200.png",
+                                                                          height:
+                                                                              100.0,
+                                                                          width:
+                                                                              100.0,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                            )
+                                                          : Container(),
                                                     ),
                                                   ),
                                                   const SizedBox(
@@ -1557,6 +1671,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                       onPressed: () {
                         setState(() {
                           final nameController = TextEditingController();
+                        
                           final detailController = QuillController.basic();
 
                           List<Widget> expansionPanelImagesList =
@@ -1642,7 +1757,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                   .document
                                   .toDelta()
                                   .toJson();
-                              debugPrint("$deltaJson");
+                              print("$deltaJson");
 
                               final converter = QuillDeltaToHtmlConverter(
                                 List.castFrom(deltaJson),
@@ -1650,26 +1765,11 @@ class _MultiplecontentState extends State<Multiplecontent> {
                               _html = converter.convert();
 
                               htmlList.add(_html);
-                              debugPrint("$htmlList");
+                              print("$htmlList");
                             }
 
-                            // htmlLists.add(htmlList);
-                            debugPrint("$htmlLists");
-                            // int index = 0;
-                            // int selectedIndex = 0;
-                            // final deltaJson = _contentController[selectedIndex]
-                            //     .document
-                            //     .toDelta()
-                            //     .toJson();
-                            // debugPrint(deltaJson);
-
-                            // final converter = QuillDeltaToHtmlConverter(
-                            //   List.castFrom(deltaJson),
-                            // );
-                            // _html = converter.convert();
-                            // htmlList.add(_html);
-                            // debugPrint(_html);
-                            // debugPrint(htmlList);
+                            print("$htmlLists");
+                    
                             uploadImageAndSaveItemInfo();
                           },
                           style: ElevatedButton.styleFrom(
@@ -1704,24 +1804,38 @@ class _MultiplecontentState extends State<Multiplecontent> {
     );
   }
 
-  // void removeImage() {
-  //   setState(() {
-  //     itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
-  //   });
-  // }
-
+  
   Future<void> pickPhotoFromGallery(int index) async {
-    debugPrint("srr");
+    print("srr");
     List<XFile>? newPhotos = await _picker.pickMultiImage();
     setState(() {
-      debugPrint("srr11");
+      print("srr11");
       if (expansionPanelImagesList.length <= index) {
         expansionPanelImagesList.add(newPhotos);
-        debugPrint("$expansionPanelImagesList");
+        print("$expansionPanelImagesList");
       } else {
-        expansionPanelImagesList[index] = newPhotos;
+        expansionPanelImagesList[index].addAll(newPhotos);
       }
-      debugPrint("${expansionPanelImagesList[index]}");
+      print("${expansionPanelImagesList[index]}");
+    });
+  }
+
+  Future<void> editImage(int panelIndex, int imageIndex) async {
+    final editedPhoto =
+        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+    if (editedPhoto != null) {
+      setState(() {
+        expansionPanelImagesList[panelIndex][imageIndex] = editedPhoto;
+      });
+    }
+  }
+
+  void deleteImage(int panelIndex, int imageIndex) {
+    setState(() {
+      expansionPanelImagesList[panelIndex].removeAt(imageIndex);
+      if (expansionPanelImagesList[panelIndex].isEmpty) {
+        expansionPanelImagesList.removeAt(panelIndex);
+      }
     });
   }
 
@@ -1764,30 +1878,46 @@ class _MultiplecontentState extends State<Multiplecontent> {
     String imageUrl = await reference.getDownloadURL();
     debugPrint(imageUrl);
     debugPrint("$ListimageUrl");
-
     setState(() {
       ListimageUrl.add(imageUrl);
       // debugPrint(ListimageUrl);
     });
   }
 
+  // Future<String> addContent(
+  //     String contentName, String contentDetail, String imageUrl) async {
+  //   Map<String, dynamic> contentMap = {
+  //     "ContentName": contentName,
+  //     "ContentDetail": contentDetail,
+  //     "image_url": imageUrl,
+  //     "create_at": Timestamp.now(),
+  //     "deleted_at": null,
+  //     "update_at": null,
+  //   };
+  //   String contentId = const Uuid().v4().substring(0, 10);
+  //   await Databasemethods().addContent(contentMap, contentId);
+  //   debugPrint("addContent success");
+  //   debugPrint("contentName $contentName");
+  //   debugPrint("ContentDetail $contentDetail");
+  //   return contentId;
+  // }
+
   Future<String> addContent(
-      String contentName, String contentDetail, String imageUrl) async {
+      String contentName, String contentDetail, List<String> imageUrls) async {
     Map<String, dynamic> contentMap = {
       "ContentName": contentName,
       "ContentDetail": contentDetail,
-      "image_url": imageUrl,
+      "image_url": imageUrls, // เปลี่ยนเป็น List
       "create_at": Timestamp.now(),
       "deleted_at": null,
       "update_at": null,
     };
-    // Generate a unique ID (replace with your preferred method)
     String contentId = const Uuid().v4().substring(0, 10);
-    // Add data using addKnowlege, passing both contentMap and generated ID
     await Databasemethods().addContent(contentMap, contentId);
-    debugPrint("addContent success");
-    debugPrint("contentName $contentName");
-    debugPrint("ContentDetail $contentDetail");
+    print("addContent success");
+    print("contentName $contentName");
+    print("ContentDetail $contentDetail");
+    print("imageUrls $imageUrls");
     return contentId;
   }
 
@@ -1805,25 +1935,28 @@ class _MultiplecontentState extends State<Multiplecontent> {
       return;
     }
     List<String> contentIds = [];
-    debugPrint("list ${itemImagesList.length}");
+    print("list ${itemImagesList.length}");
+
 
     for (int panelIndex = 0;
         panelIndex < expansionPanelImagesList.length;
         panelIndex++) {
       List<XFile> panelImages = expansionPanelImagesList[panelIndex];
+      String contentName = contentNameControllers[panelIndex].text;
+      String contentDetail = htmlList[panelIndex];
 
+      // สร้าง List ของ URL สำหรับแต่ละ panel
+      List<String> panelImageUrls = [];
       for (int i = 0; i < panelImages.length; i++) {
-        String contentName = contentNameControllers[panelIndex].text;
-        // String contentDetail = contentDetailControllers[panelIndex].text;
-        String contentDetail = htmlList[panelIndex];
-        String imageurl = ListimageUrl[panelIndex * panelImages.length + i];
-
-        String contentId =
-            await addContent(contentName, contentDetail, imageurl);
-        // debugPrint("contentNameControllers ${contentNameControllers}");
-        contentIds.add(contentId);
+        panelImageUrls.add(ListimageUrl[panelIndex * panelImages.length + i]);
       }
+
+      // เรียกใช้ addContent ด้วย List ของ URL
+      String contentId =
+          await addContent(contentName, contentDetail, panelImageUrls);
+      contentIds.add(contentId);
     }
+
     if (contentIds.isEmpty) {
       Fluttertoast.showToast(
         msg: "กรุณาเพิ่มข้อมูลของเนื้อหา",
@@ -1909,82 +2042,129 @@ class _MultiplecontentState extends State<Multiplecontent> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            itemCount: expansionPanelImagesList.length,
-            itemBuilder: (BuildContext context, int panelIndex) {
-              List<XFile> panelImages = expansionPanelImagesList[panelIndex];
-
-              return SizedBox(
-                height: 253, // กำหนดความสูงของ Container สำหรับแสดงรูปภาพ
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: panelImages.length,
-                  itemBuilder: (BuildContext context, int photoIndex) {
-                    return SizedBox(
-                      width: 390, // กำหนดความกว้างของรูปภาพ
-                      child: kIsWeb
-                          ? Image.network(
-                              expansionPanelImagesList[index].first.path,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(panelImages[photoIndex].path),
+          if (expansionPanelImagesList.length > index &&
+              expansionPanelImagesList[index].isNotEmpty)
+            Column(
+              children: [
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    viewportFraction: 1,
+                    enlargeCenterPage: true,
+                    enableInfiniteScroll: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _current = index;
+                      });
+                    },
+                  ),
+                  items: expansionPanelImagesList[index]
+                      .asMap()
+                      .entries
+                      .map<Widget>((entry) {
+                    XFile xFile = entry.value;
+                    return Stack(
+                      children: [
+                        Container(
+                          child: ClipRRect(
+                            child: SizedBox(
+                              child: kIsWeb
+                                  ? Image.network(
+                                      xFile.path,
+                                      fit: BoxFit.cover,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                    )
+                                  : Image.file(
+                                      File(xFile.path),
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
+                          ),
+                        ),
+                      ],
                     );
-                  },
+                  }).toList(),
                 ),
-              );
-            },
-          ),
-          Positioned(
-            // ใช้ตัวแปร _positionY แทนค่า top
-            bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              height: MediaQuery.of(context).size.width * 1.85,
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: const BoxDecoration(
-                  color: WhiteColor,
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(40))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: itemPhotosWidgetList.map((url) {
+                    int index = itemPhotosWidgetList.indexOf(url);
+                    return Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _current == index
+                            ? Color.fromRGBO(0, 0, 0, 0.9)
+                            : Color.fromRGBO(0, 0, 0, 0.4),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            )
+          else
+            Container(
               width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        icons[_selectedValue] ??
-                            Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                        size: 24, // ขนาดของไอคอน
-                        color: GPrimaryColor, // สีของไอคอน
-                      ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Text(
-                        contentNameControllers[index].text,
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: _displayedWidgetHtmlWidget[index],
-                      ),
-                    ],
-                  )
-                ],
+              height: MediaQuery.of(context).size.height * 0.3,
+              color: Colors.grey[200], // สีพื้นหลังเมื่อไม่มีรูปภาพ
+              child: Center(
+                child: Text(
+                  'ไม่มีรูปภาพ',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                ),
               ),
+            ),
+          Container(
+            margin: EdgeInsets.only(top: 200),
+            height: MediaQuery.of(context).size.width * 1.85,
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            decoration: const BoxDecoration(
+                color: WhiteColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icons[_selectedValue] ??
+                          Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                      size: 24, // ขนาดของไอคอน
+                      color: GPrimaryColor, // สีของไอคอน
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        contentNameControllers[index].text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _displayedWidgetHtmlWidget[index],
+                    )
+                  ],
+                )
+              ],
             ),
           ),
         ],

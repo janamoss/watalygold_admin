@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_quill/quill_delta.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:quill_delta/quill_delta.dart';
+
 import 'package:uuid/uuid.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import 'package:watalygold_admin/Page/Knowlege/htmltodelta.dart';
@@ -24,6 +25,10 @@ import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
+import 'package:flutter_widget_from_html_core/src/core_data.dart'
+    as htmlImageSource;
+import 'package:image_picker_platform_interface/src/types/image_source.dart'
+    as pickerImageSource;
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -50,9 +55,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   QuillController _contentController = QuillController.basic();
-  // late QuillController _contentController;
   String _html = '';
-  // String htmlString = '<h1 class="ql-indent-1"><strong>1232121444</strong></h1>';
   List<XFile?> latestPickedPhotos = [];
   List<Widget> itemPhotosWidgetList = <Widget>[];
   final ImagePicker _picker = ImagePicker();
@@ -60,6 +63,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   List<XFile>? photo = <XFile>[];
   List<XFile> itemImagesList = <XFile>[];
   List<String> downloadUrl = <String>[];
+  List<String> _imageUrlsList = [];
 
   bool uploading = false;
 
@@ -77,7 +81,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         document: Document.fromDelta(delta),
         selection: const TextSelection.collapsed(offset: 0),
       );
+      _imageUrlsList = List.from(widget.knowledge!.knowledgeImg);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      addKnowledgeImages();
+    });
   }
 
   Widget _buildTabBar() {
@@ -151,7 +160,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                   'หลายเนื้อหา',
                                   style: TextStyle(
                                     fontSize: 20,
-                                   color: Colors.black45,
+                                    color: Colors.black45,
                                   ),
                                 ),
                               ),
@@ -632,74 +641,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     height: 30.0,
                                                   ),
                                                   Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
-                                                        color: Colors.white70,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors
-                                                                .grey.shade200,
-                                                            offset:
-                                                                const Offset(
-                                                                    0.0, 0.5),
-                                                            blurRadius: 30.0,
-                                                          )
-                                                        ]),
                                                     width:
                                                         MediaQuery.of(context)
                                                             .size
                                                             .width,
                                                     height: 250.0,
-                                                    child: Center(
-                                                      child: itemPhotosWidgetList
-                                                              .isEmpty
-                                                          ? Center(
-                                                              child:
-                                                                  MaterialButton(
-                                                                onPressed:
-                                                                    pickPhotoFromGallery,
-                                                                child:
-                                                                    Container(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .bottomCenter,
-                                                                  child: Center(
-                                                                    child: Image
-                                                                        .network(
-                                                                      widget.knowledge !=
-                                                                              null
-                                                                          ? widget
-                                                                              .knowledge!
-                                                                              .knowledgeImg
-                                                                          : widget
-                                                                              .contents!
-                                                                              .ImageURL,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              child: Wrap(
-                                                                spacing: 5.0,
-                                                                direction: Axis
-                                                                    .horizontal,
-                                                                children:
-                                                                    itemPhotosWidgetList,
-                                                                alignment:
-                                                                    WrapAlignment
-                                                                        .spaceEvenly,
-                                                                runSpacing:
-                                                                    10.0,
-                                                              ),
-                                                            ),
-                                                    ),
+                                                    child: buildImageGallery(),
                                                   ),
                                                   SizedBox(
                                                     height: 10,
@@ -711,7 +658,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     style: ElevatedButton
                                                         .styleFrom(
                                                       backgroundColor:
-                                                          YPrimaryColor,
+                                                          GPrimaryColor,
                                                       shape:
                                                           RoundedRectangleBorder(
                                                         borderRadius:
@@ -720,7 +667,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                     child: Text(
-                                                      "แก้ไขรูปภาพ",
+                                                      "เพิ่มรูปภาพ",
                                                       style: TextStyle(
                                                           color: Colors.white),
                                                     ),
@@ -1198,74 +1145,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     height: 30.0,
                                                   ),
                                                   Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
-                                                        color: Colors.white70,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors
-                                                                .grey.shade200,
-                                                            offset:
-                                                                const Offset(
-                                                                    0.0, 0.5),
-                                                            blurRadius: 30.0,
-                                                          )
-                                                        ]),
                                                     width:
                                                         MediaQuery.of(context)
                                                             .size
                                                             .width,
                                                     height: 250.0,
-                                                    child: Center(
-                                                      child: itemPhotosWidgetList
-                                                              .isEmpty
-                                                          ? Center(
-                                                              child:
-                                                                  MaterialButton(
-                                                                onPressed:
-                                                                    pickPhotoFromGallery,
-                                                                child:
-                                                                    Container(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .bottomCenter,
-                                                                  child: Center(
-                                                                    child: Image
-                                                                        .network(
-                                                                      widget.knowledge !=
-                                                                              null
-                                                                          ? widget
-                                                                              .knowledge!
-                                                                              .knowledgeImg
-                                                                          : widget
-                                                                              .contents!
-                                                                              .ImageURL,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              child: Wrap(
-                                                                spacing: 5.0,
-                                                                direction: Axis
-                                                                    .horizontal,
-                                                                children:
-                                                                    itemPhotosWidgetList,
-                                                                alignment:
-                                                                    WrapAlignment
-                                                                        .spaceEvenly,
-                                                                runSpacing:
-                                                                    10.0,
-                                                              ),
-                                                            ),
-                                                    ),
+                                                    child: buildImageGallery(),
                                                   ),
                                                   SizedBox(
                                                     height: 10,
@@ -1277,7 +1162,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     style: ElevatedButton
                                                         .styleFrom(
                                                       backgroundColor:
-                                                          YPrimaryColor,
+                                                          GPrimaryColor,
                                                       shape:
                                                           RoundedRectangleBorder(
                                                         borderRadius:
@@ -1286,7 +1171,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                     child: Text(
-                                                      "แก้ไขรูปภาพ",
+                                                      "เพิ่มรูปภาพ",
                                                       style: TextStyle(
                                                           color: Colors.white),
                                                     ),
@@ -1467,18 +1352,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () async {
-                                      final deltaJson = _contentController
-                                          .document
-                                          .toDelta()
-                                          .toJson();
-                                      print(deltaJson);
-
-                                      final converter =
-                                          QuillDeltaToHtmlConverter(
-                                        List.castFrom(deltaJson),
-                                      );
-                                      _html = converter.convert();
-                                      print(_html);
+                                      convertDeltaToHtml();
                                       upload();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -1519,21 +1393,141 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     );
   }
 
-  void addImage() {
-    removeImage();
-    for (var bytes in photo!) {
+  int _current = 0;
+  final CarouselController _controller = CarouselController();
+  Widget buildImageGallery() {
+    if (itemPhotosWidgetList.isNotEmpty) {
+      return Column(
+        children: [
+          CarouselSlider(
+            carouselController: _controller,
+            options: CarouselOptions(
+                height: 200.0,
+                enlargeCenterPage: true,
+                enableInfiniteScroll: true,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _current = index;
+                  });
+                }),
+            items: itemPhotosWidgetList.map((imageWidget) {
+              final index = itemPhotosWidgetList.indexOf(imageWidget);
+              return Builder(
+                builder: (BuildContext context) {
+                  return Stack(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: imageWidget,
+                      ),
+                      Positioned(
+                        bottom: 8.0,
+                        right: 8.0,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                editImage(index);
+                              },
+                              icon: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: YellowColor,
+                                  size: 20.0,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                deleteImage(
+                                    itemPhotosWidgetList.indexOf(imageWidget));
+                              },
+                              icon: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.delete_forever_rounded,
+                                  color: Colors.red,
+                                  size: 20.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }).toList(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: itemPhotosWidgetList.asMap().entries.map((entry) {
+              return GestureDetector(
+                onTap: () => _controller.animateToPage(entry.key),
+                child: Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : GPrimaryColor)
+                          .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  void convertDeltaToHtml() {
+    final deltaJson = _contentController.document.toDelta().toJson();
+    print(deltaJson);
+    final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
+    _html = converter.convert();
+    print(_html);
+  }
+
+  Future<void> pickPhotoFromGallery() async {
+    photo = await _picker.pickMultiImage();
+    if (photo != null && photo!.isNotEmpty) {
+      setState(() {
+        itemImagesList.addAll(photo!.toSet().toList());
+        print("itemImagesList ${itemImagesList}");
+        addImagewidget();
+      });
+    }
+  }
+
+  void addImagewidget() {
+    for (var images in itemImagesList) {
       itemPhotosWidgetList.add(Padding(
         padding: const EdgeInsets.all(0),
         child: Container(
-          height: 390,
+          height: 200,
           child: Container(
             child: kIsWeb
                 ? Image.network(
-                    File(bytes.path).path,
+                    File(images.path).path,
                     fit: BoxFit.cover,
                   )
                 : Image.file(
-                    File(bytes.path),
+                    File(images.path),
                   ),
           ),
         ),
@@ -1541,77 +1535,152 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     }
   }
 
-  Future<void> pickPhotoFromGallery() async {
-    photo = await _picker.pickMultiImage();
-    if (photo != null && photo!.isNotEmpty) {
+  void addKnowledgeImages() {
+    if (_imageUrlsList.isNotEmpty) {
       setState(() {
-        itemImagesList = itemImagesList + photo!;
-        latestPickedPhotos.addAll(photo!); // เพิ่มรูปภาพล่าสุดเข้าไปในรายการ
-        addImage();
-        photo!.clear();
+        for (var imageUrl in _imageUrlsList) {
+          itemPhotosWidgetList.add(Padding(
+            padding: const EdgeInsets.all(0),
+            child: Container(
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                width: 300,
+                height: 200,
+              ),
+            ),
+          ));
+        }
       });
     }
+  }
+
+  void deleteImage(int index) {
+    setState(() {
+      itemPhotosWidgetList.removeAt(index);
+      _imageUrlsList.removeAt(index);
+      print(_imageUrlsList);
+    });
   }
 
   upload() async {
+    List<String> existingImageUrls = [];
+
+    if (widget.knowledge != null && widget.knowledge!.knowledgeImg != null) {
+      existingImageUrls = widget.knowledge!.knowledgeImg;
+    } else if (widget.contents != null) {
+      // existingImageUrls.add(widget.contents!.ImageURL);
+    }
+
+    List<String> newImageUrls = []; //เก็บรูปภที่เพิ่มมาใหม่
     if (itemImagesList.isNotEmpty) {
-      String knowledgetId = await uploadImageAndSaveItemInfo();
+      newImageUrls = await uploadImageAndSaveItemInfo();
       setState(() {
-        uploading = false;
+        _imageUrlsList.addAll(newImageUrls);
       });
+      print("_imageUrlsList ${_imageUrlsList}");
+      print("newImageUrls ${newImageUrls}");
+    }
+
+    // ตรวจสอบว่ามีการเปลี่ยนแปลงรูปภาพหรือไม่
+    if (existingImageUrls.length != _imageUrlsList.length ||
+        existingImageUrls.any((url) => !_imageUrlsList.contains(url))) {
+      // มีการเปลี่ยนแปลงรูปภาพ
+      updateKnowledges(_imageUrlsList);
+      print("updateKnowledges(_imageUrls)");
+      print(_imageUrlsList);
+      print(existingImageUrls.length);
+      print(_imageUrlsList.length);
     } else {
-      updateKnowledges(widget.knowledge != null
-          ? widget.knowledge!.knowledgeImg
-          : widget.contents!.ImageURL);
+      // ไม่มีการเปลี่ยนแปลงรูปภาพ
+      updateKnowledges(existingImageUrls);
+      print(existingImageUrls);
     }
   }
 
-  Future<String> uploadImageAndSaveItemInfo() async {
+  Future<void> editImage(int index) async {
+    final editPhoto =
+        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+    if (editPhoto != null) {
+      // อัปโหลดรูปภาพไปยัง Firebase Storage
+      String knowledgetId = widget.knowledge!.id;
+      List<PickedFile> pickedFiles = [PickedFile(editPhoto.path)];
+      List<String> imageUrlsedit =
+          await uploadImageToStorage(pickedFiles, knowledgetId);
+
+      setState(() {
+        if (index < _imageUrlsList.length) {
+          _imageUrlsList[index] = imageUrlsedit.first;
+        } else {
+          _imageUrlsList.addAll(imageUrlsedit);
+        }
+        itemPhotosWidgetList[index] = Padding(
+          padding: const EdgeInsets.all(0),
+          child: Container(
+            height: 200,
+            child: Image.network(
+              _imageUrlsList[index], // ใช้ URL จาก _imageUrls
+              fit: BoxFit.cover,
+              width: 300,
+              height: 200,
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  Future<List<String>> uploadImageAndSaveItemInfo() async {
     setState(() {
       uploading = true;
     });
+
     if (itemImagesList.isEmpty) {
-      // ไม่มีการเพิ่มรูปภาพใหม่ ส่ง imageUrl เดิมไปยัง updateKnowledges
-      updateKnowledges(widget.knowledge != null
-          ? widget.knowledge!.knowledgeImg
-          : widget.contents!.ImageURL);
-      return ''; // คืนค่าว่างหรือค่า null เพราะไม่มีรูปภาพใหม่ที่อัปโหลด
+      return []; // คืนค่าว่างหรือค่า null เพราะไม่มีรูปภาพใหม่ที่อัปโหลด
     }
-    PickedFile? pickedFile;
+
     String? knowledgetId = const Uuid().v4().substring(0, 10);
-    if (latestPickedPhotos.isNotEmpty) {
-      XFile? latestPickedPhoto = latestPickedPhotos.last;
-      if (latestPickedPhoto != null) {
-        file = File(latestPickedPhoto.path);
-        pickedFile = PickedFile(file!.path);
-        await uploadImageToStorage(pickedFile, knowledgetId);
-      }
+    List<PickedFile> pickedFiles = [];
+    for (var ImagesList in itemImagesList) {
+      file = File(ImagesList.path);
+      pickedFiles.add(PickedFile(file!.path));
     }
-    return knowledgetId;
-  }
 
-  void removeImage() {
+    List<String> newImageUrls =
+        await uploadImageToStorage(pickedFiles, knowledgetId);
+
     setState(() {
-      itemPhotosWidgetList.clear(); // ลบภาพเดิมทั้งหมด
+      uploading = false;
     });
+
+    return newImageUrls; // คืนค่า URL ของรูปภาพใหม่ที่อัปโหลด
   }
 
-  uploadImageToStorage(PickedFile? pickedFile, String knowledgetId) async {
-    if (pickedFile != null) {
+  Future<List<String>> uploadImageToStorage(
+      List<PickedFile> pickedFiles, String knowledgetId) async {
+    List<String> imageUrls = [];
+
+    for (var pickedFile in pickedFiles) {
       String? kId = const Uuid().v4().substring(0, 10);
       Reference reference = FirebaseStorage.instance
           .ref()
           .child('Knowledge/$knowledgetId/knowledImg_$kId');
+
       await reference.putData(
         await pickedFile.readAsBytes(),
         SettableMetadata(contentType: 'image/jpeg'),
       );
+
       String imageUrl = await reference.getDownloadURL();
-      updateKnowledges(imageUrl);
+
+      imageUrls.add(imageUrl);
     }
+
+    return imageUrls;
   }
 
-  void updateKnowledges(String? imageUrl) async {
+  void updateKnowledges(List<String> imageUrls) async {
     String Id = widget.knowledge!.id;
 
     String? selectedValue;
@@ -1631,7 +1700,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       "KnowledgeIcons": _selectedValue ??
           icons.keys.firstWhere((key) => icons[key].toString() == selectedValue,
               orElse: () => ''),
-      "KnowledgeImg": imageUrl,
+      "KnowledgeImg": imageUrls, // ใช้รายการ imageUrls ที่ส่งเข้ามา
       "deleted_at": null,
       "update_at": Timestamp.now(),
       "Content": [],
@@ -1656,20 +1725,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-    });
-  }
-
-  void clearAllFields() {
-    nameController.clear();
-    contentController.clear();
-
-    setState(() {
-      _selectedValue = null;
-    });
-
-    setState(() {
-      itemImagesList.clear();
-      itemPhotosWidgetList.clear();
     });
   }
 
@@ -1737,119 +1792,87 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            itemCount: itemPhotosWidgetList.length > 0
-                ? itemPhotosWidgetList.length
-                : 1,
-            itemBuilder: (BuildContext context, int index) {
-              if (itemPhotosWidgetList.length > 0) {
-                return Container(
-                  // กำหนดความกว้างของรูปภาพ
-                  child: itemPhotosWidgetList[index], // ใส่รูปภาพลงใน Container
-                );
-              } else {
-                // หากไม่มี itemPhotosWidgetList ให้แสดงรูปภาพจาก knowledgeImg
-                return Container(
-                  // กำหนดความกว้างของรูปภาพ
-                  child: Image.network(
-                    widget.knowledge != null
-                        ? widget.knowledge!.knowledgeImg
-                        : widget.contents!.ImageURL,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }
-            },
-          ),
-
-          // ListView.builder(
-          //   itemCount: itemPhotosWidgetList.length,
-          //   itemBuilder: (BuildContext context, int index) {
-          //     return Container(
-          //     // กำหนดความกว้างของรูปภาพ
-          //       child: itemPhotosWidgetList[index], // ใส่รูปภาพลงใน Container
-          //     );
-          //   },
-          // ),
-
-          Positioned(
-            // ใช้ตัวแปร _positionY แทนค่า top
-            bottom: 0.0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
-            left: 0.0,
-            right: 0.0,
-            child: SingleChildScrollView(
-              child: Container(
-                height: MediaQuery.of(context).size.width * 1.85,
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                decoration: BoxDecoration(
-                    color: WhiteColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(40))),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    Row(
+          itemPhotosWidgetList.isNotEmpty
+              ? itemPhotosWidgetList.length > 1
+                  ? Column(
                       children: [
-                        Icon(
-                          icons[_selectedValue] ??
-                              Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                          size: 24, // ขนาดของไอคอน
-                          color: GPrimaryColor, // สีของไอคอน
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text(
-                          nameController.text,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: _displayedWidgetHtmlWidget,
+                        CarouselSlider.builder(
+                          itemCount: itemPhotosWidgetList.length > 0
+                              ? itemPhotosWidgetList.length
+                              : 1,
+                          itemBuilder:
+                              (BuildContext context, int index, int realIndex) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: itemPhotosWidgetList[index],
+                            );
+                          },
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            viewportFraction: 1.0,
+                            autoPlay: false,
+                            enlargeCenterPage: false,
+                          ),
                         ),
                       ],
                     )
+                  : Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      child: itemPhotosWidgetList[0],
+                    )
+              : Container(),
+          Container(
+            margin: EdgeInsets.only(top: 200),
+            height: MediaQuery.of(context).size.width * 1.85,
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            decoration: const BoxDecoration(
+                color: WhiteColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icons[_selectedValue] ??
+                          Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                      size: 24, // ขนาดของไอคอน
+                      color: GPrimaryColor, // สีของไอคอน
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        nameController.text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: _displayedWidgetHtmlWidget),
+                  ],
+                )
+              ],
             ),
           ),
         ],
       ),
     );
   }
-
-  // Widget _displayedWidgetWidget() {
-  //   final deltaJson = _contentController.document.toDelta().toJson();
-  //     final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
-  //     final html = converter.convert();
-  //   return Column(
-  //     mainAxisAlignment: MainAxisAlignment.start,
-  //     children: [
-  //       Align(alignment: Alignment.centerLeft, child:HtmlWidget(
-  //       html,
-  //       textStyle: TextStyle(color: Colors.black, fontSize: 15),
-  //       renderMode: RenderMode.column,
-  //       customStylesBuilder: (element) {
-  //         if (element.classes.contains('p')) {
-  //           return {'color': 'red'};
-  //         }
-  //         return null;
-  //       },),)
-  //     ],
-  //   );
-  // }
 
   void display() {
     // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()

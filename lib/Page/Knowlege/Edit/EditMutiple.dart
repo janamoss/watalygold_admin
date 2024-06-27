@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +22,8 @@ import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/Deleteddialogknowledge.dart';
+import 'package:image_picker_platform_interface/src/types/image_source.dart'
+    as pickerImageSource;
 import 'package:watalygold_admin/Widgets/Dialog/DeleteknowledgeSuccess.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogEdit.dart';
@@ -78,16 +82,14 @@ class _EditMutipleState extends State<EditMutiple> {
   TextEditingController contentdetailcontroller = TextEditingController();
   TextEditingController contentnamecontroller = TextEditingController();
   List<TextEditingController> contentNameControllers = [];
-  // List<TextEditingController> contentDetailControllers = [];
   List<TextEditingController> contentNameAdd = [];
-  // List<TextEditingController> contentDetailupdate = [];
   List<QuillController> _contentAddController = [];
   List<QuillController> contentDetailControllers = [];
   QuillController _contentController = QuillController.basic();
   String _html = '';
   List<String> htmlUpdateList = [];
   List<String> htmlAddList = [];
-
+  int _current = 0;
   List<Widget>? displayedContentWidgets;
   List<Knowledge> knowledgelist = [];
   List<int> _deletedPanels = [];
@@ -107,6 +109,12 @@ class _EditMutipleState extends State<EditMutiple> {
   List<String> ContentNamelist = [];
   List? itemContent;
   List<String> ListimageUrl = [];
+  final CarouselController _controller = CarouselController();
+  List<List<XFile>> expansionPanelImagesList = [];
+  List<List<XFile>> updatedImageFiles = [];
+  Map<String, List<String>> localImageUrls = {};
+  Map<String, List<XFile>> updatedImageFilesMap = {};
+  List<List<String>> newImageUrlsList = [];
 
   Future<List<Knowledge>> getKnowledges() async {
     try {
@@ -135,7 +143,7 @@ class _EditMutipleState extends State<EditMutiple> {
         id: doc.id,
         ContentName: data!['ContentName'].toString(),
         ContentDetail: data['ContentDetail'].toString(),
-        ImageURL: data['image_url'].toString(),
+        ImageURL: (data['image_url'] as List).cast<String>().toList(),
         deleted_at: doc['deleted_at'],
         create_at: data['create_at'] as Timestamp? ??
             Timestamp.fromDate(DateTime.now()),
@@ -172,8 +180,8 @@ class _EditMutipleState extends State<EditMutiple> {
     }
   }
 
-  Future<void> updateContent(
-      List<String> newImageUrls, List<String> updatedImageUrls) async {
+  Future<void> updateContent(List<List<String>> newImageUrlsList,
+      List<List<String>> updatedImageUrlsList) async {
     String? selectedValue;
     selectedValue = widget.knowledge!.knowledgeIcons != null
         ? widget.knowledge!.knowledgeIcons.toString()
@@ -183,79 +191,48 @@ class _EditMutipleState extends State<EditMutiple> {
                 orElse: () => '',
               )
             : null;
-
     try {
       final knowledgeDocRef = FirebaseFirestore.instance
           .collection('Knowledge')
           .doc(widget.knowledge!.id);
 
-      // Update general data except Content and image_url
+      // อัปเดตข้อมูลทั่วไป
       await knowledgeDocRef.update({
         'KnowledgeName': namecontroller.text,
         'KnowledgeIcons': _selectedValue ??
             icons.keys.firstWhere(
                 (key) => icons[key].toString() == selectedValue,
                 orElse: () => ''),
-        "Content": contentIds,
         'update_at': Timestamp.now()
       });
 
-      List<String> existingContentIds =
-          contentList.map((content) => content.id).toList();
-      // Update existing contents with new image URLs
-      // Update existing contents with new image URLs
       List<String> updatedContentIds = [];
-      Map<String, int> contentIdIndexMap = {};
 
-      for (int i = 0; i < contentList.length; i++) {
-        contentIdIndexMap[contentList[i].id] = i;
-      }
+      // อัปเดต content ที่มีอยู่
       for (int index = 0; index < contentList.length; index++) {
-        String contentName = contentNameControllers[index].text;
-        String contentDetail =
-            htmlUpdateList[contentIdIndexMap[contentList[index].id]!];
         String contentId = contentList[index].id;
-        String imageUrl;
-
-        // Check if the current contentId exists in updatedImageFilesMap
-        if (updatedImageFilesMap.containsKey(contentId)) {
-          // If the contentId exists, get the first updated image URL for that contentId
-          List<XFile> updatedImageFiles = updatedImageFilesMap[contentId]!;
-          if (updatedImageFiles.isNotEmpty) {
-            XFile updatedImageFile = updatedImageFiles[0];
-            PickedFile pickedFile = PickedFile(updatedImageFile.path);
-            imageUrl = await uploadImageToStorage(pickedFile, contentId, 0);
-          } else {
-            // If there are no updated images for this contentId, use the existing ImageURL
-            imageUrl = contentList[index].ImageURL;
-          }
-        } else {
-          // If the contentId doesn't exist in updatedImageFilesMap, use the existing ImageURL
-          imageUrl = contentList[index].ImageURL;
-        }
+        String contentName = contentNameControllers[index].text;
+        String contentDetail = htmlUpdateList[index];
+        List<String> imageUrl = contentList[index].ImageURL;
 
         updatedContentIds.add(
             await upContent(contentId, contentName, contentDetail, imageUrl));
       }
 
-      // Add new contents for new images
-      for (int index = 0; index < newImageUrls.length; index++) {
-        String contentNamenew =
-            index < contentNameAdd.length ? contentNameAdd[index].text : '';
-        // String contentdetailnew = index < contentDetailupdate.length
-        //     ? contentDetailupdate[index].text
-        //     : '';
-        String contentdetailnew =
-            index < htmlAddList.length ? htmlAddList[index] : '';
-        //  String contentdetailnew = htmlList[index];
-        String imageUrl = newImageUrls[index];
+      // เพิ่ม content ใหม่
+      for (int index = 0; index < newImageUrlsList.length; index++) {
+        String contentNamenew = contentNameAdd[index].text;
+        String contentdetailnew = htmlAddList[index];
+        List<String> imageUrls = newImageUrlsList[index];
         String newContentId =
-            await addContent(contentNamenew, contentdetailnew, imageUrl);
+            await addContent(contentNamenew, contentdetailnew, imageUrls);
         updatedContentIds.add(newContentId);
       }
 
-      await knowledgeDocRef
-          .update({'Content': updatedContentIds, 'update_at': Timestamp.now()});
+      // อัปเดตรายการ Content ID ใน Knowledge document
+      await knowledgeDocRef.update({'Content': updatedContentIds});
+
+      // แสดง dialog และ navigate
       showDialog(
         context: context,
         builder: (context) => DialogEdit(),
@@ -265,7 +242,44 @@ class _EditMutipleState extends State<EditMutiple> {
         context.goNamed("/mainKnowledge");
       });
     } catch (error) {
-      print("Error getting knowledge updateContent: $error");
+      print("Error updating content: $error");
+    }
+  }
+
+  Future<void> editImage(int contentIndex, int imageIndex) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image =
+        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+
+    if (image != null) {
+      String contentId = contentList[contentIndex].id;
+      // แปลง XFile เป็น PickedFile
+      PickedFile pickedFile = PickedFile(image.path);
+      // อัปโหลดรูปภาพโดยใช้ฟังก์ชันที่มีอยู่
+      List<String> uploadedUrls =
+          await uploadImagesToStorage([pickedFile], contentId);
+      if (uploadedUrls.isNotEmpty) {
+        String newImageUrl =
+            uploadedUrls[0]; // เราอัปโหลดเพียงรูปเดียว จึงใช้ index 0
+        setState(() {
+          if (localImageUrls[contentId] == null) {
+            localImageUrls[contentId] =
+                List.from(contentList[contentIndex].ImageURL);
+          }
+          // แทนที่หรือเพิ่ม URL ใหม่
+          if (imageIndex < localImageUrls[contentId]!.length) {
+            localImageUrls[contentId]![imageIndex] = newImageUrl;
+          } else {
+            localImageUrls[contentId]!.add(newImageUrl);
+          }
+          // อัปเดต contentList เพื่อสะท้อนการเปลี่ยนแปลง
+          if (imageIndex < contentList[contentIndex].ImageURL.length) {
+            contentList[contentIndex].ImageURL[imageIndex] = newImageUrl;
+          } else {
+            contentList[contentIndex].ImageURL.add(newImageUrl);
+          }
+        });
+      }
     }
   }
 
@@ -273,13 +287,13 @@ class _EditMutipleState extends State<EditMutiple> {
     String contentId,
     String contentName,
     String contentDetail,
-    String imageUrl,
+    List<String> imageUrls,
   ) async {
     try {
       Map<String, dynamic> updateContent = {
         'ContentName': contentName,
         'ContentDetail': contentDetail,
-        'image_url': imageUrl, // Update image_url with the new URL
+        'image_url': imageUrls,
         'update_at': Timestamp.now(),
       };
 
@@ -300,64 +314,22 @@ class _EditMutipleState extends State<EditMutiple> {
 
   List<String> contentIds = [];
 
-  Future<String> addContent(
-      String contentNamenew, String contentdetailnew, String imageUrl) async {
+  Future<String> addContent(String contentNamenew, String contentdetailnew,
+      List<String> imageUrls) async {
     Map<String, dynamic> contentMap = {
       "ContentName": contentNamenew,
       "ContentDetail": contentdetailnew,
-      "image_url": imageUrl,
+      "image_url": imageUrls,
       "create_at": Timestamp.now(),
       "deleted_at": null,
       "update_at": null,
     };
     print(" contentNamenew ${contentNamenew}");
     print('addContent successfully');
-    // Generate a unique ID (replace with your preferred method)
     String contentId = const Uuid().v4().substring(0, 10);
-
-    // Add data using addKnowlege, passing both contentMap and generated ID
     await Databasemethods().addContent(contentMap, contentId);
 
     return contentId;
-  }
-
-  List<List<XFile>> expansionPanelImagesList = [];
-
-  // Future<void> pickPhotoFromGallers(int index) async {
-  //   print("เริ่มการเลือกรูปภาพ pickPhotoFromGallers");
-  //   List<XFile>? newPhotos = await _picker.pickMultiImage();
-  //   if (newPhotos != null) {
-  //     setState(() {
-  //       print("Loop");
-  //       if (expansionPanelImagesList.length <= index) {
-  //         expansionPanelImagesList.add(newPhotos);
-  //         print("รายการรูปภาพใหม่ if: $expansionPanelImagesList");
-  //       }
-  //     });
-  //   }
-  // }
-  // List<List<XFile>> expansionPanelImagesList = [];
-
-// สำหรับรูปภาพที่ต้องการเพิ่ม
-  // List<XFile> newImageFiles = [];
-
-// สำหรับรูปภาพที่ต้องการอัปเดต
-  List<List<XFile>> updatedImageFiles = [];
-
-  Map<String, List<XFile>> updatedImageFilesMap = {};
-
-  Future<void> pickPhotoFromGallers(String contentId) async {
-    List<XFile>? newPhotos = await _picker.pickMultiImage();
-
-    if (newPhotos != null) {
-      print("Loop");
-      setState(() {
-        print("Loop");
-        updatedImageFilesMap[contentId] = newPhotos;
-        print(
-            "updatedImageFilesMap[contentId]: ${updatedImageFilesMap[contentId]}");
-      });
-    }
   }
 
   Future<void> pickPhotoFromGallery(int index) async {
@@ -370,180 +342,132 @@ class _EditMutipleState extends State<EditMutiple> {
           expansionPanelImagesList.add(newPhotos);
           print(expansionPanelImagesList);
         } else {
-          expansionPanelImagesList[index] = newPhotos;
+          expansionPanelImagesList[index].addAll(newPhotos);
         }
         print(expansionPanelImagesList[index]);
       });
     }
   }
-  // Future<void> pickPhotoFromGallers(int index) async {
-  //   print("เริ่มการเลือกรูปภาพ pickPhotoFromGallers");
-  //   List<XFile>? newPhotos = await _picker.pickMultiImage();
 
-  //   if (newPhotos != null) {
-  //     setState(() {
-  //       print("Loop");
-  //       print("รายการรูปภาพที่ต้องการอัปเดต 1: $updatedImageFiles");
-  //       print("index ${index}");
-  //       // แทนที่รูปภาพในตำแหน่ง index ของ updatedImageFiles ด้วยรูปภาพใหม่
-  //       if (updatedImageFiles.length <= index) {
-  //         updatedImageFiles.add(newPhotos);
-  //       } else {
-  //         updatedImageFiles[index] = newPhotos;
-  //       }
+  Future<void> pickPhotoFromGallers(String contentId) async {
+    List<XFile>? newPhotos = await _picker.pickMultiImage();
+    if (newPhotos != null && newPhotos.isNotEmpty) {
+      List<PickedFile> pickedFiles =
+          newPhotos.map((xFile) => PickedFile(xFile.path)).toList();
+      List<String> uploadedUrls =
+          await uploadImagesToStorage(pickedFiles, contentId);
 
-  //       print("รายการรูปภาพที่ต้องการอัปเดต 3: $updatedImageFiles");
-  //     });
-  //   }
-  // }
-  // Future<void> pickPhotoFromGallers(int index) async {
-  //   print("เริ่มการเลือกรูปภาพ pickPhotoFromGallers");
-  //   List<XFile>? newPhotos = await _picker.pickMultiImage();
-  //   if (newPhotos != null) {
-  //     setState(() {
-  //       print("Loop");
-  //        print("รายการรูปภาพที่ต้องการอัปเดต 1: $updatedImageFiles");
-  //       if (updatedImageFiles.length <= index) {
-  //         updatedImageFiles.add(
-  //             newPhotos);
-  //              print("รายการรูปภาพที่ต้องการอัปเดต 2: $updatedImageFiles"); // เพิ่ม List ของ XFile เข้าไปในรายการ updatedImageFiles
-  //       } else {
-  //         updatedImageFiles[index] =
-  //             newPhotos; // กำหนด List ของ XFile ให้กับตำแหน่งที่ระบุในรายการ updatedImageFiles
-  //       }
-  //       print("รายการรูปภาพที่ต้องการอัปเดต 3: $updatedImageFiles");
-  //     });
-  //   }
-  // }
-
-  // Future<void> pickPhotoFromGallery(
-  //   int index,
-  //   ExpansionPanelData expansionPanelData,
-  // ) async {
-  //   print("เริ่มการเลือกรูปภาพ");
-  //   List<XFile>? newPhotos = await _picker.pickMultiImage();
-  //   if (newPhotos != null) {
-  //     setState(() {
-  //       newImageFiles
-  //           .addAll(newPhotos); // เพิ่มรูปภาพใหม่ลงในรายการ newImageFiles
-
-  //     });
-  //     // addImage(expansionPanelData);
-  //     print("รายการรูปภาพใหม่: $newImageFiles");
-  //   }
-  // }
-
-  Future<void> uploadImageAndSaveItemInfo() async {
-    print('star uploadImageAndSaveItemInfo ');
-    setState(() {
-      uploading = true;
-    });
-
-    PickedFile? pickedFile;
-    String? contentIdnew = const Uuid().v4().substring(0, 10);
-
-// Create a new list to store URLs of new images
-    List<String> newImageUrls = [];
-
-    // Upload and save new images
-    for (List<XFile> panelImages in expansionPanelImagesList) {
-      for (XFile newImageFile in panelImages) {
-        file = File(newImageFile.path);
-        pickedFile = PickedFile(file!.path);
-        print('เริ่มการอัปโหลดรูปภาพ');
-        String imageUrl =
-            await uploadImageToStorage(pickedFile, contentIdnew, newImageFile);
-        newImageUrls.add(imageUrl); // เพิ่ม URL ของรูปภาพใหม่ลงในรายการ
-      }
+      setState(() {
+        if (contentId == 'new') {
+          expansionPanelImagesList.add(newPhotos);
+        } else {
+          int index =
+              contentList.indexWhere((content) => content.id == contentId);
+          if (index != -1) {
+            contentList[index].ImageURL.addAll(uploadedUrls);
+            localImageUrls[contentId] = List.from(contentList[index].ImageURL);
+          }
+        }
+      });
     }
+  }
 
-    // for (XFile newImageFile in newImageFiles) {
-    //   file = File(newImageFile.path);
-    //   pickedFile = PickedFile(file!.path);
-    //   print('star uploadImageToStorage 1');
-    //   String imageUrl =
-    //       await uploadImageToStorage(pickedFile, contentIdnew, newImageFile);
-    //   newImageUrls.add(imageUrl); // Add the new image URL to the list
-    // }
-
-    // Upload and update existing images
-    List<String> updatedImageUrls = [];
-    for (var entry in updatedImageFilesMap.entries) {
-      String contentId = entry.key;
-      List<XFile> updatedImageFileList = entry.value;
-
-      for (int j = 0; j < updatedImageFileList.length; j++) {
-        XFile updatedImageFile = updatedImageFileList[j];
-        file = File(updatedImageFile.path);
-        pickedFile = PickedFile(file!.path);
-
-        print("updatedImageFilesMap: ${updatedImageFilesMap}");
-        // // ลบรูปภาพเดิมออกจาก Storage
-        // Reference reference = FirebaseStorage.instance.refFromURL(contentList.firstWhere((content) => content.id == contentId).ImageURL);
-        // await reference.delete();
-        // print(contentId);
-        // print('ลบรูปภาพเดิมออกจาก Storage ');
-
-        String imageUrl = await uploadImageToStorage(pickedFile, contentId, j);
-        updatedImageUrls.add(imageUrl); // Add the updated image URL to the list
-        print('star uploadImageToStorage ');
-      }
-    }
-
-//   await updateContent(newImageUrls, updatedImageUrls); // Pass the new and updated image URLs to updateContent
-
-    await updateContent(newImageUrls,
-        updatedImageUrls); // Pass the new image URLs to updateContent
-
+  void deleteImage(int contentIndex, int imageIndex) {
     setState(() {
-      uploading = false;
+      if (contentList[contentIndex].ImageURL.length > imageIndex) {
+        contentList[contentIndex].ImageURL.removeAt(imageIndex);
+      } else {
+        int localIndex = imageIndex - contentList[contentIndex].ImageURL.length;
+        localImageUrls[contentList[contentIndex].id]?.removeAt(localIndex);
+      }
     });
   }
 
-  // void addImage(ExpansionPanelData expansionPanelData) {
-  //   // เพิ่มรูปภาพใหม่จากรายการ newImageFiles
-  //   for (var file in newImageFiles) {
-  //     expansionPanelData.itemPhotosWidgetList.add(
-  //       Padding(
-  //         padding: const EdgeInsets.all(0),
-  //         child: Container(
-  //           height: 200.0,
-  //           child: AspectRatio(
-  //             aspectRatio: 16 / 9,
-  //             child: Container(
-  //               child: kIsWeb
-  //                   ? Image.network(file.path)
-  //                   : Image.file(
-  //                       File(file.path),
-  //                     ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //   }
-  // }
+  Future<void> editImageAdd(int panelIndex, int imageIndex) async {
+    final editedPhoto =
+        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+    if (editedPhoto != null) {
+      setState(() {
+        expansionPanelImagesList[panelIndex][imageIndex] = editedPhoto;
+      });
+    }
+  }
 
-  Future<String> uploadImageToStorage(
-      PickedFile? pickedFile, String contentId, index) async {
-    String? kId = const Uuid().v4().substring(0, 10);
-    Reference reference = FirebaseStorage.instance
-        .ref()
-        .child('Content/$contentId/contentImg_$kId');
-    await reference.putData(
-      await pickedFile!.readAsBytes(),
-      SettableMetadata(contentType: 'image/jpeg'),
-    );
-    String imageUrl = await reference.getDownloadURL();
-    print("uploadImageToStorage imageUrl ${imageUrl}");
-    return imageUrl; // Return the image URL instead of adding it to ListimageUrl
+  void deleteImageAdd(int panelIndex, int imageIndex) {
+    setState(() {
+      expansionPanelImagesList[panelIndex].removeAt(imageIndex);
+      if (expansionPanelImagesList[panelIndex].isEmpty) {
+        expansionPanelImagesList.removeAt(panelIndex);
+      }
+    });
+  }
+
+  Future<List<String>> uploadImagesToStorage(
+      List<PickedFile> pickedFiles, String contentId) async {
+    List<String> imageUrls = [];
+    for (PickedFile pickedFile in pickedFiles) {
+      try {
+        String kId = const Uuid().v4().substring(0, 10);
+        Reference reference = FirebaseStorage.instance
+            .ref()
+            .child('Content/$contentId/contentImg_$kId');
+        UploadTask uploadTask = reference.putData(
+          await pickedFile.readAsBytes(),
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+        TaskSnapshot snapshot = await uploadTask;
+        String imageUrl = await snapshot.ref.getDownloadURL();
+
+        imageUrls.add(imageUrl);
+      } catch (e) {
+        print("Error uploading image: $e");
+      }
+    }
+    return imageUrls;
+  }
+
+  Future<void> uploadImageAndSaveItemInfo() async {
+    List<List<String>> updatedImageUrlsList = [];
+    for (var entry in updatedImageFilesMap.entries) {
+      String contentId = entry.key;
+      List<XFile> updatedImageFileList = entry.value;
+      List<PickedFile> pickedFiles =
+          updatedImageFileList.map((xFile) => PickedFile(xFile.path)).toList();
+      List<String> updatedImageUrls =
+          await uploadImagesToStorage(pickedFiles, contentId);
+
+      int index = contentList.indexWhere((content) => content.id == contentId);
+      if (index != -1) {
+        // แทนที่รูปภาพเดิมด้วยรูปภาพที่อัปเดต
+        contentList[index].ImageURL = updatedImageUrls;
+        updatedImageUrlsList.add(updatedImageUrls);
+      }
+    }
+
+    // จัดการกับรูปภาพใหม่
+    for (var newImages in expansionPanelImagesList) {
+      String newContentId = const Uuid().v4().substring(0, 10);
+      List<PickedFile> pickedFiles =
+          newImages.map((xFile) => PickedFile(xFile.path)).toList();
+      List<String> newImageUrls =
+          await uploadImagesToStorage(pickedFiles, newContentId);
+      newImageUrlsList.add(newImageUrls);
+    }
+    // เรียกใช้ updateContent เพื่ออัปเดตข้อมูลใน Firebase
+    await updateContent(newImageUrlsList, updatedImageUrlsList);
+    // เคลียร์ข้อมูลหลังอัปโหลด
+    setState(() {
+      uploading = false;
+      updatedImageFilesMap.clear();
+      expansionPanelImagesList.clear();
+      localImageUrls.clear(); // เคลียร์ URLs ท้องถิ่นที่ใช้สำหรับแสดงผล
+    });
   }
 
   void clearAndRemoveData(int index) {
     setState(() {
       contentNameAdd[index].clear();
       _contentAddController[index].clear();
-
       if (expansionPanelImagesList.isNotEmpty &&
           expansionPanelImagesList[index].isNotEmpty) {
         expansionPanelImagesList[index].clear();
@@ -563,7 +487,6 @@ class _EditMutipleState extends State<EditMutiple> {
       namecontroller.text = widget.knowledge!.knowledgeName;
       contentcontroller.text = widget.knowledge!.knowledgeDetail;
     }
-
     setState(() {
       _isLoading = true; // Set loading state to true
     });
@@ -582,12 +505,7 @@ class _EditMutipleState extends State<EditMutiple> {
           contentList.add(contents);
           contentNameControllers
               .add(TextEditingController(text: contents.ContentName));
-          // _contentUpdateController.add(QuillController(
-          //   document: QuillDocument.fromJson(jsonDecode(contents
-          //       .ContentDetail)), // สร้างเอกสารในรูปแบบ Delta จากสตริง ContentDetail
-          //   selection: TextSelection.collapsed(
-          //       offset: 0), // ระบุตำแหน่งเริ่มต้นของการเลือก
-          // ));
+
           String htmlString = contents.ContentDetail;
           var delta = HtmlToDeltaConverter.htmlToDelta(htmlString);
 
@@ -596,9 +514,10 @@ class _EditMutipleState extends State<EditMutiple> {
             selection: const TextSelection.collapsed(offset: 0),
           );
           contentDetailControllers.add(_contentController);
-          // updatedImageFiles.add(contents.ImageURL);
+          print(contentDetailControllers);
         });
       }
+
       print(contents.deleted_at);
       print(contentList);
       print(contents.ContentName);
@@ -627,28 +546,34 @@ class _EditMutipleState extends State<EditMutiple> {
       _isLoading = true; // Set loading state to true
     });
     getKnowledges().then((value) async {
+      List<String> tempImageURLlist = [];
+      for (var knowledge in value) {
+        String imageUrl = '';
+        if (knowledge.knowledgeImg.isNotEmpty) {
+          imageUrl = knowledge.knowledgeImg[0];
+        } else if (knowledge.contents.isNotEmpty) {
+          try {
+            final firstContent = knowledge.contents[0].toString();
+            final contents = await getContentsById(firstContent);
+            if (contents.ImageURL.isNotEmpty) {
+              imageUrl = contents.ImageURL[0];
+            }
+          } catch (e) {
+            print("Error fetching content: $e");
+          }
+        }
+        tempImageURLlist.add(imageUrl);
+      }
+
       setState(() {
         knowledgelist = value;
+        imageURLlist = tempImageURLlist;
+        _isLoading = false;
       });
-      if (knowledgelist.length == 0) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      for (var knowledge in knowledgelist) {
-        if (knowledge.knowledgeImg.isEmpty) {
-          // แสดง Loading indicator
-          final firstContent = knowledge.contents[0].toString();
-          final contents = await getContentsById(firstContent);
-          imageURLlist.add(contents.ImageURL);
-          setState(() {
-            _isLoading = false;
-          });
-          // ซ่อน Loading indicator
-        } else {
-          imageURLlist.add(knowledge.knowledgeImg);
-        }
-      }
+
+      print(knowledgelist);
+      print(imageURLlist);
+      print(imageURLlist.length);
     });
   }
 
@@ -768,6 +693,62 @@ class _EditMutipleState extends State<EditMutiple> {
                     ),
                   ],
                 )),
+    );
+  }
+
+  Widget buildImageStack(BuildContext context, String imagePath,
+      {bool isLocal = false}) {
+    return Stack(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          margin: EdgeInsets.symmetric(horizontal: 5.0),
+          decoration: BoxDecoration(
+            color: Colors.grey,
+          ),
+          child: isLocal
+              ? Image.file(File(imagePath), fit: BoxFit.cover)
+              : Image.network(imagePath, fit: BoxFit.cover),
+        ),
+        Positioned(
+          bottom: 8.0,
+          right: 8.0,
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  child: const Icon(
+                    Icons.edit,
+                    color: Colors.yellow,
+                    size: 20.0,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  child: const Icon(
+                    Icons.delete_forever_rounded,
+                    color: Colors.red,
+                    size: 20.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1695,7 +1676,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   context)
                                                               .size
                                                               .width,
-                                                          height: 1000,
+                                                          height: 1100,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -1937,88 +1918,142 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   ),
                                                                 ),
                                                                 Container(
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
-                                                                      color: Colors
-                                                                          .white70,
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: Colors
-                                                                              .grey
-                                                                              .shade200,
-                                                                          offset: const Offset(
-                                                                              0.0,
-                                                                              0.5),
-                                                                          blurRadius:
-                                                                              30.0,
-                                                                        )
-                                                                      ]),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            12.0),
+                                                                    boxShadow: [
+                                                                      // ... (boxShadow properties)
+                                                                    ],
+                                                                  ),
                                                                   width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width,
-                                                                  height: 200.0,
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.5,
+                                                                  height: 250.0,
                                                                   child: Center(
                                                                     child: expansionPanelData
                                                                             .itemPhotosWidgetList
                                                                             .isEmpty
-                                                                        ? Center(
-                                                                            child:
-                                                                                MaterialButton(
-                                                                              onPressed: () => pickPhotoFromGallery(index),
-                                                                              child: Container(
-                                                                                width: MediaQuery.of(context).size.width,
-                                                                                height: 200.0,
-                                                                                child: AspectRatio(
-                                                                                  aspectRatio: 1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
-                                                                                  child: expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty
-                                                                                      ? kIsWeb
-                                                                                          ? Image.network(
-                                                                                              expansionPanelImagesList[index].first.path,
-                                                                                              fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                                            )
-                                                                                          : Image.file(
-                                                                                              File(expansionPanelImagesList[index].first.path),
-                                                                                              fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                                            )
-                                                                                      : Image.network(
-                                                                                          "https://static.thenounproject.com/png/3322766-200.png",
-                                                                                          width: MediaQuery.of(context).size.width * 0.01,
-                                                                                          height: 200.0,
-                                                                                        ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        : SingleChildScrollView(
-                                                                            scrollDirection:
-                                                                                Axis.vertical,
-                                                                            child:
-                                                                                Wrap(
-                                                                              spacing: 5.0,
-                                                                              direction: Axis.horizontal,
-                                                                              alignment: WrapAlignment.spaceEvenly,
-                                                                              runSpacing: 10.0,
-                                                                              children: (expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty)
-                                                                                  ? expansionPanelImagesList[index]
-                                                                                      .map<Widget>(
-                                                                                        (XFile xFile) => Padding(
-                                                                                          padding: const EdgeInsets.all(0),
-                                                                                          child: Container(
+                                                                        ? SizedBox(
+                                                                            child: expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty
+                                                                                ? Column(
+                                                                                    children: [
+                                                                                      Expanded(
+                                                                                        child: CarouselSlider(
+                                                                                          options: CarouselOptions(
                                                                                             height: 200.0,
-                                                                                            child: AspectRatio(
-                                                                                              aspectRatio: 16 / 9,
-                                                                                              child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
-                                                                                            ),
+                                                                                            viewportFraction: 1,
+                                                                                            enlargeCenterPage: true,
+                                                                                            enableInfiniteScroll: false,
+                                                                                            onPageChanged: (index, reason) {
+                                                                                              setState(() {
+                                                                                                _current = index;
+                                                                                              });
+                                                                                            },
                                                                                           ),
+                                                                                          items: expansionPanelImagesList[index]
+                                                                                              .map<Widget>((XFile xFile) => Stack(
+                                                                                                    fit: StackFit.expand,
+                                                                                                    children: [
+                                                                                                      Container(
+                                                                                                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                                                                        child: ClipRRect(
+                                                                                                          child: kIsWeb
+                                                                                                              ? Image.network(
+                                                                                                                  xFile.path,
+                                                                                                                  fit: BoxFit.cover,
+                                                                                                                )
+                                                                                                              : Image.file(
+                                                                                                                  File(xFile.path),
+                                                                                                                  fit: BoxFit.cover,
+                                                                                                                ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      Positioned(
+                                                                                                        bottom: 8.0,
+                                                                                                        right: 8.0,
+                                                                                                        child: Row(
+                                                                                                          children: [
+                                                                                                            IconButton(
+                                                                                                              onPressed: () {
+                                                                                                                print("Edit button pressed");
+                                                                                                                editImageAdd(index, _current);
+                                                                                                              },
+                                                                                                              icon: Container(
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.white,
+                                                                                                                ),
+                                                                                                                padding: EdgeInsets.all(8.0),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.edit,
+                                                                                                                  color: Colors.yellow,
+                                                                                                                  size: 20.0,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                            IconButton(
+                                                                                                              onPressed: () {
+                                                                                                                print("Delete button pressed");
+                                                                                                                deleteImageAdd(index, _current);
+                                                                                                              },
+                                                                                                              icon: Container(
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.white,
+                                                                                                                ),
+                                                                                                                padding: EdgeInsets.all(8.0),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.delete_forever_rounded,
+                                                                                                                  color: Colors.red,
+                                                                                                                  size: 20.0,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ))
+                                                                                              .toList(),
                                                                                         ),
-                                                                                      )
-                                                                                      .toList()
-                                                                                  : itemPhotosWidgetList,
-                                                                            ),
-                                                                          ),
+                                                                                      ),
+                                                                                      Row(
+                                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                                        children: expansionPanelImagesList[index].asMap().entries.map((entry) {
+                                                                                          return GestureDetector(
+                                                                                            onTap: () => _controller.animateToPage(entry.key),
+                                                                                            child: Container(
+                                                                                              width: 8.0,
+                                                                                              height: 8.0,
+                                                                                              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                                                                              decoration: BoxDecoration(
+                                                                                                shape: BoxShape.circle,
+                                                                                                color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : GPrimaryColor).withOpacity(_current == entry.key ? 0.9 : 0.4),
+                                                                                              ),
+                                                                                            ),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                      ),
+                                                                                    ],
+                                                                                  )
+                                                                                : MaterialButton(
+                                                                                    height: 250.0,
+                                                                                    onPressed: () => pickPhotoFromGallery(index),
+                                                                                    child: Container(
+                                                                                      width: MediaQuery.of(context).size.width * 0.5,
+                                                                                      child: Image.network(
+                                                                                        "https://static.thenounproject.com/png/3322766-200.png",
+                                                                                        height: 100.0,
+                                                                                        width: 100.0,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                          )
+                                                                        : Container(),
                                                                   ),
                                                                 ),
                                                                 SizedBox(
@@ -2082,7 +2117,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   context)
                                                               .size
                                                               .width,
-                                                          height: 1000,
+                                                          height: 1200,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -2156,7 +2191,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   .size
                                                                   .width *
                                                               0.33,
-                                                          height: 1000,
+                                                          height: 1100,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -2398,88 +2433,142 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   ),
                                                                 ),
                                                                 Container(
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
-                                                                      color: Colors
-                                                                          .white70,
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: Colors
-                                                                              .grey
-                                                                              .shade200,
-                                                                          offset: const Offset(
-                                                                              0.0,
-                                                                              0.5),
-                                                                          blurRadius:
-                                                                              30.0,
-                                                                        )
-                                                                      ]),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            12.0),
+                                                                    boxShadow: [
+                                                                      // ... (boxShadow properties)
+                                                                    ],
+                                                                  ),
                                                                   width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width,
-                                                                  height: 200.0,
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.5,
+                                                                  height: 250.0,
                                                                   child: Center(
                                                                     child: expansionPanelData
                                                                             .itemPhotosWidgetList
                                                                             .isEmpty
-                                                                        ? Center(
-                                                                            child:
-                                                                                MaterialButton(
-                                                                              onPressed: () => pickPhotoFromGallery(index),
-                                                                              child: Container(
-                                                                                width: MediaQuery.of(context).size.width,
-                                                                                height: 200.0,
-                                                                                child: AspectRatio(
-                                                                                  aspectRatio: 1.0, // กำหนดสัดส่วนเป็น 1:1 เพื่อให้รูปภาพเต็มพื้นที่ของ Container
-                                                                                  child: expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty
-                                                                                      ? kIsWeb
-                                                                                          ? Image.network(
-                                                                                              expansionPanelImagesList[index].first.path,
-                                                                                              fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                                            )
-                                                                                          : Image.file(
-                                                                                              File(expansionPanelImagesList[index].first.path),
-                                                                                              fit: BoxFit.cover, // ปรับขนาดรูปภาพให้เต็มพื้นที่ของ AspectRatio
-                                                                                            )
-                                                                                      : Image.network(
-                                                                                          "https://static.thenounproject.com/png/3322766-200.png",
-                                                                                          width: MediaQuery.of(context).size.width * 0.01,
-                                                                                          height: 200.0,
-                                                                                        ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        : SingleChildScrollView(
-                                                                            scrollDirection:
-                                                                                Axis.vertical,
-                                                                            child:
-                                                                                Wrap(
-                                                                              spacing: 5.0,
-                                                                              direction: Axis.horizontal,
-                                                                              alignment: WrapAlignment.spaceEvenly,
-                                                                              runSpacing: 10.0,
-                                                                              children: (expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty)
-                                                                                  ? expansionPanelImagesList[index]
-                                                                                      .map<Widget>(
-                                                                                        (XFile xFile) => Padding(
-                                                                                          padding: const EdgeInsets.all(0),
-                                                                                          child: Container(
+                                                                        ? SizedBox(
+                                                                            child: expansionPanelImagesList.length > index && expansionPanelImagesList[index].isNotEmpty
+                                                                                ? Column(
+                                                                                    children: [
+                                                                                      Expanded(
+                                                                                        child: CarouselSlider(
+                                                                                          options: CarouselOptions(
                                                                                             height: 200.0,
-                                                                                            child: AspectRatio(
-                                                                                              aspectRatio: 16 / 9,
-                                                                                              child: kIsWeb ? Image.network(xFile.path) : Image.file(File(xFile.path)),
-                                                                                            ),
+                                                                                            viewportFraction: 1,
+                                                                                            enlargeCenterPage: true,
+                                                                                            enableInfiniteScroll: false,
+                                                                                            onPageChanged: (index, reason) {
+                                                                                              setState(() {
+                                                                                                _current = index;
+                                                                                              });
+                                                                                            },
                                                                                           ),
+                                                                                          items: expansionPanelImagesList[index]
+                                                                                              .map<Widget>((XFile xFile) => Stack(
+                                                                                                    fit: StackFit.expand,
+                                                                                                    children: [
+                                                                                                      Container(
+                                                                                                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                                                                        child: ClipRRect(
+                                                                                                          child: kIsWeb
+                                                                                                              ? Image.network(
+                                                                                                                  xFile.path,
+                                                                                                                  fit: BoxFit.cover,
+                                                                                                                )
+                                                                                                              : Image.file(
+                                                                                                                  File(xFile.path),
+                                                                                                                  fit: BoxFit.cover,
+                                                                                                                ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      Positioned(
+                                                                                                        bottom: 8.0,
+                                                                                                        right: 8.0,
+                                                                                                        child: Row(
+                                                                                                          children: [
+                                                                                                            IconButton(
+                                                                                                              onPressed: () {
+                                                                                                                print("Edit button pressed");
+                                                                                                                editImageAdd(index, _current);
+                                                                                                              },
+                                                                                                              icon: Container(
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.white,
+                                                                                                                ),
+                                                                                                                padding: EdgeInsets.all(8.0),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.edit,
+                                                                                                                  color: Colors.yellow,
+                                                                                                                  size: 20.0,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                            IconButton(
+                                                                                                              onPressed: () {
+                                                                                                                print("Delete button pressed");
+                                                                                                                deleteImageAdd(index, _current);
+                                                                                                              },
+                                                                                                              icon: Container(
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.white,
+                                                                                                                ),
+                                                                                                                padding: EdgeInsets.all(8.0),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.delete_forever_rounded,
+                                                                                                                  color: Colors.red,
+                                                                                                                  size: 20.0,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ))
+                                                                                              .toList(),
                                                                                         ),
-                                                                                      )
-                                                                                      .toList()
-                                                                                  : itemPhotosWidgetList,
-                                                                            ),
-                                                                          ),
+                                                                                      ),
+                                                                                      Row(
+                                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                                        children: expansionPanelImagesList[index].asMap().entries.map((entry) {
+                                                                                          return GestureDetector(
+                                                                                            onTap: () => _controller.animateToPage(entry.key),
+                                                                                            child: Container(
+                                                                                              width: 8.0,
+                                                                                              height: 8.0,
+                                                                                              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                                                                              decoration: BoxDecoration(
+                                                                                                shape: BoxShape.circle,
+                                                                                                color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : GPrimaryColor).withOpacity(_current == entry.key ? 0.9 : 0.4),
+                                                                                              ),
+                                                                                            ),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                      ),
+                                                                                    ],
+                                                                                  )
+                                                                                : MaterialButton(
+                                                                                    height: 250.0,
+                                                                                    onPressed: () => pickPhotoFromGallery(index),
+                                                                                    child: Container(
+                                                                                      width: MediaQuery.of(context).size.width * 0.5,
+                                                                                      child: Image.network(
+                                                                                        "https://static.thenounproject.com/png/3322766-200.png",
+                                                                                        height: 100.0,
+                                                                                        width: 100.0,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                          )
+                                                                        : Container(),
                                                                   ),
                                                                 ),
                                                                 SizedBox(
@@ -2867,101 +2956,129 @@ class _EditMutipleState extends State<EditMutiple> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            itemCount: expansionPanelImagesList.length,
-            itemBuilder: (BuildContext context, int panelIndex) {
-              List<XFile> panelImages = expansionPanelImagesList[panelIndex];
-
-              return SizedBox(
-                height: 253, // กำหนดความสูงของ Container สำหรับแสดงรูปภาพ
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: panelImages.length,
-                  itemBuilder: (BuildContext context, int photoIndex) {
-                    return Container(
-                      width: 390, // กำหนดความกว้างของรูปภาพ
-                      child: kIsWeb
-                          ? Image.network(
-                              expansionPanelImagesList[index].first.path,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(panelImages[photoIndex].path),
+          if (expansionPanelImagesList.length > index &&
+              expansionPanelImagesList[index].isNotEmpty)
+            Column(
+              children: [
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    viewportFraction: 1,
+                    enlargeCenterPage: true,
+                    enableInfiniteScroll: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _current = index;
+                      });
+                    },
+                  ),
+                  items: expansionPanelImagesList[index]
+                      .asMap()
+                      .entries
+                      .map<Widget>((entry) {
+                    XFile xFile = entry.value;
+                    return Stack(
+                      children: [
+                        Container(
+                          child: ClipRRect(
+                            child: SizedBox(
+                              child: kIsWeb
+                                  ? Image.network(
+                                      xFile.path,
+                                      fit: BoxFit.cover,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                    )
+                                  : Image.file(
+                                      File(xFile.path),
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
+                          ),
+                        ),
+                      ],
                     );
-                  },
+                  }).toList(),
                 ),
-              );
-            },
-          ),
-          Positioned(
-            bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              height: MediaQuery.of(context).size.width * 1.85,
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: BoxDecoration(
-                  color: WhiteColor,
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(40))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: itemPhotosWidgetList.map((url) {
+                    int index = itemPhotosWidgetList.indexOf(url);
+                    return Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _current == index
+                            ? Color.fromRGBO(0, 0, 0, 0.9)
+                            : Color.fromRGBO(0, 0, 0, 0.4),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            )
+          else
+            Container(
               width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        icons[_selectedValue] ??
-                            Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                        size: 24, // ขนาดของไอคอน
-                        color: GPrimaryColor, // สีของไอคอน
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      // for (int index = 0;
-                      //     index < contentNameupdate.length;
-                      //     index++)
-                      Text(
-                        contentNameAdd[index].text,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: _displayedWidgetHtmlWidget[index],
-                      ),
-                    ],
-                  )
-                  // Column(
-                  //   mainAxisAlignment: MainAxisAlignment.start,
-                  //   children: [
-                  //     // for (int index = 0;
-                  //     //     index < contentDetailupdate.length;
-                  //     //     index++)
-                  //       Align(
-                  //         alignment: Alignment.centerLeft,
-                  //         child: Text(
-                  //           contentDetailupdate[index].text,
-                  //           style: TextStyle(color: Colors.black, fontSize: 15),
-                  //           textAlign: TextAlign.left,
-                  //           maxLines: null,
-                  //         ),
-                  //       ),
-                  //   ],
-                  // )
-                ],
+              height: MediaQuery.of(context).size.height * 0.3,
+              color: Colors.grey[200], // สีพื้นหลังเมื่อไม่มีรูปภาพ
+              child: Center(
+                child: Text(
+                  'ไม่มีรูปภาพ',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                ),
               ),
+            ),
+          Container(
+            margin: EdgeInsets.only(top: 200),
+            height: MediaQuery.of(context).size.width * 1.85,
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            decoration: const BoxDecoration(
+                color: WhiteColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icons[_selectedValue] ??
+                          Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                      size: 24, // ขนาดของไอคอน
+                      color: GPrimaryColor, // สีของไอคอน
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        contentNameAdd[index].text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _displayedWidgetHtmlWidget[index],
+                    )
+                  ],
+                )
+              ],
             ),
           ),
         ],
@@ -3027,101 +3144,117 @@ class _EditMutipleState extends State<EditMutiple> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            // itemCount: expansionPanelImagesList.length,
-            itemBuilder: (BuildContext context, int panelIndex) {
-              // List<XFile> panelImages = expansionPanelImagesList[panelIndex];
+          Container(
+            // width: MediaQuery.of(context).size.width * 1,
+            height: 250,
+            child: Center(
+              child: Builder(
+                builder: (BuildContext context) {
+                  String contentId = contentList[index].id;
+                  List<String> imageUrls =
+                      localImageUrls[contentId] ?? contentList[index].ImageURL;
 
-              return SizedBox(
-                height: 253, // กำหนดความสูงของ Container สำหรับแสดงรูปภาพ
-                child: ListView.builder(
-                  // itemCount: panelImages.length,
-                  itemBuilder: (BuildContext context, int photoIndex) {
-                    return Center(
-                      child: (updatedImageFilesMap[contentId] ?? []).isNotEmpty
-                          ? Container(
-                              child: Row(
-                                children: updatedImageFilesMap[contentId]!
-                                    .map(
-                                      (xFile) => Padding(
-                                        padding: const EdgeInsets.all(0),
-                                        child: Image.network(
-                                          xFile.path,
-                                          fit: BoxFit.cover,
-                                          height: 253,
-                                          width: 380,
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            )
-                          : Container(
-                              alignment: Alignment.bottomCenter,
-                              child: Center(
-                                child: contentList.isNotEmpty &&
-                                        contentList.length > index
-                                    ? Image.network(
-                                        contentList[index].ImageURL,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : SizedBox(),
-                              ),
-                            ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              height: MediaQuery.of(context).size.width * 1.85,
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: const BoxDecoration(
-                color: WhiteColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-              ),
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Row(
+                  if (imageUrls.isEmpty) {
+                    return const Center(child: Text('No images'));
+                  }
+
+                  return Column(
                     children: [
-                      Icon(
-                        icons[_selectedValue] ?? Icons.error,
-                        size: 24,
-                        color: GPrimaryColor,
-                      ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Text(
-                        contentNameControllers[index].text,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                      Expanded(
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: 250.0,
+                            viewportFraction: 1.0,
+                            enlargeCenterPage: true,
+                            autoPlay: false,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                _current = index;
+                              });
+                            },
+                          ),
+                          items: imageUrls.asMap().entries.map((entry) {
+                            final url = entry.value;
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                  ),
+                                  child: Image.network(
+                                    url,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      print("Error loading image: $error");
+                                      return Center(
+                                          child: Text('Error loading image'));
+                                    },
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
                         ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: displayedContentWidgets![index],
                       ),
                     ],
-                  )
-                ],
+                  );
+                },
               ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 200),
+            height: MediaQuery.of(context).size.width * 1.85,
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            decoration: const BoxDecoration(
+                color: WhiteColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icons[_selectedValue] ??
+                          Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                      size: 24, // ขนาดของไอคอน
+                      color: GPrimaryColor, // สีของไอคอน
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        contentNameControllers[index].text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: displayedContentWidgets![index],
+                    )
+                  ],
+                )
+              ],
             ),
           ),
         ],
@@ -3150,6 +3283,7 @@ class _EditMutipleState extends State<EditMutiple> {
       // if (displayedContentWidgets != null &&
       //     index < displayedContentWidgets!.length) {
       displayedContentWidgets![index] = _displaycontentWidget(index);
+      print(html);
 
       // }
     });
@@ -3317,7 +3451,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                       Container(
                                         width:
                                             MediaQuery.of(context).size.width,
-                                        height: 1000,
+                                        height: 1100,
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -3436,7 +3570,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                                         configurations:
                                                             QuillSimpleToolbarConfigurations(
                                                           controller:
-                                                              _contentController,
+                                                              contentDetailControllers[
+                                                                  index],
                                                           sharedConfigurations:
                                                               const QuillSharedConfigurations(
                                                             locale:
@@ -3456,7 +3591,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                                             configurations:
                                                                 QuillEditorConfigurations(
                                                               controller:
-                                                                  _contentController,
+                                                                  contentDetailControllers[
+                                                                      index],
                                                               readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
@@ -3498,91 +3634,198 @@ class _EditMutipleState extends State<EditMutiple> {
                                                 ),
                                               ),
                                               Container(
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
-                                                    color: Colors.white70,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors
-                                                            .grey.shade200,
-                                                        offset: const Offset(
-                                                            0.0, 0.5),
-                                                        blurRadius: 30.0,
-                                                      )
-                                                    ]),
                                                 width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                height: 200.0,
+                                                        .size
+                                                        .width *
+                                                    0.5,
+                                                height: 250.0,
                                                 child: Center(
-                                                  child: (updatedImageFilesMap[
+                                                  child: Builder(
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      String contentId =
+                                                          contentList[index].id;
+                                                      List<String> imageUrls =
+                                                          localImageUrls[
                                                                   contentId] ??
-                                                              [])
-                                                          .isNotEmpty
-                                                      ? SingleChildScrollView(
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          child: Row(
-                                                            children:
-                                                                updatedImageFilesMap[
-                                                                        contentId]!
-                                                                    .map(
-                                                                      (xFile) =>
-                                                                          Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            0),
-                                                                        child: Image
-                                                                            .network(
-                                                                          xFile
-                                                                              .path,
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                    .toList(),
-                                                          ),
-                                                        )
-                                                      : Center(
-                                                          child: MaterialButton(
-                                                            onPressed: () =>
-                                                                pickPhotoFromGallers(
-                                                                    contentId),
-                                                            child: Container(
-                                                              alignment: Alignment
-                                                                  .bottomCenter,
-                                                              child: Center(
-                                                                child: contentList
-                                                                            .isNotEmpty &&
-                                                                        contentList.length >
-                                                                            index
-                                                                    ? Image
-                                                                        .network(
-                                                                        contentList[index]
-                                                                            .ImageURL,
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      )
-                                                                    : SizedBox(),
+                                                              contentList[index]
+                                                                  .ImageURL;
+
+                                                      if (imageUrls.isEmpty) {
+                                                        return const Center(
+                                                            child: Text(
+                                                                'No images'));
+                                                      }
+
+                                                      return Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child:
+                                                                CarouselSlider(
+                                                              options:
+                                                                  CarouselOptions(
+                                                                height: 200.0,
+                                                                viewportFraction:
+                                                                    1.0,
+                                                                enlargeCenterPage:
+                                                                    true,
+                                                                autoPlay: false,
+                                                                onPageChanged:
+                                                                    (index,
+                                                                        reason) {
+                                                                  setState(() {
+                                                                    _current =
+                                                                        index;
+                                                                  });
+                                                                },
                                                               ),
+                                                              items: imageUrls
+                                                                  .asMap()
+                                                                  .entries
+                                                                  .map((entry) {
+                                                                final url =
+                                                                    entry.value;
+                                                                return Builder(
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return Stack(
+                                                                      children: [
+                                                                        Container(
+                                                                          width: MediaQuery.of(context)
+                                                                              .size
+                                                                              .width,
+                                                                          margin:
+                                                                              EdgeInsets.symmetric(horizontal: 5.0),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          ),
+                                                                          child:
+                                                                              Image.network(
+                                                                            url,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            errorBuilder: (context,
+                                                                                error,
+                                                                                stackTrace) {
+                                                                              print("Error loading image: $error");
+                                                                              return Center(child: Text('Error loading image'));
+                                                                            },
+                                                                            loadingBuilder: (context,
+                                                                                child,
+                                                                                loadingProgress) {
+                                                                              if (loadingProgress == null)
+                                                                                return child;
+                                                                              return Center(child: CircularProgressIndicator());
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                        Positioned(
+                                                                          bottom:
+                                                                              8.0,
+                                                                          right:
+                                                                              8.0,
+                                                                          child:
+                                                                              Row(
+                                                                            children: [
+                                                                              IconButton(
+                                                                                onPressed: () => editImage(index, entry.key),
+                                                                                icon: Container(
+                                                                                  decoration: const BoxDecoration(
+                                                                                    shape: BoxShape.circle,
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                  padding: EdgeInsets.all(8.0),
+                                                                                  child: const Icon(
+                                                                                    Icons.edit,
+                                                                                    color: Colors.yellow,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              IconButton(
+                                                                                onPressed: () => deleteImage(index, entry.key),
+                                                                                icon: Container(
+                                                                                  decoration: const BoxDecoration(
+                                                                                    shape: BoxShape.circle,
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                  padding: EdgeInsets.all(8.0),
+                                                                                  child: const Icon(
+                                                                                    Icons.delete_forever_rounded,
+                                                                                    color: Colors.red,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              }).toList(),
                                                             ),
                                                           ),
-                                                        ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: imageUrls
+                                                                .asMap()
+                                                                .entries
+                                                                .map((entry) {
+                                                              return GestureDetector(
+                                                                onTap: () => _controller
+                                                                    .animateToPage(
+                                                                        entry
+                                                                            .key),
+                                                                child:
+                                                                    Container(
+                                                                  width: 8.0,
+                                                                  height: 8.0,
+                                                                  margin: EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          8.0,
+                                                                      horizontal:
+                                                                          4.0),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    color: (Theme.of(context).brightness == Brightness.dark
+                                                                            ? Colors
+                                                                                .white
+                                                                            : GPrimaryColor)
+                                                                        .withOpacity(_current ==
+                                                                                entry.key
+                                                                            ? 0.9
+                                                                            : 0.4),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }).toList(),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                               SizedBox(
                                                 height: 10,
                                               ),
                                               ElevatedButton(
-                                                onPressed: () =>
-                                                    pickPhotoFromGallers(
-                                                        contentId),
+                                                onPressed: () {},
+                                                // onPressed: () =>
+                                                //     pickPhotoFromGallers(
+                                                //         contentId),
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor:
-                                                      Colors.yellow,
+                                                      GPrimaryColor,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -3590,7 +3833,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                                 child: Text(
-                                                  "แก้ไขรูปภาพ",
+                                                  "เพิ่มรูปภาพ",
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -3686,7 +3929,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.33,
-                                        height: 1000,
+                                        height: 1100,
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -3769,7 +4012,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-
                                               SizedBox(height: 30),
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -3806,7 +4048,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                                         configurations:
                                                             QuillSimpleToolbarConfigurations(
                                                           controller:
-                                                              _contentController,
+                                                              contentDetailControllers[
+                                                                  index],
                                                           sharedConfigurations:
                                                               const QuillSharedConfigurations(
                                                             locale:
@@ -3826,7 +4069,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                                             configurations:
                                                                 QuillEditorConfigurations(
                                                               controller:
-                                                                  _contentController,
+                                                                  contentDetailControllers[
+                                                                      index],
                                                               readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
@@ -3841,37 +4085,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 )),
                                               ),
-                                              // Padding(
-                                              //   padding: const EdgeInsets.only(
-                                              //       left: 0.0, right: 0),
-                                              //   child: Container(
-                                              //     decoration: BoxDecoration(
-                                              //         border: Border.all(
-                                              //             color: Color(0xffCFD3D4)),
-                                              //         borderRadius:
-                                              //             BorderRadius.circular(5)),
-                                              //     child: TextField(
-                                              //       controller:
-                                              //           contentDetailControllers[
-                                              //               index],
-
-                                              //       // controller: TextEditingController(
-                                              //       //     text: contentList[index]
-                                              //       //         .ContentDetail),
-                                              //       keyboardType:
-                                              //           TextInputType.multiline,
-                                              //       maxLines: 5,
-                                              //       decoration: InputDecoration(
-                                              //           focusedBorder:
-                                              //               OutlineInputBorder(
-                                              //                   borderSide:
-                                              //                       BorderSide(
-                                              //                           width: 1,
-                                              //                           color: Colors
-                                              //                               .white))),
-                                              //     ),
-                                              //   ),
-                                              // ),
                                               SizedBox(height: 30),
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -3899,82 +4112,188 @@ class _EditMutipleState extends State<EditMutiple> {
                                                 ),
                                               ),
                                               Container(
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
-                                                    color: Colors.white70,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors
-                                                            .grey.shade200,
-                                                        offset: const Offset(
-                                                            0.0, 0.5),
-                                                        blurRadius: 30.0,
-                                                      )
-                                                    ]),
                                                 width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                height: 200.0,
+                                                        .size
+                                                        .width *
+                                                    0.5,
+                                                height: 250.0,
                                                 child: Center(
-                                                  child: (updatedImageFilesMap[
+                                                  child: Builder(
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      String contentId =
+                                                          contentList[index].id;
+                                                      List<String> imageUrls =
+                                                          localImageUrls[
                                                                   contentId] ??
-                                                              [])
-                                                          .isNotEmpty
-                                                      ? SingleChildScrollView(
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          child: Row(
-                                                            children:
-                                                                updatedImageFilesMap[
-                                                                        contentId]!
-                                                                    .map(
-                                                                      (xFile) =>
-                                                                          Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            0),
-                                                                        child: Image
-                                                                            .network(
-                                                                          xFile
-                                                                              .path,
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                    .toList(),
-                                                          ),
-                                                        )
-                                                      : Center(
-                                                          child: MaterialButton(
-                                                            onPressed: () =>
-                                                                pickPhotoFromGallers(
-                                                                    contentId),
-                                                            child: Container(
-                                                              alignment: Alignment
-                                                                  .bottomCenter,
-                                                              child: Center(
-                                                                child: contentList
-                                                                            .isNotEmpty &&
-                                                                        contentList.length >
-                                                                            index
-                                                                    ? Image
-                                                                        .network(
-                                                                        contentList[index]
-                                                                            .ImageURL,
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      )
-                                                                    : SizedBox(),
+                                                              contentList[index]
+                                                                  .ImageURL;
+
+                                                      if (imageUrls.isEmpty) {
+                                                        return const Center(
+                                                            child: Text(
+                                                                'No images'));
+                                                      }
+
+                                                      return Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child:
+                                                                CarouselSlider(
+                                                              options:
+                                                                  CarouselOptions(
+                                                                height: 200.0,
+                                                                viewportFraction:
+                                                                    1.0,
+                                                                enlargeCenterPage:
+                                                                    true,
+                                                                autoPlay: false,
+                                                                onPageChanged:
+                                                                    (index,
+                                                                        reason) {
+                                                                  setState(() {
+                                                                    _current =
+                                                                        index;
+                                                                  });
+                                                                },
                                                               ),
+                                                              items: imageUrls
+                                                                  .asMap()
+                                                                  .entries
+                                                                  .map((entry) {
+                                                                final url =
+                                                                    entry.value;
+                                                                return Builder(
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return Stack(
+                                                                      children: [
+                                                                        Container(
+                                                                          width: MediaQuery.of(context)
+                                                                              .size
+                                                                              .width,
+                                                                          margin:
+                                                                              EdgeInsets.symmetric(horizontal: 5.0),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          ),
+                                                                          child:
+                                                                              Image.network(
+                                                                            url,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            errorBuilder: (context,
+                                                                                error,
+                                                                                stackTrace) {
+                                                                              print("Error loading image: $error");
+                                                                              return Center(child: Text('Error loading image'));
+                                                                            },
+                                                                            loadingBuilder: (context,
+                                                                                child,
+                                                                                loadingProgress) {
+                                                                              if (loadingProgress == null)
+                                                                                return child;
+                                                                              return Center(child: CircularProgressIndicator());
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                        Positioned(
+                                                                          bottom:
+                                                                              8.0,
+                                                                          right:
+                                                                              8.0,
+                                                                          child:
+                                                                              Row(
+                                                                            children: [
+                                                                              IconButton(
+                                                                                onPressed: () => editImage(index, entry.key),
+                                                                                icon: Container(
+                                                                                  decoration: const BoxDecoration(
+                                                                                    shape: BoxShape.circle,
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                  padding: EdgeInsets.all(8.0),
+                                                                                  child: const Icon(
+                                                                                    Icons.edit,
+                                                                                    color: Colors.yellow,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              IconButton(
+                                                                                onPressed: () => deleteImage(index, entry.key),
+                                                                                icon: Container(
+                                                                                  decoration: const BoxDecoration(
+                                                                                    shape: BoxShape.circle,
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                  padding: EdgeInsets.all(8.0),
+                                                                                  child: const Icon(
+                                                                                    Icons.delete_forever_rounded,
+                                                                                    color: Colors.red,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              }).toList(),
                                                             ),
                                                           ),
-                                                        ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: imageUrls
+                                                                .asMap()
+                                                                .entries
+                                                                .map((entry) {
+                                                              return GestureDetector(
+                                                                onTap: () => _controller
+                                                                    .animateToPage(
+                                                                        entry
+                                                                            .key),
+                                                                child:
+                                                                    Container(
+                                                                  width: 8.0,
+                                                                  height: 8.0,
+                                                                  margin: EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          8.0,
+                                                                      horizontal:
+                                                                          4.0),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    color: (Theme.of(context).brightness == Brightness.dark
+                                                                            ? Colors
+                                                                                .white
+                                                                            : GPrimaryColor)
+                                                                        .withOpacity(_current ==
+                                                                                entry.key
+                                                                            ? 0.9
+                                                                            : 0.4),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }).toList(),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 10,
                                               ),
                                               ElevatedButton(
@@ -3983,15 +4302,15 @@ class _EditMutipleState extends State<EditMutiple> {
                                                         contentId),
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor:
-                                                      Colors.yellow,
+                                                      GPrimaryColor,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
                                                   ),
                                                 ),
-                                                child: Text(
-                                                  "แก้ไขรูปภาพ",
+                                                child: const Text(
+                                                  "เพิ่มรูปภาพ",
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),

@@ -17,6 +17,7 @@ import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainKnowlege extends StatefulWidget {
   const MainKnowlege({super.key});
@@ -58,7 +59,8 @@ class _MainKnowlegeState extends State<MainKnowlege> {
       return Contents(
         ContentName: data!['ContentName'].toString(),
         ContentDetail: data['ContentDetail'].toString(),
-        ImageURL: data['image_url'].toString(),
+        ImageURL: (data['image_url'] as List).cast<String>().toList(),
+
         id: doc.id,
         create_at: data['create_at'] as Timestamp? ??
             Timestamp.fromDate(DateTime.now()),
@@ -88,32 +90,40 @@ class _MainKnowlegeState extends State<MainKnowlege> {
     });
 
     getKnowledges().then((value) async {
-      setState(() {
-        knowledgelist = value;
-      });
-      if (knowledgelist.length == 0) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      for (var knowledge in knowledgelist) {
-        if (knowledge.knowledgeImg.isEmpty) {
-          // แสดง Loading indicator
+    List<String> tempImageURLlist = [];
+    for (var knowledge in value) {
+      String imageUrl = '';
+      if (knowledge.knowledgeImg.isNotEmpty) {
+        imageUrl = knowledge.knowledgeImg[0];
+      } else if (knowledge.contents.isNotEmpty) {
+        try {
           final firstContent = knowledge.contents[0].toString();
           final contents = await getContentsById(firstContent);
-          imageURLlist.add(contents.ImageURL);
-          setState(() {
-            _isLoading = false;
-          });
-          // ซ่อน Loading indicator
-        } else {
-          imageURLlist.add(knowledge.knowledgeImg);
+          if (contents.ImageURL.isNotEmpty) {
+            imageUrl = contents.ImageURL[0];
+          }
+        } catch (e) {
+          print("Error fetching content: $e");
         }
       }
+      tempImageURLlist.add(imageUrl);
+    }
+
+    setState(() {
+      knowledgelist = value;
+      imageURLlist = tempImageURLlist;
+      _isLoading = false;
     });
+
+    print(knowledgelist);
+    print(imageURLlist);
+    print(imageURLlist.length);
+  });
   }
 
   Widget build(BuildContext context) {
+     ScreenSize screenSize = getScreenSize(context);
+
     return Scaffold(
       body: SafeArea(
           child: Row(
@@ -230,21 +240,15 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                         icons: knowledgelist[i].knowledgeIcons,
                                         date: timestampToDateThai(
                                             knowledgelist[i].create_at!),
-                                        image: imageURLlist[i].toString(),
+                                        image: i < imageURLlist.length
+                                            ? imageURLlist[i]
+                                            : '',
                                         status: knowledgelist[i]
                                                 .knowledgeImg
                                                 .isEmpty
                                             ? "หลายเนื้อหา"
                                             : "เนื้อหาเดียว",
                                       ),
-                                    knowledgelist.length == 0
-                                        ? Text(
-                                            "ไม่มีเนื้อหา",
-                                            style: TextStyle(
-                                                color: GPrimaryColor,
-                                                fontSize: 18),
-                                          )
-                                        : SizedBox(),
                                   ],
                                 ),
                               )
@@ -288,10 +292,11 @@ class KnowledgeContainer extends StatefulWidget {
 class _KnowledgeContainerState extends State<KnowledgeContainer> {
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = getScreenSize(context);
     return Container(
-      margin: EdgeInsets.all(30),
+     margin: EdgeInsets.all(30),
       width: MediaQuery.of(context).size.width * 0.3,
-      height: 200,
+      height: screenSize == ScreenSize.minidesktop ? 300 : 200,
       decoration: BoxDecoration(
         color: WhiteColor,
         borderRadius: BorderRadius.circular(15),
@@ -363,15 +368,15 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                           ],
                         )),
                     Spacer(),
-                    Row(
-                      children: [
-                        Text(
-                          "วันที่ ${widget.date}",
-                          style: TextStyle(color: GPrimaryColor, fontSize: 15),
-                        ),
-                        Spacer(),
-                        Row(
-                          children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "วันที่ ${widget.date}",
+                        style: TextStyle(color: GPrimaryColor, fontSize: 15),
+                      ),
+                    ),
+                    screenSize == ScreenSize.minidesktop
+                        ? Column(children: [
                             ElevatedButton.icon(
                                 onPressed: () {
                                   if (widget.status != "เนื้อหาเดียว") {
@@ -410,7 +415,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                   style: TextStyle(color: WhiteColor),
                                 )),
                             SizedBox(
-                              width: 15,
+                              height: 15,
                             ),
                             ElevatedButton.icon(
                                 onPressed: () {
@@ -436,11 +441,79 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                     shadowColor: Colors.black,
                                     elevation: 1),
                                 label: Text("ลบ",
-                                    style: TextStyle(color: WhiteColor)))
-                          ],
-                        ),
-                      ],
-                    ),
+                                    style: TextStyle(color: WhiteColor))),
+                          ])
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    if (widget.status != "เนื้อหาเดียว") {
+                                      // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
+                                      context.goNamed(
+                                        '/editmultiKnowledge',
+                                        extra: {
+                                          'knowledge': widget.knowledge,
+                                          'icon': widget.icons,
+                                        },
+                                      );
+                                    } else {
+                                      // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
+                                      context.goNamed(
+                                        '/editKnowledge',
+                                        extra: {
+                                          'knowledge': widget.knowledge,
+                                          'icon': widget.icons,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: WhiteColor,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.yellow.shade400,
+                                      shape: ContinuousRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      shadowColor: Colors.black,
+                                      elevation: 1),
+                                  label: Text(
+                                    "แก้ไข",
+                                    style: TextStyle(color: WhiteColor),
+                                  )),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          Deleteddialogknowledge(
+                                        knowledgeName: widget.title,
+                                        id: widget.id,
+                                      ),
+                                    ).then((value) => Navigator.popUntil(
+                                        context,
+                                        ModalRoute.withName("/mainKnowledge")));
+                                  },
+                                  icon: Icon(
+                                    Icons.delete_forever_rounded,
+                                    color: WhiteColor,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red.shade400,
+                                      shape: ContinuousRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      shadowColor: Colors.black,
+                                      elevation: 1),
+                                  label: Text("ลบ",
+                                      style: TextStyle(color: WhiteColor)))
+                            ],
+                          )
                   ],
                 ),
               ))
