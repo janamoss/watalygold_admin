@@ -4,7 +4,8 @@ class Contents {
   final String id;
   final String ContentName;
   final String ContentDetail;
-  final String ImageURL;
+  // final String ImageURL;
+   late final List<String> ImageURL;
   final Timestamp? create_at;
   final Timestamp? deleted_at;
   final Timestamp? update_at;
@@ -20,15 +21,14 @@ class Contents {
   });
 
   factory Contents.fromFirestore(DocumentSnapshot doc) {
-    return Contents(
-      id: doc.id,
-      ImageURL: doc['image_url'],
-      ContentName: doc['ContentName'],
-      ContentDetail: doc['ContentDetail'],
-      deleted_at: doc['deleted_at'],
-       create_at:
-          doc['create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
-    );
-  }
-
+  return Contents(
+    id: doc.id,
+    ImageURL: List<String>.from(doc.get('image_url') ?? []),
+    ContentName: doc.get('ContentName'),
+    ContentDetail: doc.get('ContentDetail'),
+    deleted_at: doc.get('deleted_at'),
+    create_at: doc.get('create_at'),
+    update_at: doc.get('update_at'),
+  );
+}
 }

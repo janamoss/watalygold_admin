@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -17,8 +18,11 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogCancle.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-
 import 'package:watalygold_admin/service/screen_unit.dart';
+import 'package:flutter_widget_from_html_core/src/core_data.dart'
+    as htmlImageSource;
+import 'package:image_picker_platform_interface/src/types/image_source.dart'
+    as pickerImageSource;
 
 Map<String, IconData> icons = {
   'สถิติ': Icons.analytics_outlined,
@@ -50,6 +54,7 @@ class _SinglecontentState extends State<Singlecontent> {
   List<XFile> itemImagesList = <XFile>[];
   List<String> downloadUrl = <String>[];
   bool uploading = false;
+  final CarouselController _controller = CarouselController();
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +101,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -181,8 +186,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -209,7 +214,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                     padding: const EdgeInsets.only(
                                         left: 0.0, right: 0),
                                     child: Container(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       decoration: BoxDecoration(
                                         border: Border.all(
                                             color: const Color(0xffCFD3D4)),
@@ -229,8 +235,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                     height: 5,
                                   ),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -248,8 +254,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -306,36 +312,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     )),
                                   ),
-                                  // Container(
-                                  //   color: Colors.white38,
-                                  //   child: Expanded(
-                                  //     child: testss(),
-                                  //   ),
-                                  // ),
-
-                                  // Padding(
-                                  //   padding:
-                                  //       const EdgeInsets.only(left: 0.0, right: 0),
-                                  //   child: Container(
-                                  //     decoration: BoxDecoration(
-                                  //         border:
-                                  //             Border.all(color: Color(0xffCFD3D4)),
-                                  //         borderRadius: BorderRadius.circular(5)),
-                                  //     child: TextField(
-                                  //       controller: contentController,
-                                  //       keyboardType: TextInputType.multiline,
-                                  //       maxLines: 5,
-                                  //       decoration: InputDecoration(
-                                  //           focusedBorder: OutlineInputBorder(
-                                  //               borderSide: BorderSide(
-                                  //                   width: 1, color: Colors.white))),
-                                  //     ),
-                                  //   ),
-                                  // ),
                                   const SizedBox(height: 50),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0, right: 0),
+                                    padding: EdgeInsets.only(left: 0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -534,7 +513,7 @@ class _SinglecontentState extends State<Singlecontent> {
                         children: [
                           Container(
                             width: MediaQuery.of(context).size.width * 0.34,
-                            height: 1200,
+                            height: 1300,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -561,8 +540,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -646,8 +625,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -674,7 +653,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                     padding: const EdgeInsets.only(
                                         left: 0.0, right: 0),
                                     child: Container(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       decoration: BoxDecoration(
                                         border: Border.all(
                                             color: const Color(0xffCFD3D4)),
@@ -694,8 +674,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                     height: 5,
                                   ),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -713,8 +693,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   const SizedBox(height: 30),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0.0, right: 0),
+                                    padding:
+                                        EdgeInsets.only(left: 0.0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -771,36 +751,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     )),
                                   ),
-                                  // Container(
-                                  //   color: Colors.white38,
-                                  //   child: Expanded(
-                                  //     child: testss(),
-                                  //   ),
-                                  // ),
-
-                                  // Padding(
-                                  //   padding:
-                                  //       const EdgeInsets.only(left: 0.0, right: 0),
-                                  //   child: Container(
-                                  //     decoration: BoxDecoration(
-                                  //         border:
-                                  //             Border.all(color: Color(0xffCFD3D4)),
-                                  //         borderRadius: BorderRadius.circular(5)),
-                                  //     child: TextField(
-                                  //       controller: contentController,
-                                  //       keyboardType: TextInputType.multiline,
-                                  //       maxLines: 5,
-                                  //       decoration: InputDecoration(
-                                  //           focusedBorder: OutlineInputBorder(
-                                  //               borderSide: BorderSide(
-                                  //                   width: 1, color: Colors.white))),
-                                  //     ),
-                                  //   ),
-                                  // ),
                                   const SizedBox(height: 50),
                                   const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 0, right: 0),
+                                    padding: EdgeInsets.only(left: 0, right: 0),
                                     child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -823,50 +776,198 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     ),
                                   ),
+                                  SizedBox(
+                                    height: 20.0,
+                                  ),
                                   Container(
                                     decoration: BoxDecoration(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
-                                        color: Colors.white70,
                                         boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.shade200,
-                                            offset: const Offset(0.0, 0.5),
-                                            blurRadius: 30.0,
-                                          )
+                                          // BoxShadow(
+                                          //   color: Colors.red,
+                                          //   offset: const Offset(0.0, 0.5),
+                                          //   blurRadius: 30.0,
+                                          // )
                                         ]),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 200.0,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    height: 250.0,
                                     child: Center(
-                                      child: itemPhotosWidgetList.isEmpty
-                                          ? Center(
-                                              child: MaterialButton(
-                                                onPressed: pickPhotoFromGallery,
-                                                child: Container(
-                                                  alignment:
-                                                      Alignment.bottomCenter,
-                                                  child: Center(
-                                                    child: Image.network(
-                                                      "https://static.thenounproject.com/png/3322766-200.png",
-                                                      height: 100.0,
-                                                      width: 100.0,
+                                        child: itemPhotosWidgetList.isEmpty
+                                            ? Center(
+                                                child: MaterialButton(
+                                                  onPressed:
+                                                      pickPhotoFromGallery,
+                                                  child: Container(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Center(
+                                                      child: Image.network(
+                                                        "https://static.thenounproject.com/png/3322766-200.png",
+                                                        height: 100.0,
+                                                        width: 100.0,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            )
-                                          : SingleChildScrollView(
-                                              scrollDirection: Axis.vertical,
-                                              child: Wrap(
-                                                spacing: 5.0,
-                                                direction: Axis.horizontal,
-                                                alignment:
-                                                    WrapAlignment.spaceEvenly,
-                                                runSpacing: 10.0,
-                                                children: itemPhotosWidgetList,
-                                              ),
-                                            ),
-                                    ),
+                                              )
+                                            : Column(
+                                                children: [
+                                                  Expanded(
+                                                    child: CarouselSlider(
+                                                      items:
+                                                          itemPhotosWidgetList
+                                                              .map((photo) {
+                                                        return Builder(
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return Stack(
+                                                              children: [
+                                                                Container(
+                                                                  width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width,
+                                                                  height: 250.0,
+                                                                  child: photo,
+                                                                ),
+                                                                Positioned(
+                                                                  bottom: 8.0,
+                                                                  right: 8.0,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          int index =
+                                                                              itemPhotosWidgetList.indexOf(photo);
+                                                                          if (index !=
+                                                                              -1) {
+                                                                            editImage(index);
+                                                                          }
+                                                                          // editImage(
+                                                                          //     itemPhotosWidgetList.indexOf(imageWidget));
+                                                                        },
+                                                                        icon:
+                                                                            Container(
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                          padding:
+                                                                              EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.edit,
+                                                                            color:
+                                                                                YellowColor,
+                                                                            size:
+                                                                                20.0,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          int index =
+                                                                              itemPhotosWidgetList.indexOf(photo);
+                                                                          if (index !=
+                                                                              -1) {
+                                                                            deleteImage(index);
+                                                                          }
+                                                                        },
+                                                                        icon:
+                                                                            Container(
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                          padding:
+                                                                              EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.delete_forever_rounded,
+                                                                            color:
+                                                                                Colors.red,
+                                                                            size:
+                                                                                20.0,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      }).toList(),
+                                                      options: CarouselOptions(
+                                                        height: 250.0,
+                                                        viewportFraction: 1,
+                                                        enlargeCenterPage: true,
+                                                        enableInfiniteScroll:
+                                                            false,
+                                                        onPageChanged:
+                                                            (index, reason) {
+                                                          setState(() {
+                                                            _current = index;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children:
+                                                        itemPhotosWidgetList
+                                                            .asMap()
+                                                            .entries
+                                                            .map((entry) {
+                                                      return GestureDetector(
+                                                        onTap: () => _controller
+                                                            .animateToPage(
+                                                                entry.key),
+                                                        child: Container(
+                                                          width: 8.0,
+                                                          height: 8.0,
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 8.0,
+                                                                  horizontal:
+                                                                      4.0),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: (Theme.of(context)
+                                                                            .brightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                    ? Colors
+                                                                        .white
+                                                                    : GPrimaryColor)
+                                                                .withOpacity(
+                                                                    _current ==
+                                                                            entry.key
+                                                                        ? 0.9
+                                                                        : 0.4),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ],
+                                              )),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -909,7 +1010,7 @@ class _SinglecontentState extends State<Singlecontent> {
                           const SizedBox(width: 20), // SizedBox
                           Container(
                             width: MediaQuery.of(context).size.width * 0.34,
-                            height: 1200,
+                            height: 1300,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -979,8 +1080,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                             height: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                2, // กำหนดความสูงของ Container ให้มากกว่าหรือเท่ากับขนาดที่ต้องการเลื่อน
-
+                                                2,
                                             child: _displayedcontentWidget ??
                                                 Container(),
                                           ),
@@ -1070,12 +1170,14 @@ class _SinglecontentState extends State<Singlecontent> {
     );
   }
 
+  int _current = 0;
+
   void addImage() {
     for (var bytes in photo!) {
       itemPhotosWidgetList.add(Padding(
         padding: const EdgeInsets.all(0),
         child: SizedBox(
-          height: 390,
+          height: 200,
           child: Container(
             child: kIsWeb
                 ? Image.network(
@@ -1091,37 +1193,58 @@ class _SinglecontentState extends State<Singlecontent> {
     }
   }
 
-  List<XFile?> latestPickedPhotos = [];
+  Future<void> editImage(int index) async {
+    final pickedFile =
+        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        itemPhotosWidgetList[index] = SizedBox(
+          height: 200,
+          child: kIsWeb
+              ? Image.network(
+                  File(pickedFile.path).path,
+                  fit: BoxFit.cover,
+                )
+              : Image.file(
+                  File(pickedFile.path),
+                ),
+        );
+        itemImagesList[index] = XFile(pickedFile.path);
+      });
+    }
+  }
+
+  void deleteImage(int index) {
+    setState(() {
+      itemPhotosWidgetList.removeAt(index);
+      itemImagesList.removeAt(index); // ลบรูปภาพออกจาก itemImagesList ด้วย
+    });
+  }
 
   Future<void> pickPhotoFromGallery() async {
     photo = await _picker.pickMultiImage();
     if (photo != null && photo!.isNotEmpty) {
       setState(() {
         itemImagesList = itemImagesList + photo!;
-        latestPickedPhotos.addAll(photo!); // เพิ่มรูปภาพล่าสุดเข้าไปในรายการ
+        debugPrint("itemImagesList ${itemImagesList}");
         addImage();
-        photo!.clear();
       });
     }
   }
 
-  Future<String> uploadImageAndSaveItemInfo() async {
-    setState(() {
-      uploading = true;
-    });
-    PickedFile? pickedFile;
-    String? knowledgetId = const Uuid().v4().substring(0, 10);
-
-    // ใช้ latestPickedPhotos เพื่อเลือกรูปภาพที่เพิ่มล่าสุดเท่านั้น
-    if (latestPickedPhotos.isNotEmpty) {
-      XFile? latestPickedPhoto = latestPickedPhotos.last;
-      if (latestPickedPhoto != null) {
-        file = File(latestPickedPhoto.path);
-        pickedFile = PickedFile(file!.path);
-        await uploadImageToStorage(pickedFile, knowledgetId);
-      }
-    }
-    return knowledgetId;
+  Future<String> uploadImageToStorage(
+      PickedFile pickedFile, String knowledgetId) async {
+    String kId = const Uuid().v4().substring(0, 10);
+    Reference reference = FirebaseStorage.instance
+        .ref()
+        .child('Knowledge/$knowledgetId/knowledImg_$kId');
+    await reference.putData(
+      await pickedFile.readAsBytes(),
+      SettableMetadata(contentType: 'image/jpeg'),
+    );
+    String imageUrl = await reference.getDownloadURL();
+    return imageUrl; // คืนค่า URL ของรูปภาพที่อัปโหลดสำเร็จ
   }
 
   upload() async {
@@ -1139,40 +1262,38 @@ class _SinglecontentState extends State<Singlecontent> {
     });
   }
 
-  // Future<String> uploadImageAndSaveItemInfo() async {
-  //   setState(() {
-  //     uploading = true;
-  //   });
-  //   PickedFile? pickedFile;
-  //   String? knowledgetId = const Uuid().v4().substring(0, 10);
-  //   for (int i = 0; i < itemImagesList.length; i++) {
-  //     file = File(itemImagesList[i].path);
-  //     pickedFile = PickedFile(file!.path);
-
-  //     await uploadImageToStorage(pickedFile, knowledgetId);
-  //   }
-  //   return knowledgetId;
-  // }
-
-  uploadImageToStorage(PickedFile? pickedFile, String knowledgetId) async {
-    String? kId = const Uuid().v4().substring(0, 10);
-    Reference reference = FirebaseStorage.instance
-        .ref()
-        .child('Knowledge/$knowledgetId/knowledImg_$kId');
-    await reference.putData(
-      await pickedFile!.readAsBytes(),
-      SettableMetadata(contentType: 'image/jpeg'),
-    );
-    String imageUrl = await reference.getDownloadURL();
-    addKnowledge(imageUrl);
-  }
-
   bool _isKnowledgeAdded = false;
 
-  Future<void> addKnowledge(String imageUrl) async {
+  Future<String> uploadImageAndSaveItemInfo() async {
+    setState(() {
+      uploading = true;
+    });
+    PickedFile? pickedFile;
+    String knowledgetId = '';
+    List<String> imageUrls = [];
+
+    for (XFile? photo in itemImagesList) {
+      if (photo != null) {
+        file = File(photo.path);
+        pickedFile = PickedFile(file!.path);
+        knowledgetId = const Uuid().v4().substring(0, 10);
+        String imageUrl = await uploadImageToStorage(pickedFile, knowledgetId);
+        imageUrls.add(imageUrl); // เพิ่ม URL รูปภาพลงใน List
+      }
+    }
+
+    // เรียกใช้งานฟังก์ชัน addKnowledge โดยส่ง List ของ URL รูปภาพ
+    await addKnowledge(imageUrls);
+
+    setState(() {
+      uploading = false;
+    });
+    return knowledgetId;
+  }
+
+  Future<void> addKnowledge(List<String> imageUrls) async {
     // ตรวจสอบความสมบูรณ์ของข้อมูล
-    if (nameController.text.isEmpty ||
-        _selectedValue == null) {
+    if (nameController.text.isEmpty || _selectedValue == null) {
       Fluttertoast.showToast(
         msg: "กรุณากรอกข้อมูลให้ครบ",
         toastLength: Toast.LENGTH_SHORT,
@@ -1187,18 +1308,15 @@ class _SinglecontentState extends State<Singlecontent> {
 
     // ตรวจสอบว่ามีความรู้หรือยัง
     if (!_isKnowledgeAdded) {
-      _isKnowledgeAdded =
-          true; // กำหนดให้ไม่สามารถเพิ่มความรู้อีกได้ระหว่างการดำเนินการ
-
+      _isKnowledgeAdded = true;
       // สร้าง ID ใหม่
       String Id = const Uuid().v4().substring(0, 10);
-
       // สร้างข้อมูล Knowledge
       Map<String, dynamic> knowledgeMap = {
         "KnowledgeName": nameController.text,
         "KnowledgeDetail": _html,
         "KnowledgeIcons": _selectedValue,
-        "KnowledgeImg": imageUrl,
+        "KnowledgeImg": imageUrls, // ใช้ Map ของ URL รูปภาพที่ได้รับเข้ามา
         "create_at": Timestamp.now(),
         "deleted_at": null,
         "update_at": null,
@@ -1229,20 +1347,6 @@ class _SinglecontentState extends State<Singlecontent> {
         );
       });
     }
-  }
-
-  void clearAllFields() {
-    nameController.clear();
-    _contentController.clear();
-
-    setState(() {
-      _selectedValue = null;
-    });
-
-    setState(() {
-      itemImagesList.clear();
-      itemPhotosWidgetList.clear();
-    });
   }
 
   Widget _displayedWidget = Container();
@@ -1309,67 +1413,112 @@ class _SinglecontentState extends State<Singlecontent> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            itemCount: itemPhotosWidgetList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                width: 390,
-                child: itemPhotosWidgetList[index],
-                // ใส่รูปภาพลงใน Container
-              );
-            },
-          ),
-          Positioned(
-            // ใช้ตัวแปร _positionY แทนค่า top
-            bottom: 0, // ปรับค่านี้เพื่อขยับ Container ขึ้น
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              height: MediaQuery.of(context).size.width * 1.85,
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: const BoxDecoration(
-                  color: WhiteColor,
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(40))),
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        icons[_selectedValue] ??
-                            Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                        size: 24, // ขนาดของไอคอน
-                        color: GPrimaryColor, // สีของไอคอน
-                      ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Expanded(
-                        child: Text(
-                          nameController.text,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
+          itemPhotosWidgetList.isNotEmpty
+              ? itemPhotosWidgetList.length > 1
+                  ? Column(
+                      children: [
+                        CarouselSlider.builder(
+                          itemCount: itemPhotosWidgetList.length,
+                          itemBuilder:
+                              (BuildContext context, int index, int realIndex) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: itemPhotosWidgetList[index],
+                            );
+                          },
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            viewportFraction: 1.0,
+                            autoPlay: false,
+                            enlargeCenterPage: false,
+                            // onPageChanged: (index, reason) {
+                            //   setState(() {
+                            //     _current = index;
+                            //   });
+                            // },
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Align(
-                          alignment: Alignment.centerLeft,
-                          child: _displayedWidgetHtmlWidget),
-                    ],
-                  )
-                ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: itemPhotosWidgetList.map((url) {
+                            int index = itemPhotosWidgetList.indexOf(url);
+                            return Container(
+                              width: 8.0,
+                              height: 8.0,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 2.0),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == index
+                                    ? Color.fromRGBO(0, 0, 0, 0.9)
+                                    : Color.fromRGBO(0, 0, 0, 0.4),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    )
+                  : Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      child: itemPhotosWidgetList[0],
+                    )
+              : Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.3,
+              color: Colors.grey[200], // สีพื้นหลังเมื่อไม่มีรูปภาพ
+              child: Center(
+                child: Text(
+                  'ไม่มีรูปภาพ',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                ),
               ),
+            ),
+          Container(
+            margin: EdgeInsets.only(top: 200),
+            height: MediaQuery.of(context).size.width * 1.85,
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            decoration: const BoxDecoration(
+                color: WhiteColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icons[_selectedValue] ??
+                          Icons.error, // ระบุไอคอนตามค่าที่เลือก
+                      size: 24, // ขนาดของไอคอน
+                      color: GPrimaryColor, // สีของไอคอน
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        nameController.text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: _displayedWidgetHtmlWidget),
+                  ],
+                )
+              ],
             ),
           ),
         ],

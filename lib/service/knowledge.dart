@@ -16,7 +16,7 @@ class Knowledge {
   final List<dynamic> contents;
   final String knowledgeDetail;
   final IconData knowledgeIcons;
-  late final String knowledgeImg;
+  final List<String> knowledgeImg;
   final Timestamp? create_at;
 
   Knowledge({
@@ -31,15 +31,23 @@ class Knowledge {
 
   factory Knowledge.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    var rawKnowledgeImg = data['KnowledgeImg'];
+    List<String> knowledgeImgList = [];
+
+    if (rawKnowledgeImg is List) {
+      knowledgeImgList = List<String>.from(rawKnowledgeImg);
+    } else if (rawKnowledgeImg is String) {
+      knowledgeImgList = [rawKnowledgeImg];
+    }
+
     return Knowledge(
       id: doc.id,
       knowledgeName: data['KnowledgeName'] ?? '',
-      contents: data['Content']?.map((e) => e).cast<dynamic>().toList() ?? [],
+      contents: (data['Content'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       knowledgeDetail: data['KnowledgeDetail'] ?? '',
       knowledgeIcons: iconMap[data['KnowledgeIcons']] ?? Icons.question_mark,
-      knowledgeImg: data['KnowledgeImg'] ?? '',
-      create_at:
-          data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
+      knowledgeImg: knowledgeImgList,
+      create_at: data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
     );
   }
 }
