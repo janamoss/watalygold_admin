@@ -1464,16 +1464,16 @@ class _SinglecontentState extends State<Singlecontent> {
                       child: itemPhotosWidgetList[0],
                     )
               : Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.3,
-              color: Colors.grey[200], // สีพื้นหลังเมื่อไม่มีรูปภาพ
-              child: Center(
-                child: Text(
-                  'ไม่มีรูปภาพ',
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  color: Colors.grey[200], // สีพื้นหลังเมื่อไม่มีรูปภาพ
+                  child: Center(
+                    child: Text(
+                      'ไม่มีรูปภาพ',
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    ),
+                  ),
                 ),
-              ),
-            ),
           Container(
             margin: EdgeInsets.only(top: 200),
             height: MediaQuery.of(context).size.width * 1.85,
