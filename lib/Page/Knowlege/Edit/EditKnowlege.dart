@@ -73,6 +73,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
 
     if (widget.knowledge != null) {
       nameController.text = widget.knowledge!.knowledgeName;
+      _selectedValue = widget.knowledge!.knowledgeIconString;
 
       String htmlString = widget.knowledge!.knowledgeDetail;
       var delta = HtmlToDeltaConverter.htmlToDelta(htmlString);
@@ -1784,6 +1785,10 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       ),
     );
   }
+
+  IconData getIconData(String iconName) {
+   return icons[iconName] ?? Icons.error;
+ }
 
   Widget _displaycontentWidget() {
     return Scaffold(

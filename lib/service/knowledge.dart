@@ -17,6 +17,7 @@ class Knowledge {
   final String knowledgeDetail;
   final IconData knowledgeIcons;
   final List<String> knowledgeImg;
+  final String knowledgeIconString;
   final Timestamp? create_at;
 
   Knowledge({
@@ -26,6 +27,7 @@ class Knowledge {
     required this.knowledgeDetail,
     required this.knowledgeIcons,
     required this.knowledgeImg,
+    required this.knowledgeIconString,
     required this.create_at,
   });
 
@@ -46,6 +48,7 @@ class Knowledge {
       contents: (data['Content'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       knowledgeDetail: data['KnowledgeDetail'] ?? '',
       knowledgeIcons: iconMap[data['KnowledgeIcons']] ?? Icons.question_mark,
+      knowledgeIconString: data['KnowledgeIcons'] ?? '',
       knowledgeImg: knowledgeImgList,
       create_at: data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
     );

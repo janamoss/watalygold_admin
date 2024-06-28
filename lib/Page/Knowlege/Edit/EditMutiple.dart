@@ -486,6 +486,7 @@ class _EditMutipleState extends State<EditMutiple> {
     if (widget.knowledge != null) {
       namecontroller.text = widget.knowledge!.knowledgeName;
       contentcontroller.text = widget.knowledge!.knowledgeDetail;
+      _selectedValue = widget.knowledge!.knowledgeIconString;
     }
     setState(() {
       _isLoading = true; // Set loading state to true
@@ -3404,7 +3405,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                 ),
                               );
                             },
-                          );
+                          ).then((value) => Navigator.popUntil(context,
+                               ModalRoute.withName("/editmultiKnowledge")));
                         },
                         icon: Icon(
                           Icons.cancel,
