@@ -22,6 +22,25 @@ class _CardChartState extends State<CardChart> {
   final dateLabels = <String>[];
   final yearLabels = <String>[];
 
+  List<String> shortMonths = [
+    "ม.ค.",
+    "ก.พ.",
+    "มี.ค.",
+    "เม.ย.",
+    "พ.ค.",
+    "มิ.ย.",
+    "ก.ค.",
+    "ส.ค.",
+    "ก.ย.",
+    "ต.ค.",
+    "พ.ย.",
+    "ธ.ค."
+  ];
+
+  String getMonthNumber(int month) {
+    return month.toString().padLeft(2, '0');
+  }
+
   Map<String, Map<String, int>> groupDataByDayMonthYear() {
     Map<String, Map<String, int>> result = {};
     for (var item in widget.results) {
@@ -76,13 +95,14 @@ class _CardChartState extends State<CardChart> {
       final dateParts = dateKey.split('-');
       final entryYear = int.parse(dateParts[0]);
       final entryMonth = int.parse(dateParts[1]);
+
       final day = int.parse(dateParts[2]);
-      final thaiYear = entryYear + 543; // แปลงเป็น พ.ศ.
+      final thaiYear = entryYear + 543;
 
       // ตรวจสอบเงื่อนไขการกรอง
       if ((month == null || months[entryMonth - 1] == month) &&
           (year == null || thaiYear.toString() == year)) {
-        final dateString = '$day ${months[entryMonth - 1]} $thaiYear';
+        final dateString = '$day/${getMonthNumber(entryMonth)}/$thaiYear';
         printInfo(info: dateString);
         dateLabels.add(dateString);
         return BarChartGroupData(

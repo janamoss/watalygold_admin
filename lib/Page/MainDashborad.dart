@@ -120,6 +120,8 @@ class _MainDashState extends State<MainDash> {
                                 CardResultDetail(
                                   results: results,
                                   lefts: 20,
+                                  parentWidth:
+                                      MediaQuery.of(context).size.width * 0.6,
                                 )
                               ],
                             ),
@@ -180,6 +182,9 @@ class _MainDashState extends State<MainDash> {
                                           600, // ใช้ chartHeight ที่อัปเดตแล้ว
                                       child: CardResultDetail(
                                         results: results,
+                                        parentWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.13,
                                       ),
                                     ),
                                   ),

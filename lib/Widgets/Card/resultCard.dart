@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:watalygold_admin/Widgets/Card/crad_detail.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/service/result.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class ResultCard extends StatefulWidget {
   final List<Map<String, dynamic>> results;
@@ -24,6 +26,27 @@ class _ResultCardState extends State<ResultCard> {
   void initState() {
     super.initState();
     fetchAllResults();
+  }
+
+  final List<String> thaiMonths = [
+    'มกราคม',
+    'กุมภาพันธ์',
+    'มีนาคม',
+    'เมษายน',
+    'พฤษภาคม',
+    'มิถุนายน',
+    'กรกฎาคม',
+    'สิงหาคม',
+    'กันยายน',
+    'ตุลาคม',
+    'พฤศจิกายน',
+    'ธันวาคม'
+  ];
+
+  String getThaiDate(DateTime date) {
+    int thaiYear = date.year + 543;
+    String thaiMonth = thaiMonths[date.month - 1];
+    return '${date.day} $thaiMonth $thaiYear';
   }
 
   Future<void> fetchAllResults() async {
@@ -69,6 +92,10 @@ class _ResultCardState extends State<ResultCard> {
 
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting('th_TH', null);
+    DateTime now = DateTime.now();
+    String thaiDate = getThaiDate(now);
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Material(
@@ -93,7 +120,7 @@ class _ResultCardState extends State<ResultCard> {
                     width: 15,
                   ),
                   Text(
-                    "(ณ วันปัจจุบัน)",
+                    "(${thaiDate})",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ],

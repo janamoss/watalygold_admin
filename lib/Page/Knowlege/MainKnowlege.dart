@@ -509,6 +509,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                     ).then((value) => Navigator.popUntil(
                                         context,
                                         ModalRoute.withName("/mainKnowledge")));
+                                      
                                   },
                                   icon: Icon(
                                     Icons.delete_forever_rounded,
