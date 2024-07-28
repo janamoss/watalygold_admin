@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,12 +26,21 @@ import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
 
 Map<String, IconData> icons = {
+  'ใบไม้': FontAwesomeIcons.leaf,
+  'ต้นกล้า': FontAwesomeIcons.seedling,
+  'ไวรัส': FontAwesomeIcons.virus,
   'สถิติ': Icons.analytics_outlined,
   'ดอกไม้': Icons.yard,
-  'หนังสือ': Icons.book,
+  'หนังสือ': FontAwesomeIcons.book,
   'น้ำ': Icons.water_drop_outlined,
   'ระวัง': Icons.warning_rounded,
   'คำถาม': Icons.quiz_outlined,
+  'รูปภาพ': FontAwesomeIcons.image,
+  'ระฆัง': FontAwesomeIcons.bell,
+  'ความคิดเห็น': FontAwesomeIcons.comments,
+  'ตำแหน่ง': FontAwesomeIcons.locationDot,
+  'กล้อง': FontAwesomeIcons.camera,
+  'ปฏิทิน': FontAwesomeIcons.calendarDays,
 };
 
 class Singlecontent extends StatefulWidget {
@@ -125,65 +135,150 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     ),
                                   ),
-                                  Align(
+                                   Align(
                                     alignment: Alignment.topLeft,
                                     child: Container(
-                                      child: DropdownButton(
-                                        items: <String>[
-                                          'สถิติ',
-                                          'ดอกไม้',
-                                          'หนังสือ',
-                                          'น้ำ',
-                                          'ระวัง',
-                                          'คำถาม'
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Row(
-                                              children: [
-                                                icons[value] != null
-                                                    ? Icon(
-                                                        icons[value]!,
-                                                        color: GPrimaryColor,
-                                                      )
-                                                    : const SizedBox(),
-                                                const SizedBox(width: 15),
-                                                Text(
-                                                  value,
-                                                  style: const TextStyle(
-                                                      color: GPrimaryColor),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _selectedValue = value;
-                                          });
-                                        },
-                                        hint: const Row(
-                                          children: [
-                                            Icon(
-                                              Icons.image_outlined,
-                                              color: GPrimaryColor,
-                                            ), // ไอคอนที่ต้องการเพิ่ม
-                                            SizedBox(
-                                                width:
-                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                            Text(
-                                              "เลือกไอคอนสำหรับคลังความรู้",
-                                              style: TextStyle(
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          items: <String>[
+                                            'ใบไม้',
+                                            'ต้นกล้า',
+                                            'สถิติ',
+                                            'ดอกไม้',
+                                            'หนังสือ',
+                                            'น้ำ',
+                                            'ระวัง',
+                                            'คำถาม',
+                                            'รูปภาพ',
+                                            'ระฆัง',
+                                            'ความคิดเห็น',
+                                            'ตำแหน่ง',
+                                            'กล้อง',
+                                            'ปฏิทิน',
+                                            'ไวรัส'
+                                            
+                                        
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Row(
+                                                children: [
+                                                  icons[value] != null
+                                                      ? Icon(
+                                                          icons[value]!,
+                                                          color: GPrimaryColor,
+                                                        )
+                                                      : const SizedBox(),
+                                                  const SizedBox(width: 15),
+                                                  Text(
+                                                    value,
+                                                    style: const TextStyle(
+                                                        color: GPrimaryColor),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedValue = value;
+                                            });
+                                          },
+                                          hint: const Row(
+                                            children: [
+                                              Icon(
+                                                Icons.image_outlined,
+                                                color: GPrimaryColor,
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "เลือกไอคอนสำหรับคลังความรู้",
+                                                style: TextStyle(
                                                   color: GPrimaryColor,
-                                                  fontSize: 17),
+                                                  fontSize: 17,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          value: _selectedValue,
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 300,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
                                             ),
-                                          ],
+                                          ),
+                                          // scrollbarProps: ScrollbarProps(
+                                          //   radius: const Radius.circular(40),
+                                          //   thickness: 6,
+                                          //   thumbVisibility: true,
+                                          // ),
                                         ),
-                                        value: _selectedValue,
                                       ),
                                     ),
                                   ),
+                                  // Align(
+                                  //   alignment: Alignment.topLeft,
+                                  //   child: Container(
+                                  //     child: DropdownButton(
+                                  //       items: <String>[
+                                  //         'สถิติ',
+                                  //         'ดอกไม้',
+                                  //         'หนังสือ',
+                                  //         'น้ำ',
+                                  //         'ระวัง',
+                                  //         'คำถาม',
+                                  //         'รูปภาพ',
+                                  //         'ระฆัง'
+                                  //       ].map<DropdownMenuItem<String>>(
+                                  //           (String value) {
+                                  //         return DropdownMenuItem<String>(
+                                  //           value: value,
+                                  //           child: Row(
+                                  //             children: [
+                                  //               icons[value] != null
+                                  //                   ? Icon(
+                                  //                       icons[value]!,
+                                  //                       color: GPrimaryColor,
+                                  //                     )
+                                  //                   : const SizedBox(),
+                                  //               const SizedBox(width: 15),
+                                  //               Text(
+                                  //                 value,
+                                  //                 style: const TextStyle(
+                                  //                     color: GPrimaryColor),
+                                  //               ),
+                                  //             ],
+                                  //           ),
+                                  //         );
+                                  //       }).toList(),
+                                  //       onChanged: (value) {
+                                  //         setState(() {
+                                  //           _selectedValue = value;
+                                  //         });
+                                  //       },
+                                  //       hint: const Row(
+                                  //         children: [
+                                  //           Icon(
+                                  //             Icons.image_outlined,
+                                  //             color: GPrimaryColor,
+                                  //           ), // ไอคอนที่ต้องการเพิ่ม
+                                  //           SizedBox(
+                                  //               width:
+                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                  //           Text(
+                                  //             "เลือกไอคอนสำหรับคลังความรู้",
+                                  //             style: TextStyle(
+                                  //                 color: GPrimaryColor,
+                                  //                 fontSize: 17),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //       value: _selectedValue,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   const SizedBox(height: 30),
                                   const Padding(
                                     padding:
@@ -224,7 +319,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                       child: TextField(
                                         controller: nameController,
                                         maxLength:
-                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                            20, // จำกัดจำนวนตัวอักษรไม่เกิน 30
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                         ),
@@ -564,62 +659,146 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     ),
                                   ),
+
+                                  // Align(
+                                  //   alignment: Alignment.topLeft,
+                                  //   child: Container(
+                                  //     child: DropdownButton(
+                                  //       items: <String>[
+                                  //         'สถิติ',
+                                  //         'ดอกไม้',
+                                  //         'หนังสือ',
+                                  //         'น้ำ',
+                                  //         'ระวัง',
+                                  //         'คำถาม',
+                                  //         'รูปภาพ'
+                                  //       ].map<DropdownMenuItem<String>>(
+                                  //           (String value) {
+                                  //         return DropdownMenuItem<String>(
+                                  //           value: value,
+                                  //           child: Row(
+                                  //             children: [
+                                  //               icons[value] != null
+                                  //                   ? Icon(
+                                  //                       icons[value]!,
+                                  //                       color: GPrimaryColor,
+                                  //                     )
+                                  //                   : const SizedBox(),
+                                  //               const SizedBox(width: 15),
+                                  //               Text(
+                                  //                 value,
+                                  //                 style: const TextStyle(
+                                  //                     color: GPrimaryColor),
+                                  //               ),
+                                  //             ],
+                                  //           ),
+                                  //         );
+                                  //       }).toList(),
+                                  //       onChanged: (value) {
+                                  //         setState(() {
+                                  //           _selectedValue = value;
+                                  //         });
+                                  //       },
+                                  //       hint: const Row(
+                                  //         children: [
+                                  //           Icon(
+                                  //             Icons.image_outlined,
+                                  //             color: GPrimaryColor,
+                                  //           ), // ไอคอนที่ต้องการเพิ่ม
+                                  //           SizedBox(
+                                  //               width:
+                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                  //           Text(
+                                  //             "เลือกไอคอนสำหรับคลังความรู้",
+                                  //             style: TextStyle(
+                                  //                 color: GPrimaryColor,
+                                  //                 fontSize: 17),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //       value: _selectedValue,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   Align(
                                     alignment: Alignment.topLeft,
                                     child: Container(
-                                      child: DropdownButton(
-                                        items: <String>[
-                                          'สถิติ',
-                                          'ดอกไม้',
-                                          'หนังสือ',
-                                          'น้ำ',
-                                          'ระวัง',
-                                          'คำถาม'
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Row(
-                                              children: [
-                                                icons[value] != null
-                                                    ? Icon(
-                                                        icons[value]!,
-                                                        color: GPrimaryColor,
-                                                      )
-                                                    : const SizedBox(),
-                                                const SizedBox(width: 15),
-                                                Text(
-                                                  value,
-                                                  style: const TextStyle(
-                                                      color: GPrimaryColor),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _selectedValue = value;
-                                          });
-                                        },
-                                        hint: const Row(
-                                          children: [
-                                            Icon(
-                                              Icons.image_outlined,
-                                              color: GPrimaryColor,
-                                            ), // ไอคอนที่ต้องการเพิ่ม
-                                            SizedBox(
-                                                width:
-                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                            Text(
-                                              "เลือกไอคอนสำหรับคลังความรู้",
-                                              style: TextStyle(
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          items: <String>[
+                                                 'ใบไม้',
+                                                 'ต้นกล้า',
+                                            'สถิติ',
+                                            'ดอกไม้',
+                                            'หนังสือ',
+                                            'น้ำ',
+                                            'ระวัง',
+                                            'คำถาม',
+                                            'รูปภาพ',
+                                            'ระฆัง',
+                                            'ความคิดเห็น',
+                                            'ตำแหน่ง',
+                                            'กล้อง',
+                                            'ปฏิทิน',
+                                            'ไวรัส'
+                                            
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Row(
+                                                children: [
+                                                  icons[value] != null
+                                                      ? Icon(
+                                                          icons[value]!,
+                                                          color: GPrimaryColor,
+                                                        )
+                                                      : const SizedBox(),
+                                                  const SizedBox(width: 15),
+                                                  Text(
+                                                    value,
+                                                    style: const TextStyle(
+                                                        color: GPrimaryColor),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedValue = value;
+                                            });
+                                          },
+                                          hint: const Row(
+                                            children: [
+                                              Icon(
+                                                Icons.image_outlined,
+                                                color: GPrimaryColor,
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                "เลือกไอคอนสำหรับคลังความรู้",
+                                                style: TextStyle(
                                                   color: GPrimaryColor,
-                                                  fontSize: 17),
+                                                  fontSize: 17,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          value: _selectedValue,
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 300,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
                                             ),
-                                          ],
+                                          ),
+                                          // scrollbarProps: ScrollbarProps(
+                                          //   radius: const Radius.circular(40),
+                                          //   thickness: 6,
+                                          //   thumbVisibility: true,
+                                          // ),
                                         ),
-                                        value: _selectedValue,
                                       ),
                                     ),
                                   ),
@@ -663,7 +842,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                       child: TextField(
                                         controller: nameController,
                                         maxLength:
-                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                            20, // จำกัดจำนวนตัวอักษรไม่เกิน 30
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                         ),
@@ -781,15 +960,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                   ),
                                   Container(
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        boxShadow: [
-                                          // BoxShadow(
-                                          //   color: Colors.red,
-                                          //   offset: const Offset(0.0, 0.5),
-                                          //   blurRadius: 30.0,
-                                          // )
-                                        ]),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
                                     width:
                                         MediaQuery.of(context).size.width * 0.5,
                                     height: 250.0,

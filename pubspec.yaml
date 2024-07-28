@@ -69,6 +69,7 @@ dependencies:
   quill_html_editor: ^2.2.8
   html: ^0.15.4
   quill_delta: ^3.0.0-nullsafety.2
+  ionicons: ^0.2.2
   
 
 dev_dependencies:
