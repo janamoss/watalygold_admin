@@ -120,6 +120,13 @@ class _MainKnowlegeState extends State<MainKnowlege> {
     });
   }
 
+  void onKnowledgeDeleted(String knowledgeId) {
+    setState(() {
+      knowledgelist.removeWhere((knowledge) => knowledge.id == knowledgeId);
+      // imageURLlist.removeWhere((url) => /* เช็คว่า url ตรงกับ knowledgeId หรือไม่ */);
+    });
+  }
+
   Widget build(BuildContext context) {
     ScreenSize screenSize = getScreenSize(context);
 
@@ -259,6 +266,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                                 .isEmpty
                                             ? "หลายเนื้อหา"
                                             : "เนื้อหาเดียว",
+                                        onKnowledgeDeleted: onKnowledgeDeleted,
                                       ),
                                   ],
                                 ),
@@ -283,6 +291,7 @@ class KnowledgeContainer extends StatefulWidget {
   final ontap;
   final date;
   final status;
+  final Function(String) onKnowledgeDeleted;
   final SidebarController? sidebarController;
   const KnowledgeContainer(
       {super.key,
@@ -294,7 +303,7 @@ class KnowledgeContainer extends StatefulWidget {
       this.date,
       this.status,
       this.sidebarController,
-      this.knowledge});
+      this.knowledge, required this.onKnowledgeDeleted});
 
   @override
   State<KnowledgeContainer> createState() => _KnowledgeContainerState();
@@ -436,6 +445,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                         Deleteddialogknowledge(
                                       knowledgeName: widget.title,
                                       id: widget.id,
+                                      onDelete: widget.onKnowledgeDeleted,
                                     ),
                                   ).then((value) => Navigator.popUntil(context,
                                       ModalRoute.withName("/mainKnowledge")));
@@ -505,11 +515,12 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                           Deleteddialogknowledge(
                                         knowledgeName: widget.title,
                                         id: widget.id,
+                                        onDelete: widget.onKnowledgeDeleted,
                                       ),
                                     ).then((value) => Navigator.popUntil(
                                         context,
                                         ModalRoute.withName("/mainKnowledge")));
-                                      
+                                    
                                   },
                                   icon: Icon(
                                     Icons.delete_forever_rounded,

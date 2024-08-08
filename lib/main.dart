@@ -23,6 +23,7 @@ class MainWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           fontFamily: GoogleFonts.ibmPlexSansThai().fontFamily,
           colorScheme: ColorScheme.fromSeed(seedColor: GPrimaryColor),

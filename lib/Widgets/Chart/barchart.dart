@@ -22,7 +22,7 @@ Widget buildBarChart(BuildContext context, List<BarChartGroupData> bargroups,
       gridData: FlGridData(
           show: true, drawHorizontalLine: true, drawVerticalLine: false),
       alignment: BarChartAlignment.spaceAround,
-      maxY: 30, // กำหนดค่าสูงสุดของแกน Y เพื่อป้องกันข้อผิดพลาด Infinity
+      maxY: 40, // กำหนดค่าสูงสุดของแกน Y เพื่อป้องกันข้อผิดพลาด Infinity
       titlesData: FlTitlesData(
         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         rightTitles: AxisTitles(
@@ -40,14 +40,26 @@ Widget buildBarChart(BuildContext context, List<BarChartGroupData> bargroups,
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
+            reservedSize: 55, // เพิ่มขนาดพื้นที่สำรองให้มากขึ้น
             getTitlesWidget: (value, meta) {
-              // value จะเป็น index ของ bar group
               final barGroupIndex = value.toInt();
               return SideTitleWidget(
                 axisSide: meta.axisSide,
-                child: Text(
-                  dateLabels[barGroupIndex],
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                space: 16, // เพิ่มระยะห่างระหว่างแกน X กับข้อความ
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 4,
+                      right: 4), // เพิ่ม padding เพื่อขยับข้อความลงและไปทางขวา
+                  child: Transform.rotate(
+                    angle: -45 * 3.14159 / 180, // ลดองศาการหมุนลงเหลือ 30 องศา
+                    child: Text(
+                      dateLabels[barGroupIndex],
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ),
               );
             },

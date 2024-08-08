@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -188,7 +187,7 @@ class _Menutop_darwerState extends State<Menutop_darwer> {
   Widget build(BuildContext context) {
     ScreenSize screenSize = getScreenSize(context);
     return Container(
-      color: Color(0xFFF7F7F7),
+      color: WhiteColor,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 10),
         child: screenSize == ScreenSize.minidesktop

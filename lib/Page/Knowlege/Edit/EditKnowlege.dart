@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -31,12 +33,21 @@ import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
 
 Map<String, IconData> icons = {
+  'ใบไม้': FontAwesomeIcons.leaf,
+  'ต้นกล้า': FontAwesomeIcons.seedling,
+  'ไวรัส': FontAwesomeIcons.virus,
   'สถิติ': Icons.analytics_outlined,
   'ดอกไม้': Icons.yard,
-  'หนังสือ': Icons.book,
+  'หนังสือ': FontAwesomeIcons.book,
   'น้ำ': Icons.water_drop_outlined,
   'ระวัง': Icons.warning_rounded,
   'คำถาม': Icons.quiz_outlined,
+  'รูปภาพ': FontAwesomeIcons.image,
+  'ระฆัง': FontAwesomeIcons.bell,
+  'ความคิดเห็น': FontAwesomeIcons.comments,
+  'ตำแหน่ง': FontAwesomeIcons.locationDot,
+  'กล้อง': FontAwesomeIcons.camera,
+  'ปฏิทิน': FontAwesomeIcons.calendarDays,
 };
 
 class EditKnowlege extends StatefulWidget {
@@ -113,7 +124,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: screenSize == ScreenSize.minidesktop
-                          ? Center(
+                          ? const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0),
                                 child: Text(
@@ -125,7 +136,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                 ),
                               ),
                             )
-                          : Center(
+                          : const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Text(
@@ -142,7 +153,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: screenSize == ScreenSize.minidesktop
-                          ? Center(
+                          ? const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0),
                                 child: Text(
@@ -154,7 +165,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                 ),
                               ),
                             )
-                          : Center(
+                          : const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Text(
@@ -179,7 +190,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         color: GPrimaryColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'เนื้อหาเดียว',
                           style: TextStyle(
@@ -192,7 +203,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
-                      child: Center(
+                      child: const Center(
                         // padding:
                         //     EdgeInsets.only(top: 22, bottom: 10, left: 80, right: 80),
                         child: Text(
@@ -223,7 +234,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 1,
+                        status: 2,
                         dropdown: true,
                       ),
                     ),
@@ -368,83 +379,186 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
+                                                  // Align(
+                                                  //   alignment:
+                                                  //       Alignment.topLeft,
+                                                  //   child: Container(
+                                                  //     child: DropdownButton(
+                                                  //       items: <String>[
+                                                  //         'สถิติ',
+                                                  //         'ดอกไม้',
+                                                  //         'หนังสือ',
+                                                  //         'น้ำ',
+                                                  //         'ระวัง',
+                                                  //         'คำถาม'
+                                                  //       ].map<
+                                                  //           DropdownMenuItem<
+                                                  //               String>>((String
+                                                  //           value) {
+                                                  //         return DropdownMenuItem<
+                                                  //             String>(
+                                                  //           value: value,
+                                                  //           child: Row(
+                                                  //             children: [
+                                                  //               icons[value] !=
+                                                  //                       null
+                                                  //                   ? Icon(
+                                                  //                       icons[
+                                                  //                           value]!,
+                                                  //                       color:
+                                                  //                           GPrimaryColor,
+                                                  //                     )
+                                                  //                   : SizedBox(),
+                                                  //               SizedBox(
+                                                  //                   width: 25),
+                                                  //               Text(
+                                                  //                 value,
+                                                  //                 style: TextStyle(
+                                                  //                     color:
+                                                  //                         GPrimaryColor),
+                                                  //               ),
+                                                  //             ],
+                                                  //           ),
+                                                  //         );
+                                                  //       }).toList(),
+                                                  //       onChanged: (value) {
+                                                  //         setState(() {
+                                                  //           _selectedValue =
+                                                  //               value;
+                                                  //         });
+                                                  //       },
+                                                  //       hint: Row(
+                                                  //         children: [
+                                                  //           // ไอคอนที่ต้องการเพิ่ม
+                                                  //           SizedBox(
+                                                  //               width:
+                                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                                  //           Row(
+                                                  //             children: [
+                                                  //               Icon(
+                                                  //                   widget.icons ??
+                                                  //                       Icons
+                                                  //                           .question_mark_rounded,
+                                                  //                   color:
+                                                  //                       GPrimaryColor,
+                                                  //                   size: 24),
+                                                  //               SizedBox(
+                                                  //                 width: 20,
+                                                  //               ),
+                                                  //               Text(
+                                                  //                 "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
+                                                  //                 style: TextStyle(
+                                                  //                     color:
+                                                  //                         GPrimaryColor),
+                                                  //               ),
+                                                  //             ],
+                                                  //           ),
+                                                  //         ],
+                                                  //       ),
+                                                  //       value: _selectedValue,
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                   Align(
                                                     alignment:
                                                         Alignment.topLeft,
                                                     child: Container(
-                                                      child: DropdownButton(
-                                                        items: <String>[
-                                                          'สถิติ',
-                                                          'ดอกไม้',
-                                                          'หนังสือ',
-                                                          'น้ำ',
-                                                          'ระวัง',
-                                                          'คำถาม'
-                                                        ].map<
-                                                            DropdownMenuItem<
-                                                                String>>((String
-                                                            value) {
-                                                          return DropdownMenuItem<
-                                                              String>(
-                                                            value: value,
-                                                            child: Row(
-                                                              children: [
-                                                                icons[value] !=
-                                                                        null
-                                                                    ? Icon(
-                                                                        icons[
-                                                                            value]!,
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton2<
+                                                            String>(
+                                                          items: <String>[
+                                                            'ใบไม้',
+                                                            'ต้นกล้า',
+                                                            'สถิติ',
+                                                            'ดอกไม้',
+                                                            'หนังสือ',
+                                                            'น้ำ',
+                                                            'ระวัง',
+                                                            'คำถาม',
+                                                            'รูปภาพ',
+                                                            'ระฆัง',
+                                                            'ความคิดเห็น',
+                                                            'ตำแหน่ง',
+                                                            'กล้อง',
+                                                            'ปฏิทิน',
+                                                            'ไวรัส'
+                                                          ].map<
+                                                              DropdownMenuItem<
+                                                                  String>>((String
+                                                              value) {
+                                                            return DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child: Row(
+                                                                children: [
+                                                                  icons[value] !=
+                                                                          null
+                                                                      ? Icon(
+                                                                          icons[
+                                                                              value]!,
+                                                                          color:
+                                                                              GPrimaryColor,
+                                                                        )
+                                                                      : const SizedBox(),
+                                                                  const SizedBox(
+                                                                      width:
+                                                                          15),
+                                                                  Text(
+                                                                    value,
+                                                                    style: const TextStyle(
                                                                         color:
-                                                                            GPrimaryColor,
-                                                                      )
-                                                                    : SizedBox(),
-                                                                SizedBox(
-                                                                    width: 25),
-                                                                Text(
-                                                                  value,
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          GPrimaryColor),
+                                                                            GPrimaryColor),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              _selectedValue =
+                                                                  value;
+                                                            });
+                                                          },
+                                                          hint: const Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .image_outlined,
+                                                                color:
+                                                                    GPrimaryColor,
+                                                              ),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Text(
+                                                                "เลือกไอคอนสำหรับคลังความรู้",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color:
+                                                                      GPrimaryColor,
+                                                                  fontSize: 17,
                                                                 ),
-                                                              ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          value: _selectedValue,
+                                                          dropdownStyleData:
+                                                              DropdownStyleData(
+                                                            maxHeight: 300,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          14),
                                                             ),
-                                                          );
-                                                        }).toList(),
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _selectedValue =
-                                                                value;
-                                                          });
-                                                        },
-                                                        hint: Row(
-                                                          children: [
-                                                            // ไอคอนที่ต้องการเพิ่ม
-                                                            SizedBox(
-                                                                width:
-                                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                                            Row(
-                                                              children: [
-                                                                Icon(
-                                                                    widget.icons ??
-                                                                        Icons
-                                                                            .question_mark_rounded,
-                                                                    color:
-                                                                        GPrimaryColor,
-                                                                    size: 24),
-                                                                SizedBox(
-                                                                  width: 20,
-                                                                ),
-                                                                Text(
-                                                                  "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          GPrimaryColor),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                          ),
+                                                          // scrollbarProps: ScrollbarProps(
+                                                          //   radius: const Radius.circular(40),
+                                                          //   thickness: 6,
+                                                          //   thumbVisibility: true,
+                                                          // ),
                                                         ),
-                                                        value: _selectedValue,
                                                       ),
                                                     ),
                                                   ),
@@ -498,7 +612,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         controller:
                                                             nameController,
                                                         maxLength:
-                                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                                            20, // จำกัดจำนวนตัวอักษรไม่เกิน 30
                                                         decoration:
                                                             InputDecoration(
                                                           border:
@@ -872,83 +986,186 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
+                                                  // Align(
+                                                  //   alignment:
+                                                  //       Alignment.topLeft,
+                                                  //   child: Container(
+                                                  //     child: DropdownButton(
+                                                  //       items: <String>[
+                                                  //         'สถิติ',
+                                                  //         'ดอกไม้',
+                                                  //         'หนังสือ',
+                                                  //         'น้ำ',
+                                                  //         'ระวัง',
+                                                  //         'คำถาม'
+                                                  //       ].map<
+                                                  //           DropdownMenuItem<
+                                                  //               String>>((String
+                                                  //           value) {
+                                                  //         return DropdownMenuItem<
+                                                  //             String>(
+                                                  //           value: value,
+                                                  //           child: Row(
+                                                  //             children: [
+                                                  //               icons[value] !=
+                                                  //                       null
+                                                  //                   ? Icon(
+                                                  //                       icons[
+                                                  //                           value]!,
+                                                  //                       color:
+                                                  //                           GPrimaryColor,
+                                                  //                     )
+                                                  //                   : SizedBox(),
+                                                  //               SizedBox(
+                                                  //                   width: 25),
+                                                  //               Text(
+                                                  //                 value,
+                                                  //                 style: TextStyle(
+                                                  //                     color:
+                                                  //                         GPrimaryColor),
+                                                  //               ),
+                                                  //             ],
+                                                  //           ),
+                                                  //         );
+                                                  //       }).toList(),
+                                                  //       onChanged: (value) {
+                                                  //         setState(() {
+                                                  //           _selectedValue =
+                                                  //               value;
+                                                  //         });
+                                                  //       },
+                                                  //       hint: Row(
+                                                  //         children: [
+                                                  //           // ไอคอนที่ต้องการเพิ่ม
+                                                  //           SizedBox(
+                                                  //               width:
+                                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                                  //           Row(
+                                                  //             children: [
+                                                  //               Icon(
+                                                  //                   widget.icons ??
+                                                  //                       Icons
+                                                  //                           .question_mark_rounded,
+                                                  //                   color:
+                                                  //                       GPrimaryColor,
+                                                  //                   size: 24),
+                                                  //               SizedBox(
+                                                  //                 width: 20,
+                                                  //               ),
+                                                  //               Text(
+                                                  //                 "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
+                                                  //                 style: TextStyle(
+                                                  //                     color:
+                                                  //                         GPrimaryColor),
+                                                  //               ),
+                                                  //             ],
+                                                  //           ),
+                                                  //         ],
+                                                  //       ),
+                                                  //       value: _selectedValue,
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                   Align(
                                                     alignment:
                                                         Alignment.topLeft,
                                                     child: Container(
-                                                      child: DropdownButton(
-                                                        items: <String>[
-                                                          'สถิติ',
-                                                          'ดอกไม้',
-                                                          'หนังสือ',
-                                                          'น้ำ',
-                                                          'ระวัง',
-                                                          'คำถาม'
-                                                        ].map<
-                                                            DropdownMenuItem<
-                                                                String>>((String
-                                                            value) {
-                                                          return DropdownMenuItem<
-                                                              String>(
-                                                            value: value,
-                                                            child: Row(
-                                                              children: [
-                                                                icons[value] !=
-                                                                        null
-                                                                    ? Icon(
-                                                                        icons[
-                                                                            value]!,
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton2<
+                                                            String>(
+                                                          items: <String>[
+                                                            'ใบไม้',
+                                                            'ต้นกล้า',
+                                                            'สถิติ',
+                                                            'ดอกไม้',
+                                                            'หนังสือ',
+                                                            'น้ำ',
+                                                            'ระวัง',
+                                                            'คำถาม',
+                                                            'รูปภาพ',
+                                                            'ระฆัง',
+                                                            'ความคิดเห็น',
+                                                            'ตำแหน่ง',
+                                                            'กล้อง',
+                                                            'ปฏิทิน',
+                                                            'ไวรัส'
+                                                          ].map<
+                                                              DropdownMenuItem<
+                                                                  String>>((String
+                                                              value) {
+                                                            return DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child: Row(
+                                                                children: [
+                                                                  icons[value] !=
+                                                                          null
+                                                                      ? Icon(
+                                                                          icons[
+                                                                              value]!,
+                                                                          color:
+                                                                              GPrimaryColor,
+                                                                        )
+                                                                      : const SizedBox(),
+                                                                  const SizedBox(
+                                                                      width:
+                                                                          15),
+                                                                  Text(
+                                                                    value,
+                                                                    style: const TextStyle(
                                                                         color:
-                                                                            GPrimaryColor,
-                                                                      )
-                                                                    : SizedBox(),
-                                                                SizedBox(
-                                                                    width: 25),
-                                                                Text(
-                                                                  value,
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          GPrimaryColor),
+                                                                            GPrimaryColor),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              _selectedValue =
+                                                                  value;
+                                                            });
+                                                          },
+                                                          hint: const Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .image_outlined,
+                                                                color:
+                                                                    GPrimaryColor,
+                                                              ),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Text(
+                                                                "เลือกไอคอนสำหรับคลังความรู้",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color:
+                                                                      GPrimaryColor,
+                                                                  fontSize: 17,
                                                                 ),
-                                                              ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          value: _selectedValue,
+                                                          dropdownStyleData:
+                                                              DropdownStyleData(
+                                                            maxHeight: 300,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          14),
                                                             ),
-                                                          );
-                                                        }).toList(),
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _selectedValue =
-                                                                value;
-                                                          });
-                                                        },
-                                                        hint: Row(
-                                                          children: [
-                                                            // ไอคอนที่ต้องการเพิ่ม
-                                                            SizedBox(
-                                                                width:
-                                                                    10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                                            Row(
-                                                              children: [
-                                                                Icon(
-                                                                    widget.icons ??
-                                                                        Icons
-                                                                            .question_mark_rounded,
-                                                                    color:
-                                                                        GPrimaryColor,
-                                                                    size: 24),
-                                                                SizedBox(
-                                                                  width: 20,
-                                                                ),
-                                                                Text(
-                                                                  "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          GPrimaryColor),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                          ),
+                                                          // scrollbarProps: ScrollbarProps(
+                                                          //   radius: const Radius.circular(40),
+                                                          //   thickness: 6,
+                                                          //   thumbVisibility: true,
+                                                          // ),
                                                         ),
-                                                        value: _selectedValue,
                                                       ),
                                                     ),
                                                   ),
@@ -1002,7 +1219,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         controller:
                                                             nameController,
                                                         maxLength:
-                                                            30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                                            20, // จำกัดจำนวนตัวอักษรไม่เกิน 30
                                                         decoration:
                                                             InputDecoration(
                                                           border:
@@ -1444,10 +1661,18 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                               ),
                             ),
                             IconButton(
+                              //  onPressed: () => deleteImage(index),
                               onPressed: () {
-                                deleteImage(
-                                    itemPhotosWidgetList.indexOf(imageWidget));
+                                final currentIndex =
+                                    itemPhotosWidgetList.indexOf(imageWidget);
+                                if (currentIndex != -1) {
+                                  deleteImage(currentIndex);
+                                }
                               },
+                              // onPressed: () {
+                              //   deleteImage(
+                              //       itemPhotosWidgetList.indexOf(imageWidget));
+                              // },
                               icon: Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -1498,21 +1723,10 @@ class _EditKnowlegeState extends State<EditKnowlege> {
 
   void convertDeltaToHtml() {
     final deltaJson = _contentController.document.toDelta().toJson();
-    debugPrint(deltaJson.toString());
+    debugPrint("$deltaJson");
     final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
     _html = converter.convert();
     debugPrint(_html);
-  }
-
-  Future<void> pickPhotoFromGallery() async {
-    photo = await _picker.pickMultiImage();
-    if (photo != null && photo!.isNotEmpty) {
-      setState(() {
-        itemImagesList.addAll(photo!.toSet().toList());
-        debugPrint("itemImagesList ${itemImagesList}");
-        addImagewidget();
-      });
-    }
   }
 
   void addImagewidget() {
@@ -1533,6 +1747,17 @@ class _EditKnowlegeState extends State<EditKnowlege> {
           ),
         ),
       ));
+    }
+  }
+
+  Future<void> pickPhotoFromGallery() async {
+    photo = await _picker.pickMultiImage();
+    if (photo != null && photo!.isNotEmpty) {
+      setState(() {
+        itemImagesList.addAll(photo!.toSet().toList());
+        debugPrint("itemImagesList ${itemImagesList}");
+        addImagewidget();
+      });
     }
   }
 
@@ -1559,9 +1784,28 @@ class _EditKnowlegeState extends State<EditKnowlege> {
 
   void deleteImage(int index) {
     setState(() {
-      itemPhotosWidgetList.removeAt(index);
-      _imageUrlsList.removeAt(index);
-      debugPrint(_imageUrlsList.toString());
+      if (index >= 0 && index < itemPhotosWidgetList.length) {
+        // ลบออกจาก itemPhotosWidgetList
+        itemPhotosWidgetList.removeAt(index);
+        // itemImagesList.removeAt(index);
+
+        // ลบออกจาก itemImagesList
+        if (index < itemImagesList.length) {
+          itemImagesList.removeAt(index);
+        }
+
+        // ลบออกจาก _imageUrlsList (ถ้ามี)
+        if (index < _imageUrlsList.length) {
+          _imageUrlsList.removeAt(index);
+        }
+
+        debugPrint("Image deleted at index $index");
+        debugPrint("Remaining photos: ${itemPhotosWidgetList.length}");
+        debugPrint("Remaining images: ${itemImagesList.length}");
+        debugPrint("Remaining URLs: ${_imageUrlsList.length}");
+      } else {
+        debugPrint("Invalid index: $index");
+      }
     });
   }
 
@@ -1589,14 +1833,14 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         existingImageUrls.any((url) => !_imageUrlsList.contains(url))) {
       // มีการเปลี่ยนแปลงรูปภาพ
       updateKnowledges(_imageUrlsList);
-      // debugPrint(updateKnowledges(_imageUrls));
-      debugPrint(_imageUrlsList.toString());
-      debugPrint(existingImageUrls.length.toString());
-      debugPrint(_imageUrlsList.length.toString());
+      // debugPrint("$updateKnowledges(_imageUrls)");
+      debugPrint("$_imageUrlsList");
+      debugPrint("${existingImageUrls.length}");
+      debugPrint("${_imageUrlsList.length}");
     } else {
       // ไม่มีการเปลี่ยนแปลงรูปภาพ
       updateKnowledges(existingImageUrls);
-      debugPrint(existingImageUrls.toString());
+      debugPrint("$existingImageUrls");
     }
   }
 
@@ -1676,6 +1920,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       String imageUrl = await reference.getDownloadURL();
 
       imageUrls.add(imageUrl);
+      debugPrint("imageUrls ${imageUrls}");
     }
 
     return imageUrls;
@@ -1787,8 +2032,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   }
 
   IconData getIconData(String iconName) {
-   return icons[iconName] ?? Icons.error;
- }
+    return icons[iconName] ?? Icons.error;
+  }
 
   Widget _displaycontentWidget() {
     return Scaffold(
@@ -1842,6 +2087,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     Icon(
                       icons[_selectedValue] ??
                           Icons.error, // ระบุไอคอนตามค่าที่เลือก
+
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),

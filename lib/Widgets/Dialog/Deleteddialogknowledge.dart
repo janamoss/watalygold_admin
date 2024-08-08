@@ -8,11 +8,12 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 class Deleteddialogknowledge extends StatefulWidget {
   final String knowledgeName;
   final String id;
-
+  final Function(String) onDelete;
   Deleteddialogknowledge({
     Key? key,
     required this.knowledgeName,
     required this.id,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -60,7 +61,7 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
           }
         }
       });
-      showToast("ลบคลังความรู้เสร็จสิ้น");
+      // showToast("ลบคลังความรู้เสร็จสิ้น");
       // showDialog(
       //   context: context,
       //   builder: (context) => DeleteknowledgeSuccess(
@@ -139,20 +140,85 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
-                    await deleteKnowledge();
-                    Navigator.pop(context);
-
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (context) => DeleteknowledgeSuccess(
-                    //     knowledgeName: widget.knowledgeName,
-                    //     id: widget.id,
-                    //   ),
-                    // );
+                    try {
+                      await deleteKnowledge();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('ลบคลังความรู้สำเร็จ'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      widget.onDelete(widget.id);
+                      Navigator.of(context).pop();
+                    } catch (e) {
+                      debugPrint("Error deleting knowledge: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('เกิดข้อผิดพลาดในการลบคลังความรู้'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.red, // สีสำหรับแสดงข้อผิดพลาด
+                        ),
+                      );
+                    }
                   },
                   child: const Text("ยืนยัน"),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteKnowledgeSuccessDialog extends StatelessWidget {
+  final String knowledgeName;
+
+  const DeleteKnowledgeSuccessDialog({required this.knowledgeName, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () {
+      Navigator.of(context).pop(); // Close the success dialog after 2 seconds
+    });
+
+    return Dialog(
+      child: Container(
+        width: 500,
+        padding: const EdgeInsets.symmetric(
+          vertical: 32,
+          // horizontal: 16,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize
+              .min, // กำหนดให้ความยาวของ Column ปรับตามขนาดของเนื้อหาภายใน
+          // crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_task,
+              size: 100,
+              color: Colors.red,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              'ลบคลังความรู้สำเร็จ',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 24,
+                fontFamily: 'IBM Plex Sans Thai',
+              ),
+            ),
+            SizedBox(
+              height: 20,
             ),
           ],
         ),

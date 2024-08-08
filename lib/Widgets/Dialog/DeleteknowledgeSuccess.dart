@@ -37,7 +37,7 @@ class DeleteknowledgeSuccess extends StatelessWidget {
               height: 20,
             ),
             Text(
-              'ลบคลังความรู้สำเร็จ',
+              'ลบเนื้อหาย่อยสำเร็จ',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 24,
