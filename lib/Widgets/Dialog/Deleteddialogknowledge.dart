@@ -144,23 +144,31 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
-                    // Close the current dialog
-                    Navigator.of(context).pop();
-                    // Execute the deletion process
+           
                     try {
                       await deleteKnowledge();
-                      showDialog(
-                        context: context,
-                        builder: (context) => DeleteKnowledgeSuccessDialog(
-                          knowledgeName: widget.knowledgeName,
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('ลบคลังความรู้สำเร็จ'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor:
+                              Colors.green, 
                         ),
-                      ).then((_) {
-                        // Notify about deletion completion if needed
-                        widget.onDelete(widget.id);
-                      });
+                      );
+                      widget.onDelete(widget.id);
+                      Navigator.of(context)
+                          .pop(); 
                     } catch (e) {
                       debugPrint("Error deleting knowledge: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('เกิดข้อผิดพลาดในการลบคลังความรู้'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.red, // สีสำหรับแสดงข้อผิดพลาด
+                        ),
+                      );
                     }
+
                   },
                   child: const Text("ยืนยัน"),
                 ),

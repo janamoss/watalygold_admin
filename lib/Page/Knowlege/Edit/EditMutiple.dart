@@ -176,7 +176,7 @@ class _EditMutipleState extends State<EditMutiple> {
     );
   }
 
-  Future<void> deleteContentAndUpdateUI(String documentId ,int index) async {
+  Future<void> deleteContentAndUpdateUI(String documentId, int index) async {
     // String documentId = widget.knowledge!.contents[index].id; // สมมติว่ามี id
     try {
       await Databasemethods().deleteContent(documentId);
@@ -403,26 +403,9 @@ class _EditMutipleState extends State<EditMutiple> {
     }
   }
 
-  // void deleteImage(int contentIndex, int imageIndex) {
-  //   setState(() {
-  //     if (contentList[contentIndex].ImageURL.length > imageIndex) {
-  //       contentList[contentIndex].ImageURL.removeAt(imageIndex);
-  //     } else {
-  //       //รูปใหม่
-  //       int localIndex = imageIndex - contentList[contentIndex].ImageURL.length;
-  //       localImageUrls[contentList[contentIndex].id]?.removeAt(localIndex);
-  //     }
-  //   });
-  // }
-
   void deleteImage(int contentIndex, int imageIndex) {
     setState(() {
       String contentId = contentList[contentIndex].id;
-      print(
-          "Before deletion: localImageUrls[$contentId] = ${localImageUrls[contentId]}");
-      print(
-          "Before deletion: contentList[$contentIndex].ImageURL = ${contentList[contentIndex].ImageURL}");
-
       if (localImageUrls.containsKey(contentId)) {
         if (imageIndex < localImageUrls[contentId]!.length) {
           localImageUrls[contentId]!.removeAt(imageIndex);
@@ -441,10 +424,6 @@ class _EditMutipleState extends State<EditMutiple> {
       } else {
         print("imageIndex out of range for contentList");
       }
-      print(
-          "After deletion: localImageUrls[$contentId] = ${localImageUrls[contentId]}");
-      print(
-          "After deletion: contentList[$contentIndex].ImageURL = ${contentList[contentIndex].ImageURL}");
     });
   }
 
@@ -662,7 +641,7 @@ class _EditMutipleState extends State<EditMutiple> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: screenSize == ScreenSize.minidesktop
-                          ? Center(
+                          ? const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0),
                                 child: Text(
@@ -674,7 +653,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                 ),
                               ),
                             )
-                          : Center(
+                          : const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Text(
@@ -691,7 +670,7 @@ class _EditMutipleState extends State<EditMutiple> {
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: screenSize == ScreenSize.minidesktop
-                          ? Center(
+                          ? const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0),
                                 child: Text(
@@ -703,7 +682,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                 ),
                               ),
                             )
-                          : Center(
+                          : const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Text(
@@ -724,7 +703,7 @@ class _EditMutipleState extends State<EditMutiple> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
-                      child: Center(
+                      child: const Center(
                         // padding:
                         //     EdgeInsets.only(top: 22, bottom: 10, left: 80, right: 80),
                         child: Text(
@@ -743,7 +722,7 @@ class _EditMutipleState extends State<EditMutiple> {
                         color: GPrimaryColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'หลายเนื้อหา',
                           style: TextStyle(
@@ -1757,7 +1736,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                               ),
                                             ),
                                             title: Text(
-                                              'เนื้อหาย่อยที่ ${contentList.length + index + 1}',
+                                              // 'เนื้อหาย่อยที่ ${contentList.length + index + 1}',
+                                              'เนื้อหาย่อยที่ ${_deletedPanels.contains(index) ? contentList.length + index : contentList.length + index + 1}',
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 18,
@@ -1864,20 +1844,19 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                       maxLength:
                                                                           20, // จำกัดจำนวนตัวอักษรไม่เกิน 30
                                                                       decoration:
-                                                                          InputDecoration(
+                                                                          const InputDecoration(
                                                                         border:
                                                                             InputBorder.none,
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                SizedBox(
+                                                                const SizedBox(
                                                                   height: 5,
                                                                 ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
+                                                                const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .only(
                                                                           left:
                                                                               0.0,
                                                                           right:
@@ -2027,7 +2006,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                     borderRadius:
                                                                         BorderRadius.circular(
                                                                             12.0),
-                                                                    boxShadow: [
+                                                                    boxShadow: const [
                                                                       // ... (boxShadow properties)
                                                                     ],
                                                                   ),
@@ -3496,9 +3475,11 @@ class _EditMutipleState extends State<EditMutiple> {
                                             onPressed: () {
                                               // deleteContentById(widget
                                               //     .knowledge!.contents[index]);
-                                               Navigator.pop(context);
-                                              deleteContentAndUpdateUI(widget
-                                                  .knowledge!.contents[index],index);
+                                              Navigator.pop(context);
+                                              deleteContentAndUpdateUI(
+                                                  widget.knowledge!
+                                                      .contents[index],
+                                                  index);
                                               // showDialog(
                                               //   context: context,
                                               //   builder: (context) =>
@@ -3574,8 +3555,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                           child: Column(
                                             children: [
                                               SizedBox(height: 10),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
+                                              const Padding(
+                                                padding: EdgeInsets.only(
                                                     left: 0.0, right: 0),
                                                 child: Align(
                                                   alignment: Alignment.topLeft,

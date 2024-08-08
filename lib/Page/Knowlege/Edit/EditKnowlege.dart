@@ -694,7 +694,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                           ),
                                                           Expanded(
                                                             child: Container(
-                                                              color: Color
+                                                              color: const Color
                                                                   .fromARGB(
                                                                       255,
                                                                       238,
