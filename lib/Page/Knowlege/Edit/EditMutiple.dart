@@ -1736,8 +1736,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                               ),
                                             ),
                                             title: Text(
-                                              // 'เนื้อหาย่อยที่ ${contentList.length + index + 1}',
-                                              'เนื้อหาย่อยที่ ${_deletedPanels.contains(index) ? contentList.length + index : contentList.length + index + 1}',
+                                              'เนื้อหาย่อยที่ ${contentList.length + index + 1}',
+                                              // 'เนื้อหาย่อยที่ ${_deletedPanels.contains(index) ? contentList.length + index : contentList.length + index + 1}',
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 18,
