@@ -8,11 +8,13 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 class Deleteddialogknowledge extends StatefulWidget {
   final String knowledgeName;
   final String id;
+  final Function(String) onDelete;
 
   Deleteddialogknowledge({
     Key? key,
     required this.knowledgeName,
     required this.id,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -60,17 +62,20 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
           }
         }
       });
-      showToast("ลบคลังความรู้เสร็จสิ้น");
+      // showToast("ลบคลังความรู้เสร็จสิ้น");
+      // widget.onDelete(widget.id);
+      // Close the current dialog and show success dialog
+      // Navigator.of(context).pop(); // Close the confirmation dialog
+      // await Future.delayed(Duration(milliseconds: 300)); // Add a small delay for smooth transition
       // showDialog(
       //   context: context,
-      //   builder: (context) => DeleteknowledgeSuccess(
+      //   builder: (context) => DeleteKnowledgeSuccessDialog(
       //     knowledgeName: widget.knowledgeName,
-      //     id: widget.id,
       //   ),
-      // );
+      // ).then((_) => widget.onDelete(widget.id)); // Notify about deletion completion
     } catch (e) {
       // จัดการข้อผิดพลาดที่เกิดขึ้น
-      print("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
+      debugPrint("เกิดข้อผิดพลาดในการ Soft Delete เอกสารและเนื้อหา: $e");
       throw e; // ส่งข้อผิดพลาดต่อไปเพื่อให้การจัดการข้อผิดพลาดเฉพาะรายละเอียด
     }
   }
@@ -139,20 +144,81 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
-                    await deleteKnowledge();
-                    Navigator.pop(context);
-
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (context) => DeleteknowledgeSuccess(
-                    //     knowledgeName: widget.knowledgeName,
-                    //     id: widget.id,
-                    //   ),
-                    // );
+                    // Close the current dialog
+                    Navigator.of(context).pop();
+                    // Execute the deletion process
+                    try {
+                      await deleteKnowledge();
+                      showDialog(
+                        context: context,
+                        builder: (context) => DeleteKnowledgeSuccessDialog(
+                          knowledgeName: widget.knowledgeName,
+                        ),
+                      ).then((_) {
+                        // Notify about deletion completion if needed
+                        widget.onDelete(widget.id);
+                      });
+                    } catch (e) {
+                      debugPrint("Error deleting knowledge: $e");
+                    }
                   },
                   child: const Text("ยืนยัน"),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteKnowledgeSuccessDialog extends StatelessWidget {
+  final String knowledgeName;
+
+  const DeleteKnowledgeSuccessDialog({required this.knowledgeName, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () {
+      Navigator.of(context).pop(); // Close the success dialog after 2 seconds
+    });
+
+    return Dialog(
+      child: Container(
+        width: 500,
+        padding: const EdgeInsets.symmetric(
+          vertical: 32,
+          // horizontal: 16,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize
+              .min, // กำหนดให้ความยาวของ Column ปรับตามขนาดของเนื้อหาภายใน
+          // crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_task,
+              size: 100,
+              color: Colors.red,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              'ลบคลังความรู้สำเร็จ',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 24,
+                fontFamily: 'IBM Plex Sans Thai',
+              ),
+            ),
+            SizedBox(
+              height: 20,
             ),
           ],
         ),

@@ -44,7 +44,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
           .map((doc) => Knowledge.fromFirestore(doc))
           .toList();
     } catch (error) {
-      print("Error getting knowledge: $error");
+      debugPrint("Error getting knowledge: $error");
       return []; // Or handle the error in another way
     }
   }
@@ -53,14 +53,13 @@ class _MainKnowlegeState extends State<MainKnowlege> {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final docRef = firestore.collection('Content').doc(documentId);
     final doc = await docRef.get();
-    print("${doc}");
+    debugPrint("${doc}");
     if (doc.exists) {
       final data = doc.data();
       return Contents(
         ContentName: data!['ContentName'].toString(),
         ContentDetail: data['ContentDetail'].toString(),
         ImageURL: (data['image_url'] as List).cast<String>().toList(),
-
         id: doc.id,
         create_at: data['create_at'] as Timestamp? ??
             Timestamp.fromDate(DateTime.now()),
@@ -90,56 +89,74 @@ class _MainKnowlegeState extends State<MainKnowlege> {
     });
 
     getKnowledges().then((value) async {
-    List<String> tempImageURLlist = [];
-    for (var knowledge in value) {
-      String imageUrl = '';
-      if (knowledge.knowledgeImg.isNotEmpty) {
-        imageUrl = knowledge.knowledgeImg[0];
-      } else if (knowledge.contents.isNotEmpty) {
-        try {
-          final firstContent = knowledge.contents[0].toString();
-          final contents = await getContentsById(firstContent);
-          if (contents.ImageURL.isNotEmpty) {
-            imageUrl = contents.ImageURL[0];
+      List<String> tempImageURLlist = [];
+      for (var knowledge in value) {
+        String imageUrl = '';
+        if (knowledge.knowledgeImg.isNotEmpty) {
+          imageUrl = knowledge.knowledgeImg[0];
+        } else if (knowledge.contents.isNotEmpty) {
+          try {
+            final firstContent = knowledge.contents[0].toString();
+            final contents = await getContentsById(firstContent);
+            if (contents.ImageURL.isNotEmpty) {
+              imageUrl = contents.ImageURL[0];
+            }
+          } catch (e) {
+            debugPrint("Error fetching content: $e");
           }
-        } catch (e) {
-          print("Error fetching content: $e");
         }
+        tempImageURLlist.add(imageUrl);
       }
-      tempImageURLlist.add(imageUrl);
-    }
 
-    setState(() {
-      knowledgelist = value;
-      imageURLlist = tempImageURLlist;
-      _isLoading = false;
+      setState(() {
+        knowledgelist = value;
+        imageURLlist = tempImageURLlist;
+        _isLoading = false;
+      });
+
+      debugPrint(knowledgelist.toString());
+      debugPrint(imageURLlist.toString());
+      debugPrint(imageURLlist.length.toString());
     });
-
-    print(knowledgelist);
-    print(imageURLlist);
-    print(imageURLlist.length);
-  });
+  }
+  void onKnowledgeDeleted(String knowledgeId) {
+    setState(() {
+      knowledgelist.removeWhere((knowledge) => knowledge.id == knowledgeId);
+      // imageURLlist.removeWhere((url) => /* เช็คว่า url ตรงกับ knowledgeId หรือไม่ */);
+    });
   }
 
   Widget build(BuildContext context) {
-     ScreenSize screenSize = getScreenSize(context);
+    ScreenSize screenSize = getScreenSize(context);
 
     return Scaffold(
       body: SafeArea(
           child: Row(
         children: [
-          Expanded(
-            child: Container(
-              color: GPrimaryColor,
-              child: SideNav(
-                status: 1,
-                dropdown: true,
-              ),
-            ),
-          ),
+          screenSize == ScreenSize.minidesktop
+              ? SizedBox.shrink()
+              : Expanded(
+                  child: Container(
+                    color: GPrimaryColor,
+                    child: SideNav(
+                      status: 1,
+                      dropdown: true,
+                    ),
+                  ),
+                ),
           Expanded(
               flex: 4,
               child: Scaffold(
+                drawer: screenSize == ScreenSize.minidesktop
+                    ? Container(
+                        color: GPrimaryColor,
+                        width: 300,
+                        child: SideNav(
+                          status: 1,
+                          dropdown: true,
+                        ),
+                      )
+                    : null,
                 backgroundColor: Color(0xffF1F1F1),
                 appBar: Appbarmain(),
                 body: SingleChildScrollView(
@@ -248,6 +265,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                                 .isEmpty
                                             ? "หลายเนื้อหา"
                                             : "เนื้อหาเดียว",
+                                             onKnowledgeDeleted: onKnowledgeDeleted,
                                       ),
                                   ],
                                 ),
@@ -273,6 +291,7 @@ class KnowledgeContainer extends StatefulWidget {
   final date;
   final status;
   final SidebarController? sidebarController;
+  final Function(String) onKnowledgeDeleted;
   const KnowledgeContainer(
       {super.key,
       this.id,
@@ -283,6 +302,7 @@ class KnowledgeContainer extends StatefulWidget {
       this.date,
       this.status,
       this.sidebarController,
+      required this.onKnowledgeDeleted,
       this.knowledge});
 
   @override
@@ -294,7 +314,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
   Widget build(BuildContext context) {
     ScreenSize screenSize = getScreenSize(context);
     return Container(
-     margin: EdgeInsets.all(30),
+      margin: EdgeInsets.all(30),
       width: MediaQuery.of(context).size.width * 0.3,
       height: screenSize == ScreenSize.minidesktop ? 300 : 200,
       decoration: BoxDecoration(
@@ -425,6 +445,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                         Deleteddialogknowledge(
                                       knowledgeName: widget.title,
                                       id: widget.id,
+                                      onDelete: widget.onKnowledgeDeleted,
                                     ),
                                   ).then((value) => Navigator.popUntil(context,
                                       ModalRoute.withName("/mainKnowledge")));
@@ -494,6 +515,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                           Deleteddialogknowledge(
                                         knowledgeName: widget.title,
                                         id: widget.id,
+                                        onDelete: widget.onKnowledgeDeleted,
                                       ),
                                     ).then((value) => Navigator.popUntil(
                                         context,
@@ -522,3 +544,4 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
     );
   }
 }
+
