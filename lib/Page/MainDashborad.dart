@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Card/card_chart.dart';
 import 'package:watalygold_admin/Widgets/Card/card_resultDetail.dart';
@@ -22,6 +23,8 @@ class MainDash extends StatefulWidget {
 }
 
 class _MainDashState extends State<MainDash> {
+  final sidebarController = Get.put(SidebarController());
+
   List<Map<String, dynamic>> results = [];
   List<Map<String, dynamic>> resultstoday = [];
   bool isLoading = true;
@@ -29,7 +32,9 @@ class _MainDashState extends State<MainDash> {
   @override
   void initState() {
     super.initState();
-    fetchAllResults();
+    Future.delayed(Duration.zero, () async {
+      fetchAllResults();
+    });
   }
 
   Future<void> fetchAllResults() async {
@@ -96,8 +101,10 @@ class _MainDashState extends State<MainDash> {
                     drawer: Container(
                       width: 300,
                       color: GPrimaryColor,
-                      child: const SideNav(
-                        status: 0,
+                      child: SideNav(
+                        status: sidebarController.index.value == 0
+                              ? sidebarController.index.value = 0
+                              : sidebarController.index.value = 0,
                       ),
                     ),
                     backgroundColor: Color(0xffF1F1F1),
@@ -140,8 +147,10 @@ class _MainDashState extends State<MainDash> {
               Expanded(
                 child: Container(
                   color: GPrimaryColor,
-                  child: const SideNav(
-                    status: 0,
+                  child: SideNav(
+                    status: sidebarController.index.value == 0
+                              ? sidebarController.index.value = 0
+                              : sidebarController.index.value = 0,
                   ),
                 ),
               ),

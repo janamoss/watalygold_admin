@@ -88,9 +88,10 @@ class _MainKnowlegeState extends State<MainKnowlege> {
       _isLoading = true; // Set loading state to true
     });
 
-    getKnowledges().then((value) async {
+    Future.delayed(Duration.zero, () async {
+      knowledgelist = await getKnowledges();
       List<String> tempImageURLlist = [];
-      for (var knowledge in value) {
+      for (var knowledge in knowledgelist) {
         String imageUrl = '';
         if (knowledge.knowledgeImg.isNotEmpty) {
           imageUrl = knowledge.knowledgeImg[0];
@@ -109,15 +110,12 @@ class _MainKnowlegeState extends State<MainKnowlege> {
       }
 
       setState(() {
-        knowledgelist = value;
         imageURLlist = tempImageURLlist;
         _isLoading = false;
       });
-
-      debugPrint(knowledgelist.toString());
-      debugPrint(imageURLlist.toString());
-      debugPrint(imageURLlist.length.toString());
     });
+
+    setState(() {});
   }
 
   void onKnowledgeDeleted(String knowledgeId) {
@@ -140,7 +138,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                   child: Container(
                     color: GPrimaryColor,
                     child: SideNav(
-                      status: 1,
+                      status: sidebarController.index.value == 1
+                          ? sidebarController.index.value = 1
+                          : sidebarController.index.value = 1,
                       dropdown: true,
                     ),
                   ),
@@ -153,7 +153,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 1,
+                          status: sidebarController.index.value == 1
+                              ? sidebarController.index.value = 1
+                              : sidebarController.index.value = 1,
                           dropdown: true,
                         ),
                       )
@@ -230,20 +232,27 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                     TextStyle(color: WhiteColor, fontSize: 20),
                               ),
                             )),
-                        _isLoading
-                            ? Center(
+                        FutureBuilder<List<Knowledge>>(
+                          future: getKnowledges(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
                                 child: LoadingAnimationWidget.discreteCircle(
                                   color: WhiteColor,
                                   secondRingColor: GPrimaryColor,
                                   thirdRingColor: YPrimaryColor,
                                   size: 200,
                                 ),
-                              )
-                            : Container(
+                              );
+                            } else if (snapshot.hasData) {
+                              final knowledgelist = snapshot.data!;
+                              return Container(
                                 margin: EdgeInsets.symmetric(vertical: 15),
                                 decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15)),
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
                                 child: Wrap(
                                   direction: Axis.horizontal,
                                   children: [
@@ -270,7 +279,57 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                                       ),
                                   ],
                                 ),
-                              )
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Error: ${snapshot.error}'),
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          },
+                        ),
+                        // _isLoading
+                        //     ? Center(
+                        //         child: LoadingAnimationWidget.discreteCircle(
+                        //           color: WhiteColor,
+                        //           secondRingColor: GPrimaryColor,
+                        //           thirdRingColor: YPrimaryColor,
+                        //           size: 200,
+                        //         ),
+                        //       )
+                        //     : Container(
+                        //         margin: EdgeInsets.symmetric(vertical: 15),
+                        //         decoration: BoxDecoration(
+                        //             color: Colors.transparent,
+                        //             borderRadius: BorderRadius.circular(15)),
+                        //         child: Wrap(
+                        //           direction: Axis.horizontal,
+                        //           children: [
+                        //             for (var i = 0;
+                        //                 i < knowledgelist.length;
+                        //                 i++)
+                        //               KnowledgeContainer(
+                        //                 knowledge: knowledgelist[i],
+                        //                 sidebarController: sidebarController,
+                        //                 id: knowledgelist[i].id,
+                        //                 title: knowledgelist[i].knowledgeName,
+                        //                 icons: knowledgelist[i].knowledgeIcons,
+                        //                 date: timestampToDateThai(
+                        //                     knowledgelist[i].create_at!),
+                        //                 image: i < imageURLlist.length
+                        //                     ? imageURLlist[i]
+                        //                     : '',
+                        //                 status: knowledgelist[i]
+                        //                         .knowledgeImg
+                        //                         .isEmpty
+                        //                     ? "หลายเนื้อหา"
+                        //                     : "เนื้อหาเดียว",
+                        //                 onKnowledgeDeleted: onKnowledgeDeleted,
+                        //               ),
+                        //           ],
+                        //         ),
+                        //       )
                       ],
                     ),
                   ),
@@ -303,7 +362,8 @@ class KnowledgeContainer extends StatefulWidget {
       this.date,
       this.status,
       this.sidebarController,
-      this.knowledge, required this.onKnowledgeDeleted});
+      this.knowledge,
+      required this.onKnowledgeDeleted});
 
   @override
   State<KnowledgeContainer> createState() => _KnowledgeContainerState();
@@ -520,7 +580,6 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                     ).then((value) => Navigator.popUntil(
                                         context,
                                         ModalRoute.withName("/mainKnowledge")));
-                                    
                                   },
                                   icon: Icon(
                                     Icons.delete_forever_rounded,

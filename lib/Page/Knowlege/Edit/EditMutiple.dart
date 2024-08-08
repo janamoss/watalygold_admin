@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/htmltodelta.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
@@ -80,6 +82,8 @@ class EditMutiple extends StatefulWidget {
 }
 
 class _EditMutipleState extends State<EditMutiple> {
+  final sidebarController = Get.put(SidebarController());
+
   List<List<String>> allKnowledgeContents = [];
   TextEditingController contentNameController = TextEditingController();
   String? message;
@@ -819,7 +823,9 @@ class _EditMutipleState extends State<EditMutiple> {
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 1,
+                        status: sidebarController.index.value == 1
+                          ? sidebarController.index.value = 1
+                          : sidebarController.index.value = 1,
                         dropdown: true,
                       ),
                     ),
@@ -835,7 +841,9 @@ class _EditMutipleState extends State<EditMutiple> {
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 1,
+                          status: sidebarController.index.value == 1
+                          ? sidebarController.index.value = 1
+                          : sidebarController.index.value = 1,
                           dropdown: true,
                         ),
                       )

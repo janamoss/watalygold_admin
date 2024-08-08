@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/Singlecontent.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
@@ -32,6 +34,8 @@ class Add_Knowlege extends StatefulWidget {
 
 class _Add_KnowlegeState extends State<Add_Knowlege>
     with SingleTickerProviderStateMixin {
+  final sidebarController = Get.put(SidebarController());
+
   late TabController tapController;
   // final List<bool> _tabEnabled = [false, true];
 
@@ -66,7 +70,9 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 2,
+                        status: sidebarController.index.value == 2
+                            ? sidebarController.index.value = 2
+                            : sidebarController.index.value = 2,
                         dropdown: true,
                       ),
                     ),
@@ -82,7 +88,9 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 2,
+                          status: sidebarController.index.value == 2
+                              ? sidebarController.index.value = 2
+                              : sidebarController.index.value = 2,
                           dropdown: true,
                         ),
                       )
@@ -113,13 +121,12 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                         controller: tapController,
                                         labelStyle: TextStyle(
                                             fontSize: 20, color: Colors.white),
-                                            labelPadding: EdgeInsets.symmetric(vertical: 15), 
+                                        labelPadding:
+                                            EdgeInsets.symmetric(vertical: 15),
                                         dividerColor: Colors.transparent,
                                         // indicatorWeight: 30,
                                         indicator: BoxDecoration(
-                                          
                                           color: GPrimaryColor,
-                                          
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -136,20 +143,17 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                                       Text('เนื้อหาเดียว'),
                                                     ],
                                                   )
-                                                  
-                                                : 
-                                                  Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 90),
-                                              //                  padding: EdgeInsets.only(
-                                              // top: 10,
-                                              // bottom: 0,
-                                              // left: 80,
-                                              // right: 80),
-                                                      child: Text('เนื้อหาเดียว'),
-                                                    
-                                                ),
+                                                : Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 90),
+                                                    //                  padding: EdgeInsets.only(
+                                                    // top: 10,
+                                                    // bottom: 0,
+                                                    // left: 80,
+                                                    // right: 80),
+                                                    child: Text('เนื้อหาเดียว'),
+                                                  ),
                                           ),
                                           Tab(
                                             child: screenSize ==

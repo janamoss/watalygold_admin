@@ -9,11 +9,13 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/htmltodelta.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
@@ -62,6 +64,8 @@ class EditKnowlege extends StatefulWidget {
 }
 
 class _EditKnowlegeState extends State<EditKnowlege> {
+  final sidebarController = Get.put(SidebarController());
+
   String? _selectedValue;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
@@ -234,7 +238,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 2,
+                        status: sidebarController.index.value == 1
+                            ? sidebarController.index.value = 1
+                            : sidebarController.index.value = 1,
                         dropdown: true,
                       ),
                     ),
@@ -250,7 +256,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 2,
+                          status: sidebarController.index.value == 1
+                              ? sidebarController.index.value = 1
+                              : sidebarController.index.value = 1,
                           dropdown: true,
                         ),
                       )

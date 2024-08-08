@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/Add/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/AddKnowlege.dart';
 import 'package:watalygold_admin/Page/Knowlege/Edit/EditKnowlege.dart';
@@ -16,6 +19,8 @@ import 'package:watalygold_admin/service/knowledge.dart';
 
 class RouteConfig {
   static GoRouter returnRotuer() {
+    final SidebarController sidebarController = Get.put(SidebarController());
+
     return GoRouter(
       initialLocation: "/mainKnowledge",
       routes: [
@@ -38,8 +43,8 @@ class RouteConfig {
           name: "/dashboard",
           // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
-            // final User user = state.extra as User;
             return const MainDash();
+            // final User user = state.extra as User;
           },
         ),
         GoRoute(
@@ -47,6 +52,7 @@ class RouteConfig {
           name: "/mainKnowledge",
           // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
+            // sidebarController.index.value = 1;
             return const MainKnowlege();
           },
         ),
@@ -55,6 +61,7 @@ class RouteConfig {
           name: "/addKnowledge",
           // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
+            // sidebarController.index.value = 2;
             return const Add_Knowlege();
           },
         ),

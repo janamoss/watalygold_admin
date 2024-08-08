@@ -18,6 +18,7 @@ Future<void> main() async {
 }
 
 class MainWeb extends StatelessWidget {
+
   MainWeb({super.key});
 
   @override
