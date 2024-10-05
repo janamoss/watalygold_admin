@@ -198,21 +198,20 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                                 ),
                               ),
                             ),
-                            Center(
-                              child: Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.7,
-                                width: MediaQuery.of(context).size.width *
-                                    0.7, // ปรับความสูงตามที่ต้องการ
-                                child: Expanded(
-                                  child: TabBarView(
-                                    controller: _tabController,
-                                    children: const [
-                                      Singlecontent(),
-                                      Multiplecontent(),
-                                    ],
-                                  ),
-                                ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: constraints.maxHeight -
+                                    200, // Adjust this value as needed
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.7,
+                              ),
+                              child: TabBarView(
+                                controller: _tabController,
+                                children: const [
+                                  SingleChildScrollView(child: Singlecontent()),
+                                  SingleChildScrollView(
+                                      child: Multiplecontent()),
+                                ],
                               ),
                             ),
                           ],
