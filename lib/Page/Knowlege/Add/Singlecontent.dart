@@ -25,12 +25,21 @@ import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
 
 Map<String, IconData> icons = {
+  'ใบไม้': FontAwesomeIcons.leaf,
+  'ต้นกล้า': FontAwesomeIcons.seedling,
+  'ไวรัส': FontAwesomeIcons.virus,
   'สถิติ': Icons.analytics_outlined,
   'ดอกไม้': Icons.yard,
-  'หนังสือ': Icons.book,
+  'หนังสือ': FontAwesomeIcons.book,
   'น้ำ': Icons.water_drop_outlined,
   'ระวัง': Icons.warning_rounded,
   'คำถาม': Icons.quiz_outlined,
+  'รูปภาพ': FontAwesomeIcons.image,
+  'ระฆัง': FontAwesomeIcons.bell,
+  'ความคิดเห็น': FontAwesomeIcons.comments,
+  'ตำแหน่ง': FontAwesomeIcons.locationDot,
+  'กล้อง': FontAwesomeIcons.camera,
+  'ปฏิทิน': FontAwesomeIcons.calendarDays,
 };
 
 class Singlecontent extends StatefulWidget {

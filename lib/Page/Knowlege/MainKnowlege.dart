@@ -141,7 +141,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                       status: sidebarController.index.value == 1
                           ? sidebarController.index.value = 1
                           : sidebarController.index.value = 1,
-                      dropdown: true,
+                      dropdown: sidebarController.dropdown.value == true ? sidebarController.dropdown.value == true : sidebarController.dropdown.value == true,
                     ),
                   ),
                 ),
@@ -156,7 +156,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                           status: sidebarController.index.value == 1
                               ? sidebarController.index.value = 1
                               : sidebarController.index.value = 1,
-                          dropdown: true,
+                          dropdown: sidebarController.dropdown.value == true ? sidebarController.dropdown.value == true : sidebarController.dropdown.value == true,
                         ),
                       )
                     : null,
@@ -177,118 +177,136 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                         SizedBox(
                           height: 15,
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              "มีคลังความรู้ทั้งหมด",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(0xff1D1D1D).withOpacity(0.43)),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                "${knowledgelist.length}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: GPrimaryColor),
-                              ),
-                            ),
-                            Text(
-                              "เรื่อง",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(0xff1D1D1D).withOpacity(0.43)),
-                            ),
-                          ],
-                        ),
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                sidebarController.index.value = 2;
-                                context.goNamed("/addKnowledge");
-                              },
-                              onHover: (value) {
-                                ElevatedButton.styleFrom(
-                                    backgroundColor: GPrimaryColor);
-                              },
-                              icon: Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: WhiteColor,
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: GPrimaryColor,
-                                  shape: ContinuousRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  shadowColor: Colors.black,
-                                  elevation: 5),
-                              label: Text(
-                                "เพิ่มคลังความรู้",
-                                style:
-                                    TextStyle(color: WhiteColor, fontSize: 20),
-                              ),
-                            )),
-                        FutureBuilder<List<Knowledge>>(
-                          future: getKnowledges(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: LoadingAnimationWidget.discreteCircle(
-                                  color: WhiteColor,
-                                  secondRingColor: GPrimaryColor,
-                                  thirdRingColor: YPrimaryColor,
-                                  size: 200,
-                                ),
-                              );
-                            } else if (snapshot.hasData) {
-                              final knowledgelist = snapshot.data!;
-                              return Container(
-                                margin: EdgeInsets.symmetric(vertical: 15),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Wrap(
-                                  direction: Axis.horizontal,
-                                  children: [
-                                    for (var i = 0;
-                                        i < knowledgelist.length;
-                                        i++)
-                                      KnowledgeContainer(
-                                        knowledge: knowledgelist[i],
-                                        sidebarController: sidebarController,
-                                        id: knowledgelist[i].id,
-                                        title: knowledgelist[i].knowledgeName,
-                                        icons: knowledgelist[i].knowledgeIcons,
-                                        date: timestampToDateThai(
-                                            knowledgelist[i].create_at!),
-                                        image: i < imageURLlist.length
-                                            ? imageURLlist[i]
-                                            : '',
-                                        status: knowledgelist[i]
-                                                .knowledgeImg
-                                                .isEmpty
-                                            ? "หลายเนื้อหา"
-                                            : "เนื้อหาเดียว",
-                                        onKnowledgeDeleted: onKnowledgeDeleted,
+                        _isLoading == false
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "มีคลังความรู้ทั้งหมด",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Color(0xff1D1D1D)
+                                                .withOpacity(0.43)),
                                       ),
-                                  ],
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error: ${snapshot.error}'),
-                              );
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          },
-                        ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Text(
+                                          "${knowledgelist.length}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: GPrimaryColor),
+                                        ),
+                                      ),
+                                      Text(
+                                        "เรื่อง",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Color(0xff1D1D1D)
+                                                .withOpacity(0.43)),
+                                      ),
+                                    ],
+                                  ),
+                                  Align(
+                                      alignment: Alignment.topRight,
+                                      child: ElevatedButton.icon(
+                                        onPressed: () {
+                                          sidebarController.index.value = 2;
+                                          context.goNamed("/addKnowledge");
+                                        },
+                                        onHover: (value) {
+                                          ElevatedButton.styleFrom(
+                                              backgroundColor: GPrimaryColor);
+                                        },
+                                        icon: Icon(
+                                          Icons.add_circle_outline_rounded,
+                                          color: WhiteColor,
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: GPrimaryColor,
+                                            shape: ContinuousRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            shadowColor: Colors.black,
+                                            elevation: 5),
+                                        label: Text(
+                                          "เพิ่มคลังความรู้",
+                                          style: TextStyle(
+                                              color: WhiteColor, fontSize: 20),
+                                        ),
+                                      )),
+                                  FutureBuilder<List<Knowledge>>(
+                                    future: getKnowledges(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                          child: LoadingAnimationWidget
+                                              .discreteCircle(
+                                            color: WhiteColor,
+                                            secondRingColor: GPrimaryColor,
+                                            thirdRingColor: YPrimaryColor,
+                                            size: 200,
+                                          ),
+                                        );
+                                      } else if (snapshot.hasData) {
+                                        final knowledgelist = snapshot.data!;
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 15),
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: Wrap(
+                                            direction: Axis.horizontal,
+                                            children: [
+                                              for (var i = 0;
+                                                  i < knowledgelist.length;
+                                                  i++)
+                                                KnowledgeContainer(
+                                                  knowledge: knowledgelist[i],
+                                                  sidebarController:
+                                                      sidebarController,
+                                                  id: knowledgelist[i].id,
+                                                  title: knowledgelist[i]
+                                                      .knowledgeName,
+                                                  icons: knowledgelist[i]
+                                                      .knowledgeIcons,
+                                                  date: timestampToDateThai(
+                                                      knowledgelist[i]
+                                                          .create_at!),
+                                                  image: i < imageURLlist.length
+                                                      ? imageURLlist[i]
+                                                      : '',
+                                                  status: knowledgelist[i]
+                                                          .knowledgeImg
+                                                          .isEmpty
+                                                      ? "หลายเนื้อหา"
+                                                      : "เนื้อหาเดียว",
+                                                  onKnowledgeDeleted:
+                                                      onKnowledgeDeleted,
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child:
+                                              Text('Error: ${snapshot.error}'),
+                                        );
+                                      } else {
+                                        return const SizedBox.shrink();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )
+                            : CircularProgressIndicator(),
                         // _isLoading
                         //     ? Center(
                         //         child: LoadingAnimationWidget.discreteCircle(

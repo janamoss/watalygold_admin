@@ -41,8 +41,9 @@ class RouteConfig {
         GoRoute(
           path: "/dashboard",
           name: "/dashboard",
-          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
+            // sidebarController.index.value = 0;
             return const MainDash();
             // final User user = state.extra as User;
           },
@@ -50,7 +51,7 @@ class RouteConfig {
         GoRoute(
           path: "/mainKnowledge",
           name: "/mainKnowledge",
-          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // sidebarController.index.value = 1;
             return const MainKnowlege();
@@ -59,7 +60,7 @@ class RouteConfig {
         GoRoute(
           path: "/addKnowledge",
           name: "/addKnowledge",
-          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // sidebarController.index.value = 2;
             return const Add_Knowlege();
@@ -68,7 +69,7 @@ class RouteConfig {
         GoRoute(
           path: "/editmultiKnowledge",
           name: "/editmultiKnowledge",
-          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             final args = state.extra as Map<String, dynamic>;
             final Knowledge knowledge = args['knowledge'] as Knowledge;

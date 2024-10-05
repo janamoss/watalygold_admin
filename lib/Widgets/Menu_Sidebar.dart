@@ -18,14 +18,15 @@ class SideNav extends StatefulWidget {
 class _SideNavState extends State<SideNav> {
   final logger = Logger();
 
-  final sidebarController = Get.put(SidebarController());
-  var showDropdown;
+  final SidebarController sidebarController = Get.find<SidebarController>();
+
+  final showDropdown = false.obs; // ใช้ .obs สำหรับตัวแปรที่รีแอคทีฟ
 
   @override
   void initState() {
     super.initState();
     sidebarController.index.value = widget.status ?? 0;
-    showDropdown = widget.dropdown ?? false;
+    showDropdown.value = widget.dropdown ?? false;
   }
 
   @override
@@ -40,58 +41,55 @@ class _SideNavState extends State<SideNav> {
                 fit: BoxFit.cover,
               )),
         ),
-        Obx(
-          () => Column(
-            children: [
-              SideMenutitle(
-                selectedColors: WhiteColor,
-                title: 'ผลการวิเคราะห์รายวัน',
-                icons: Icons.dashboard_outlined,
-                press: () {
-                  sidebarController.index.value = 0;
-                  context.goNamed("/dashboard");
-                },
-                seleteds: sidebarController.index.value == 0,
+        Column(
+          children: [
+            SideMenutitle(
+              selectedColors: WhiteColor,
+              title: 'ผลการวิเคราะห์รายวัน',
+              icons: Icons.dashboard_outlined,
+              press: () {
+                sidebarController.index.value = 0;
+                context.goNamed("/dashboard");
+              },
+              seleteds: sidebarController.index.value == 0,
+            ),
+            ListTile(
+              onTap: () {
+                sidebarController.dropdown.value =
+                    !sidebarController.dropdown.value; // ใช้ค่า RxBool แทน
+              },
+              leading: Icon(
+                Icons.menu_book_rounded,
+                color: WhiteColor,
               ),
-              ListTile(
-                onTap: () {
-                  logger.d(showDropdown);
-                  setState(() {
-                    showDropdown = !showDropdown;
-                  });
-                  sidebarController.dropdown.value =
-                      !sidebarController.dropdown.value;
-                },
-                leading: Icon(
-                  Icons.menu_book_rounded,
-                  color: WhiteColor,
-                ),
-                title: Text(
-                  "คลังความรู้",
-                  style: TextStyle(color: WhiteColor, fontSize: 17),
-                ),
-                trailing: RotatedBox(
-                  quarterTurns: 1,
-                  child: Icon(
-                    showDropdown
-                        ? Icons.keyboard_arrow_left_rounded
-                        : Icons.keyboard_arrow_right_rounded,
-                    color: WhiteColor,
-                  ),
-                ),
-                selected: sidebarController.index.value == 4,
+              title: Text(
+                "คลังความรู้",
+                style: TextStyle(color: WhiteColor, fontSize: 17),
               ),
-            ],
-          ),
+              trailing: Obx(() => RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      sidebarController.dropdown.value // ใช้ค่าใน Obx แทน
+                          ? Icons.keyboard_arrow_left_rounded
+                          : Icons.keyboard_arrow_right_rounded,
+                      color: WhiteColor,
+                    ),
+                  )),
+              selected: sidebarController.index.value == 4,
+            ),
+          ],
         ),
-        showDropdown
-            ? Column(
-                children: [
-                  _buildMainKnowledgeListTile(context, sidebarController),
-                  _buildAddKnowledgeListTile(context, sidebarController),
-                ],
-              )
-            : SizedBox.shrink(),
+        // ใช้ Obx ครอบคลุมการแสดงผลของ Dropdown เพื่อสังเกตการเปลี่ยนแปลง
+        Obx(
+          () => sidebarController.dropdown.value
+              ? Column(
+                  children: [
+                    _buildMainKnowledgeListTile(context, sidebarController),
+                    _buildAddKnowledgeListTile(context, sidebarController),
+                  ],
+                )
+              : SizedBox.shrink(),
+        ),
       ],
     );
   }

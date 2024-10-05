@@ -241,7 +241,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         status: sidebarController.index.value == 1
                             ? sidebarController.index.value = 1
                             : sidebarController.index.value = 1,
-                        dropdown: true,
+                        dropdown: sidebarController.dropdown.value == true
+                            ? sidebarController.dropdown.value == true
+                            : sidebarController.dropdown.value == true,
                       ),
                     ),
                   ),
@@ -259,7 +261,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                           status: sidebarController.index.value == 1
                               ? sidebarController.index.value = 1
                               : sidebarController.index.value = 1,
-                          dropdown: true,
+                          dropdown: sidebarController.dropdown.value == true
+                              ? sidebarController.dropdown.value == true
+                              : sidebarController.dropdown.value == true,
                         ),
                       )
                     : null,

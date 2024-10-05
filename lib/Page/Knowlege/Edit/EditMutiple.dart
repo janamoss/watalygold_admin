@@ -407,8 +407,6 @@ class _EditMutipleState extends State<EditMutiple> {
     }
   }
 
- 
-
   void deleteImage(int contentIndex, int imageIndex) {
     setState(() {
       String contentId = contentList[contentIndex].id;
@@ -824,9 +822,11 @@ class _EditMutipleState extends State<EditMutiple> {
                       color: GPrimaryColor,
                       child: SideNav(
                         status: sidebarController.index.value == 1
-                          ? sidebarController.index.value = 1
-                          : sidebarController.index.value = 1,
-                        dropdown: true,
+                            ? sidebarController.index.value = 1
+                            : sidebarController.index.value = 1,
+                        dropdown: sidebarController.dropdown.value == true
+                            ? sidebarController.dropdown.value == true
+                            : sidebarController.dropdown.value == true,
                       ),
                     ),
                   ),
@@ -842,9 +842,11 @@ class _EditMutipleState extends State<EditMutiple> {
                         width: 300,
                         child: SideNav(
                           status: sidebarController.index.value == 1
-                          ? sidebarController.index.value = 1
-                          : sidebarController.index.value = 1,
-                          dropdown: true,
+                              ? sidebarController.index.value = 1
+                              : sidebarController.index.value = 1,
+                          dropdown: sidebarController.dropdown.value == true
+                              ? sidebarController.dropdown.value == true
+                              : sidebarController.dropdown.value == true,
                         ),
                       )
                     : null,
