@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +17,16 @@ import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainDash extends StatefulWidget {
   final User? users;
-  const MainDash({super.key, this.users});
+  final bool showSuccessFlushbar;
+  final String message;
+  final String description;
+  const MainDash({
+    super.key,
+    this.users,
+    this.showSuccessFlushbar = false,
+    this.message = '',
+    this.description = '',
+  });
 
   @override
   State<MainDash> createState() => _MainDashState();
@@ -32,9 +42,36 @@ class _MainDashState extends State<MainDash> {
   @override
   void initState() {
     super.initState();
+    if (widget.showSuccessFlushbar) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showSucessFlushbar(widget.message, widget.description);
+      });
+    }
     Future.delayed(Duration.zero, () async {
       fetchAllResults();
     });
+  }
+
+  void _showSucessFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageColor: Colors.green.shade300,
+      titleColor: Colors.green.shade300,
+      borderRadius: BorderRadius.circular(10),
+      margin: EdgeInsets.all(15),
+      maxWidth: 600,
+      icon: Icon(
+        Icons.check_circle_rounded,
+        size: 28,
+        color: Colors.green.shade400,
+      ),
+      duration: const Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.green.shade400,
+      backgroundColor: WhiteColor,
+      flushbarPosition: FlushbarPosition.TOP,
+      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+    ).show(context);
   }
 
   Future<void> fetchAllResults() async {
@@ -103,8 +140,8 @@ class _MainDashState extends State<MainDash> {
                       color: GPrimaryColor,
                       child: SideNav(
                         status: sidebarController.index.value == 0
-                              ? sidebarController.index.value = 0
-                              : sidebarController.index.value = 0,
+                            ? sidebarController.index.value = 0
+                            : sidebarController.index.value = 0,
                       ),
                     ),
                     backgroundColor: Color(0xffF1F1F1),
@@ -149,8 +186,8 @@ class _MainDashState extends State<MainDash> {
                   color: GPrimaryColor,
                   child: SideNav(
                     status: sidebarController.index.value == 0
-                              ? sidebarController.index.value = 0
-                              : sidebarController.index.value = 0,
+                        ? sidebarController.index.value = 0
+                        : sidebarController.index.value = 0,
                   ),
                 ),
               ),

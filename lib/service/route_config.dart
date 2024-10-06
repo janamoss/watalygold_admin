@@ -29,7 +29,14 @@ class RouteConfig {
           path: "/login",
           name: "/login",
           builder: (context, state) {
-            return const LoginPage();
+            final extra =
+                state.extra as Map<String, dynamic>?; // รับค่าจาก extra
+            return LoginPage(
+              showSuccessFlushbar: extra?['showSuccessFlushbar'] ??
+                  false, // ส่งค่าไปยัง LoginPage
+              message: extra?['message'] ?? '',
+              description: extra?['description'] ?? '',
+            );
           },
         ),
         GoRoute(
@@ -44,8 +51,12 @@ class RouteConfig {
           name: "/dashboard",
           redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
-            // sidebarController.index.value = 0;
-            return const MainDash();
+            final extra = state.extra as Map<String, dynamic>?;
+            return MainDash(
+              showSuccessFlushbar: extra?['showSuccessFlushbar'] ?? false, 
+              message: extra?['message'] ?? '',
+              description: extra?['description'] ?? '',
+            );
             // final User user = state.extra as User;
           },
         ),

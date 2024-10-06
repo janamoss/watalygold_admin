@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:beamer/beamer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,16 @@ import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_serv
 import 'package:watalygold_admin/service/screen_unit.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool showSuccessFlushbar;
+  final String message;
+  final String description;
+
+  const LoginPage({
+    super.key,
+    this.showSuccessFlushbar = false,
+    this.message = '',
+    this.description = '',
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -29,12 +39,24 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _passwordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    // ตรวจสอบว่าต้องแสดง Flushbar หรือไม่
+    if (widget.showSuccessFlushbar) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showSucessFlushbar(widget.message, widget.description);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     ScreenSize screenSize = getScreenSize(context);
 
     return Scaffold(
       drawer: screenSize == ScreenSize.minidesktop
-          ? SizedBox(
+          ? const SizedBox(
               width: 300,
               child: Menutop_darwer(
                 numpage: 1,
@@ -120,6 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                                   fillColor:
                                       const Color(0xFFD9D9D9).withOpacity(0.29),
                                   filled: true,
+                                  errorText: _emailError,
                                   labelStyle: const TextStyle(fontSize: 20)),
                             )
                           ],
@@ -171,6 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fillColor:
                                     const Color(0xFFD9D9D9).withOpacity(0.29),
                                 filled: true,
+                                errorText: _passwordError,
                                 labelStyle: const TextStyle(fontSize: 20),
                               ),
                             ),
@@ -234,15 +258,94 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  String? _emailError;
+  String? _passwordError;
+
+  bool _isValidEmail(String email) {
+    // รูปแบบของอีเมลที่ใช้ regex สำหรับตรวจสอบ
+    final RegExp regex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return regex.hasMatch(email);
+  }
+
   void _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
-    final user = await _auth.LoginWithEmailandPassword(email, password);
-    final prefs = SharedPreferences.getInstance();
-    log(user!.uid.toString());
-    prefs.then((prefs) => prefs.setString("UserID", user!.uid.toString()));
-    context.goNamed(
-        '/dashboard'); // Navigate ไปยัง /dashborad หลังจากตั้งค่า "UserID" แล้ว
+
+    setState(() {
+      _emailError = email.isEmpty
+          ? 'กรุณากรอกอีเมล'
+          : !_isValidEmail(email)
+              ? 'รูปแบบอีเมลไม่ถูกต้อง'
+              : null; // ตรวจสอบอีเมล
+
+      _passwordError =
+          password.isEmpty ? 'กรุณากรอกรหัสผ่าน' : null; // ตรวจสอบรหัสผ่าน
+    });
+
+    // ถ้าทั้งสองฟิลด์กรอกถูกต้องแล้ว จึงจะทำการล็อกอิน
+    if (_emailError == null && _passwordError == null) {
+      String? userId = await _auth.LoginWithEmailandPassword(email, password);
+      debugPrint(userId);
+      if (userId != null) {
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString("UserID", userId);
+        context.goNamed(
+            '/dashboard',extra: {
+              'showSuccessFlushbar': true,
+              'message': "เข้าสู่ระบบเสร็จสิ้น",
+              'description': "ยินดีต้อนรับเข้าสู่ระบบ WatalyGold"
+            },); // Navigate ไปยัง /dashboard หลังจากตั้งค่า "UserID" แล้ว
+      } else {
+        _showErrorFlushbar(
+            "เข้าสู่ระบบล้มเหลว", "กรุณาตรวจสอบอีเมลและรหัสผ่านของคุณ");
+      }
+    }
+  }
+
+// ฟังก์ชันแสดง Flushbar
+  void _showErrorFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageColor: Colors.red.shade300,
+      titleColor: Colors.red.shade300,
+      borderRadius: BorderRadius.circular(10),
+      margin: EdgeInsets.all(15),
+      maxWidth: 600,
+      icon: Icon(
+        Icons.error_rounded,
+        size: 28,
+        color: Colors.red.shade400,
+      ),
+      duration: const Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red.shade400,
+      backgroundColor: WhiteColor,
+      flushbarPosition: FlushbarPosition.TOP,
+      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+    ).show(context);
+  }
+
+  void _showSucessFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageColor: Colors.green.shade300,
+      titleColor: Colors.green.shade300,
+      borderRadius: BorderRadius.circular(10),
+      margin: EdgeInsets.all(15),
+      maxWidth: 600,
+      icon: Icon(
+        Icons.check_circle_rounded,
+        size: 28,
+        color: Colors.green.shade400,
+      ),
+      duration: const Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.green.shade400,
+      backgroundColor: WhiteColor,
+      flushbarPosition: FlushbarPosition.TOP,
+      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+    ).show(context);
   }
 }
 

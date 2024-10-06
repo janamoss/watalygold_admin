@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,12 +27,21 @@ class _registerPageState extends State<registerPage> {
 
   final FirebaseAuthService _auth = FirebaseAuthService();
 
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _passwordenterController = TextEditingController();
-  TextEditingController _FnameController = TextEditingController();
-  TextEditingController _LnameController = TextEditingController();
-  TextEditingController _phonenumberController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordenterController =
+      TextEditingController();
+  final TextEditingController _FnameController = TextEditingController();
+  final TextEditingController _LnameController = TextEditingController();
+  final TextEditingController _phonenumberController = TextEditingController();
+
+  String? _emailError;
+  String? _passwordError;
+  String? _passwordenterError;
+  String? _fnameError;
+  String? _lnameError;
+  String? _phonenumberError;
+  String? _passwordpassError;
 
   @override
   void dispose() {
@@ -135,20 +145,20 @@ class _registerPageState extends State<registerPage> {
                                   TextField(
                                     controller: _FnameController,
                                     decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: const BorderSide(
-                                            width: 0,
-                                            style: BorderStyle.none,
-                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(
+                                          width: 0,
+                                          style: BorderStyle.none,
                                         ),
-                                        hintText: "ชื่อ",
-                                        fillColor: const Color(0xFFD9D9D9)
-                                            .withOpacity(0.29),
-                                        filled: true,
-                                        labelStyle:
-                                            const TextStyle(fontSize: 20)),
+                                      ),
+                                      hintText: "ชื่อ",
+                                      fillColor: const Color(0xFFD9D9D9)
+                                          .withOpacity(0.29),
+                                      filled: true,
+                                      labelStyle: const TextStyle(fontSize: 20),
+                                      errorText: _fnameError,
+                                    ),
                                   )
                                 ],
                               ),
@@ -174,20 +184,20 @@ class _registerPageState extends State<registerPage> {
                                   TextField(
                                     controller: _LnameController,
                                     decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: const BorderSide(
-                                            width: 0,
-                                            style: BorderStyle.none,
-                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(
+                                          width: 0,
+                                          style: BorderStyle.none,
                                         ),
-                                        hintText: "นามสกุล",
-                                        fillColor: const Color(0xFFD9D9D9)
-                                            .withOpacity(0.29),
-                                        filled: true,
-                                        labelStyle:
-                                            const TextStyle(fontSize: 20)),
+                                      ),
+                                      hintText: "นามสกุล",
+                                      fillColor: const Color(0xFFD9D9D9)
+                                          .withOpacity(0.29),
+                                      filled: true,
+                                      labelStyle: const TextStyle(fontSize: 20),
+                                      errorText: _lnameError,
+                                    ),
                                   )
                                 ],
                               ),
@@ -215,18 +225,20 @@ class _registerPageState extends State<registerPage> {
                               TextField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(
-                                        width: 0,
-                                        style: BorderStyle.none,
-                                      ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
                                     ),
-                                    hintText: "อีเมล",
-                                    fillColor: const Color(0xFFD9D9D9)
-                                        .withOpacity(0.29),
-                                    filled: true,
-                                    labelStyle: const TextStyle(fontSize: 20)),
+                                  ),
+                                  hintText: "อีเมล",
+                                  fillColor:
+                                      const Color(0xFFD9D9D9).withOpacity(0.29),
+                                  filled: true,
+                                  labelStyle: const TextStyle(fontSize: 20),
+                                  errorText: _emailError,
+                                ),
                               )
                             ],
                           ),
@@ -252,18 +264,20 @@ class _registerPageState extends State<registerPage> {
                               TextField(
                                 controller: _phonenumberController,
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(
-                                        width: 0,
-                                        style: BorderStyle.none,
-                                      ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
                                     ),
-                                    hintText: "เบอร์โทรศัพท์",
-                                    fillColor: const Color(0xFFD9D9D9)
-                                        .withOpacity(0.29),
-                                    filled: true,
-                                    labelStyle: const TextStyle(fontSize: 20)),
+                                  ),
+                                  hintText: "เบอร์โทรศัพท์",
+                                  fillColor:
+                                      const Color(0xFFD9D9D9).withOpacity(0.29),
+                                  filled: true,
+                                  labelStyle: const TextStyle(fontSize: 20),
+                                  errorText: _phonenumberError,
+                                ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                   LengthLimitingTextInputFormatter(10),
@@ -319,6 +333,7 @@ class _registerPageState extends State<registerPage> {
                                       const Color(0xFFD9D9D9).withOpacity(0.29),
                                   filled: true,
                                   labelStyle: const TextStyle(fontSize: 20),
+                                  errorText: _passwordError,
                                 ),
                               ),
                             ],
@@ -371,6 +386,8 @@ class _registerPageState extends State<registerPage> {
                                       const Color(0xFFD9D9D9).withOpacity(0.29),
                                   filled: true,
                                   labelStyle: const TextStyle(fontSize: 20),
+                                  errorText:
+                                      _passwordenterError ?? _passwordpassError,
                                 ),
                               ),
                             ],
@@ -386,12 +403,7 @@ class _registerPageState extends State<registerPage> {
                             vertical: 20, horizontal: 10),
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (_passwordController.text ==
-                                _passwordenterController.text) {
-                              _register();
-                            } else {
-                              _showwrongpass();
-                            }
+                            _register();
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: GPrimaryColor,
@@ -439,25 +451,117 @@ class _registerPageState extends State<registerPage> {
     );
   }
 
+  bool _isValidEmail(String email) {
+    // รูปแบบของอีเมลที่ใช้ regex สำหรับตรวจสอบ
+    final RegExp regex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return regex.hasMatch(email);
+  }
+
   void _register() async {
     String email = _emailController.text;
     String password = _passwordController.text;
+    String passwordenter = _passwordenterController.text;
+    String fname = _FnameController.text;
+    String lanme = _LnameController.text;
+    String phonenumber = _phonenumberController.text;
 
-    final future = EncryptAES(password);
-    final encrypted = await future;
-    await createCollectionAdmin(
-        _emailController.text,
-        encrypted.base64.toString(),
-        _FnameController.text,
-        _LnameController.text,
-        _phonenumberController.text);
-    User? user = await _auth.RegisterWithEmailandPassword(
-        email, password, "${_FnameController.text} ${_LnameController.text}");
-    logger.d(user?.uid);
-    if (user != null) {
-      context.goNamed('/login');
-    } else {
-      logger.d("error someting");
+    setState(() {
+      _emailError = email.isEmpty
+          ? 'กรุณากรอกอีเมล'
+          : !_isValidEmail(email)
+              ? 'รูปแบบอีเมลไม่ถูกต้อง'
+              : null; // ตรวจสอบอีเมล
+      _passwordError =
+          password.isEmpty ? 'กรุณากรอกรหัสผ่าน' : null; // ตรวจสอบรหัสผ่าน
+      _passwordenterError =
+          passwordenter.isEmpty ? 'กรุณากรอกยืนยันรหัสผ่าน' : null;
+      _fnameError = fname.isEmpty ? 'กรุณากรอกชื่อผู้ใช้งาน' : null;
+      _lnameError = lanme.isEmpty ? 'กรุณากรอกนามสกุลผู้ใช้งาน' : null;
+      _phonenumberError = phonenumber.isEmpty ? 'กรุณากรอกเบอร์โทรศัพท์' : null;
+      _passwordpassError =
+          password != passwordenter ? 'รหัสผ่านไม่ตรงกัน' : null;
+    });
+
+    if (_emailError == null &&
+        _passwordError == null &&
+        _passwordenterError == null &&
+        _fnameError == null &&
+        _lnameError == null &&
+        _phonenumberError == null &&
+        _passwordpassError == null) {
+      final future = EncryptAES(password);
+      final encrypted = await future;
+      await createCollectionAdmin(
+          _emailController.text,
+          encrypted.base64.toString(),
+          _FnameController.text,
+          _LnameController.text,
+          _phonenumberController.text);
+      try {
+        User? user = await _auth.RegisterWithEmailandPassword(email, password,
+            "${_FnameController.text} ${_LnameController.text}");
+        logger.d(user?.uid);
+
+        if (user != null) {
+          context.goNamed(
+            '/login',
+            extra: {
+              'showSuccessFlushbar': true,
+              'message': "สมัครสมาชิกเสร็จสิ้น",
+              'description': "คุณได้ทำการสมัครสมาชิกเสร็จสิ้นเรียบร้อย"
+            },
+          );
+          debugPrint("สมัครเสร็จสิ้นแล้ว");
+        }
+      } catch (e) {
+        // เมื่อเกิดข้อผิดพลาด ให้แสดง Flushbar ด้วยข้อความที่ได้รับ
+        _showErrorFlushbar("สมัครสมาชิกล้มเหลว", e.toString());
+      }
     }
+  }
+
+  void _showErrorFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageColor: Colors.red.shade300,
+      titleColor: Colors.red.shade300,
+      borderRadius: BorderRadius.circular(10),
+      margin: EdgeInsets.all(15),
+      maxWidth: 600,
+      icon: Icon(
+        Icons.error_rounded,
+        size: 28,
+        color: Colors.red.shade400,
+      ),
+      duration: const Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red.shade400,
+      backgroundColor: WhiteColor,
+      flushbarPosition: FlushbarPosition.TOP,
+      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+    ).show(context);
+  }
+
+  void _showSucessFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageColor: Colors.green.shade300,
+      titleColor: Colors.green.shade300,
+      borderRadius: BorderRadius.circular(10),
+      margin: EdgeInsets.all(15),
+      maxWidth: 600,
+      icon: Icon(
+        Icons.check_circle_rounded,
+        size: 28,
+        color: Colors.green.shade400,
+      ),
+      duration: const Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.green.shade400,
+      backgroundColor: WhiteColor,
+      flushbarPosition: FlushbarPosition.TOP,
+      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+    ).show(context);
   }
 }
