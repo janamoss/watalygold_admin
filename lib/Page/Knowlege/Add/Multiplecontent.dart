@@ -800,43 +800,37 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             ),
                                             SizedBox(
                                               height: 400,
-                                              child: Expanded(
-                                                  child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    QuillToolbar.simple(
-                                                      configurations:
-                                                          QuillSimpleToolbarConfigurations(
-                                                        controller:
-                                                            _contentController[
-                                                                index],
-                                                        sharedConfigurations:
-                                                            const QuillSharedConfigurations(
-                                                          locale: Locale('de'),
-                                                        ),
+                                              child: Column(
+                                                children: [
+                                                  QuillToolbar.simple(
+                                                    configurations:
+                                                        QuillSimpleToolbarConfigurations(
+                                                      controller:
+                                                          _contentController[
+                                                              index],
+                                                      sharedConfigurations:
+                                                          const QuillSharedConfigurations(
+                                                        locale: Locale('de'),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child: QuillEditor.basic(
-                                                        configurations:
-                                                            QuillEditorConfigurations(
-                                                          controller:
-                                                              _contentController[
-                                                                  index],
-                                                          placeholder:
-                                                              'เขียนข้อความที่นี่...',
-                                                          readOnly: false,
-                                                          sharedConfigurations:
-                                                              const QuillSharedConfigurations(
-                                                            locale:
-                                                                Locale('de'),
-                                                          ),
-                                                        ),
+                                                  ),
+                                                  QuillEditor.basic(
+                                                    configurations:
+                                                        QuillEditorConfigurations(
+                                                      controller:
+                                                          _contentController[
+                                                              index],
+                                                      placeholder:
+                                                          'เขียนข้อความที่นี่...',
+                                                      readOnly: false,
+                                                      sharedConfigurations:
+                                                          const QuillSharedConfigurations(
+                                                        locale: Locale('de'),
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                              )),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                             const SizedBox(height: 30),
                                             const Padding(
@@ -1124,10 +1118,14 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                                   .size
                                                                   .width *
                                                               2,
-                                                      child: Expanded(
-                                                        child: _previewWidget(
-                                                            expansionPanelData,
-                                                            index),
+                                                      child: Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child: _previewWidget(
+                                                                expansionPanelData,
+                                                                index),
+                                                          ),
+                                                        ],
                                                       ),
                                                     )
                                                   ],
@@ -1257,43 +1255,37 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             ),
                                             SizedBox(
                                               height: 400,
-                                              child: Expanded(
-                                                  child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    QuillToolbar.simple(
-                                                      configurations:
-                                                          QuillSimpleToolbarConfigurations(
-                                                        controller:
-                                                            _contentController[
-                                                                index],
-                                                        sharedConfigurations:
-                                                            const QuillSharedConfigurations(
-                                                          locale: Locale('de'),
-                                                        ),
+                                              child: Column(
+                                                children: [
+                                                  QuillToolbar.simple(
+                                                    configurations:
+                                                        QuillSimpleToolbarConfigurations(
+                                                      controller:
+                                                          _contentController[
+                                                              index],
+                                                      sharedConfigurations:
+                                                          const QuillSharedConfigurations(
+                                                        locale: Locale('de'),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child: QuillEditor.basic(
-                                                        configurations:
-                                                            QuillEditorConfigurations(
-                                                          controller:
-                                                              _contentController[
-                                                                  index],
-                                                          placeholder:
-                                                              'เขียนข้อความที่นี่...',
-                                                          readOnly: false,
-                                                          sharedConfigurations:
-                                                              const QuillSharedConfigurations(
-                                                            locale:
-                                                                Locale('de'),
-                                                          ),
-                                                        ),
+                                                  ),
+                                                  QuillEditor.basic(
+                                                    configurations:
+                                                        QuillEditorConfigurations(
+                                                      controller:
+                                                          _contentController[
+                                                              index],
+                                                      placeholder:
+                                                          'เขียนข้อความที่นี่...',
+                                                      readOnly: false,
+                                                      sharedConfigurations:
+                                                          const QuillSharedConfigurations(
+                                                        locale: Locale('de'),
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                              )),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                             const SizedBox(height: 30),
                                             const Padding(
@@ -1596,12 +1588,16 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                                   .size
                                                                   .width *
                                                               2,
-                                                      child: Expanded(
-                                                        child: _previewWidget(
-                                                            expansionPanelData,
-                                                            index),
-                                                        // _displayedcontentWidget ??
-                                                        //     Container(),
+                                                      child: Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child: _previewWidget(
+                                                                expansionPanelData,
+                                                                index),
+                                                            // _displayedcontentWidget ??
+                                                            //     Container(),
+                                                          ),
+                                                        ],
                                                       ),
                                                     )
                                                   ],
@@ -2091,18 +2087,22 @@ class _MultiplecontentState extends State<Multiplecontent> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      child: Text(
-                        contentNameControllers[index].text,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
                         ),
-                      ),
+                        Expanded(
+                          child: Text(
+                            contentNameControllers[index].text,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -2128,14 +2128,12 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
   Widget _previewWidget(ExpansionPanelData expansionPanelData, int index) {
     return _showPreview[index]
-        ? Container(
-            child: Column(
-              children: [
-                Expanded(
-                  child: _displayedcontentWidget,
-                )
-              ],
-            ),
+        ? Column(
+            children: [
+              Expanded(
+                child: _displayedcontentWidget,
+              )
+            ],
           )
         : Container(); // แสดงเป็น Container เปล่าถ้า _showPreview[index] เป็น false
   }
@@ -2187,32 +2185,29 @@ class _MultiplecontentState extends State<Multiplecontent> {
                   width: 20,
                 ),
                 Icon(
-                  icons[_selectedValue] ??
-                      Icons.error, // ระบุไอคอนตามค่าที่เลือก
-                  size: 24, // ขนาดของไอคอน
-                  color: GPrimaryColor, // สีของไอคอน
+                  icons[_selectedValue] ?? Icons.error,
+                  size: 24,
+                  color: GPrimaryColor,
                 ),
                 const SizedBox(
                   width: 20,
                 ),
-                Text(
-                  namecontroller.text,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+                Expanded(
+                  // ใช้ Expanded เพื่อให้ Text ขยายเต็มพื้นที่
+                  child: Text(
+                    namecontroller.text,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
-                const Spacer(),
                 const Padding(
                   padding: EdgeInsets.only(right: 9),
                   child: Icon(
-                    Icons
-                        .keyboard_arrow_right_rounded, // ระบุไอคอนตามค่าที่เลือก
-                    size: 24, // ขนาดของไอคอน
-                    color: GPrimaryColor, // สีของไอคอน
+                    Icons.keyboard_arrow_right_rounded,
+                    size: 24,
+                    color: GPrimaryColor,
                   ),
                 ),
               ],

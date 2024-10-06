@@ -20,6 +20,22 @@ Map<String, IconData> iconMap = {
   'ปฏิทิน': FontAwesomeIcons.calendarDays,
 };
 
+Future<Knowledge?> getKnowledgeById(String id) async {
+  try {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final docSnapshot = await firestore.collection('Knowledge').doc(id).get();
+
+    if (docSnapshot.exists) {
+      return Knowledge.fromFirestore(docSnapshot);
+    } else {
+      return null; // ถ้าไม่มีข้อมูลตาม id นั้น
+    }
+  } catch (error) {
+    debugPrint("Error getting knowledge by ID: $error");
+    return null; // หรือจัดการ error อย่างอื่นได้ตามต้องการ
+  }
+}
+
 class Knowledge {
   final String id;
   final String knowledgeName;
@@ -55,12 +71,16 @@ class Knowledge {
     return Knowledge(
       id: doc.id,
       knowledgeName: data['KnowledgeName'] ?? '',
-      contents: (data['Content'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      contents: (data['Content'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
       knowledgeDetail: data['KnowledgeDetail'] ?? '',
       knowledgeIcons: iconMap[data['KnowledgeIcons']] ?? Icons.question_mark,
       knowledgeIconString: data['KnowledgeIcons'] ?? '',
       knowledgeImg: knowledgeImgList,
-      create_at: data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
+      create_at:
+          data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
     );
   }
 }

@@ -687,17 +687,35 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  Container(
+                                                  SizedBox(
                                                     height: 400,
-                                                    child: Expanded(
-                                                        child: Container(
-                                                      child: Column(
-                                                        children: [
-                                                          QuillToolbar.simple(
+                                                    child: Column(
+                                                      children: [
+                                                        QuillToolbar.simple(
+                                                          configurations:
+                                                              QuillSimpleToolbarConfigurations(
+                                                            controller:
+                                                                _contentController,
+                                                            sharedConfigurations:
+                                                                const QuillSharedConfigurations(
+                                                              locale:
+                                                                  Locale('de'),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              238,
+                                                              238,
+                                                              238),
+                                                          child:
+                                                              QuillEditor.basic(
                                                             configurations:
-                                                                QuillSimpleToolbarConfigurations(
+                                                                QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
+                                                              readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -705,35 +723,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                          Expanded(
-                                                            child: Container(
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      238,
-                                                                      238,
-                                                                      238),
-                                                              child: QuillEditor
-                                                                  .basic(
-                                                                configurations:
-                                                                    QuillEditorConfigurations(
-                                                                  controller:
-                                                                      _contentController,
-                                                                  readOnly:
-                                                                      false,
-                                                                  sharedConfigurations:
-                                                                      const QuillSharedConfigurations(
-                                                                    locale:
-                                                                        Locale(
-                                                                            'de'),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                   SizedBox(height: 30),
                                                   Padding(
@@ -1294,17 +1286,35 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  Container(
+                                                  SizedBox(
                                                     height: 400,
-                                                    child: Expanded(
-                                                        child: Container(
-                                                      child: Column(
-                                                        children: [
-                                                          QuillToolbar.simple(
+                                                    child: Column(
+                                                      children: [
+                                                        QuillToolbar.simple(
+                                                          configurations:
+                                                              QuillSimpleToolbarConfigurations(
+                                                            controller:
+                                                                _contentController,
+                                                            sharedConfigurations:
+                                                                const QuillSharedConfigurations(
+                                                              locale:
+                                                                  Locale('de'),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              238,
+                                                              238,
+                                                              238),
+                                                          child:
+                                                              QuillEditor.basic(
                                                             configurations:
-                                                                QuillSimpleToolbarConfigurations(
+                                                                QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
+                                                              readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -1312,35 +1322,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                          Expanded(
-                                                            child: Container(
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      238,
-                                                                      238,
-                                                                      238),
-                                                              child: QuillEditor
-                                                                  .basic(
-                                                                configurations:
-                                                                    QuillEditorConfigurations(
-                                                                  controller:
-                                                                      _contentController,
-                                                                  readOnly:
-                                                                      false,
-                                                                  sharedConfigurations:
-                                                                      const QuillSharedConfigurations(
-                                                                    locale:
-                                                                        Locale(
-                                                                            'de'),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                   SizedBox(height: 30),
                                                   Padding(
@@ -2103,18 +2087,22 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      child: Text(
-                        nameController.text,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
                         ),
-                      ),
+                        Expanded(
+                          child: Text(
+                            nameController.text,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

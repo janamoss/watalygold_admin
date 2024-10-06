@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -71,27 +72,77 @@ class RouteConfig {
           name: "/editmultiKnowledge",
           redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
-            final args = state.extra as Map<String, dynamic>;
-            final Knowledge knowledge = args['knowledge'] as Knowledge;
-            final IconData icons = args['icon'] as IconData;
-            return EditMutiple(
-              knowledge: knowledge,
-              icons: icons,
-            );
+            // ดึง id จาก query parameters
+            final id = state.uri.queryParameters['id'];
+            debugPrint(id);
+
+            // ตรวจสอบว่ามีการส่ง id มาหรือไม่
+            if (id != null) {
+              // ใช้ FutureBuilder เพื่อดึงข้อมูล knowledge จาก Firestore
+              return FutureBuilder<Knowledge?>(
+                future: getKnowledgeById(id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // กำลังโหลดข้อมูล
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data == null) {
+                    return Text('No data found for ID: $id');
+                  } else {
+                    // ถ้าข้อมูลถูกดึงมาเรียบร้อย
+                    final Knowledge knowledge = snapshot.data!;
+
+                    // ส่งข้อมูล knowledge ไปใช้ในหน้า EditKnowlege
+                    return EditMutiple(
+                      knowledge: knowledge,
+                      icons: Icons.edit, // ตัวอย่างไอคอน
+                    );
+                  }
+                },
+              );
+            } else {
+              // ถ้าไม่มี id ถูกส่งมาใน URL
+              return Text('No ID provided in the URL');
+            }
           },
         ),
         GoRoute(
           path: "/editKnowledge",
           name: "/editKnowledge",
-          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
-            final args = state.extra as Map<String, dynamic>;
-            final Knowledge knowledge = args['knowledge'] as Knowledge;
-            final IconData icons = args['icon'] as IconData;
-            return EditKnowlege(
-              knowledge: knowledge,
-              icons: icons,
-            );
+            // ดึง id จาก query parameters
+            final id = state.uri.queryParameters['id'];
+            debugPrint(id);
+
+            // ตรวจสอบว่ามีการส่ง id มาหรือไม่
+            if (id != null) {
+              // ใช้ FutureBuilder เพื่อดึงข้อมูล knowledge จาก Firestore
+              return FutureBuilder<Knowledge?>(
+                future: getKnowledgeById(id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // กำลังโหลดข้อมูล
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data == null) {
+                    return Text('No data found for ID: $id');
+                  } else {
+                    // ถ้าข้อมูลถูกดึงมาเรียบร้อย
+                    final Knowledge knowledge = snapshot.data!;
+
+                    // ส่งข้อมูล knowledge ไปใช้ในหน้า EditKnowlege
+                    return EditKnowlege(
+                      knowledge: knowledge,
+                      icons: Icons.edit, // ตัวอย่างไอคอน
+                    );
+                  }
+                },
+              );
+            } else {
+              // ถ้าไม่มี id ถูกส่งมาใน URL
+              return Text('No ID provided in the URL');
+            }
           },
         ),
       ],

@@ -141,7 +141,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                       status: sidebarController.index.value == 1
                           ? sidebarController.index.value = 1
                           : sidebarController.index.value = 1,
-                      dropdown: sidebarController.dropdown.value == true ? sidebarController.dropdown.value == true : sidebarController.dropdown.value == true,
+                      dropdown: sidebarController.dropdown.value == true
+                          ? sidebarController.dropdown.value == true
+                          : sidebarController.dropdown.value == true,
                     ),
                   ),
                 ),
@@ -156,7 +158,9 @@ class _MainKnowlegeState extends State<MainKnowlege> {
                           status: sidebarController.index.value == 1
                               ? sidebarController.index.value = 1
                               : sidebarController.index.value = 1,
-                          dropdown: sidebarController.dropdown.value == true ? sidebarController.dropdown.value == true : sidebarController.dropdown.value == true,
+                          dropdown: sidebarController.dropdown.value == true
+                              ? sidebarController.dropdown.value == true
+                              : sidebarController.dropdown.value == true,
                         ),
                       )
                     : null,
@@ -479,21 +483,27 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                 onPressed: () {
                                   if (widget.status != "เนื้อหาเดียว") {
                                     // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
-                                    context.goNamed(
-                                      '/editmultiKnowledge',
-                                      extra: {
-                                        'knowledge': widget.knowledge,
-                                        'icon': widget.icons,
-                                      },
+                                    context.go(
+                                      Uri(
+                                        path: '/editmultiKnowledge',
+                                        queryParameters: {
+                                          'id': widget.knowledge!
+                                              .id, // ส่ง id ไปใน query params
+                                        },
+                                      ).toString(),
                                     );
                                   } else {
                                     // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
-                                    context.goNamed(
-                                      '/editKnowledge',
-                                      extra: {
-                                        'knowledge': widget.knowledge,
-                                        'icon': widget.icons,
-                                      },
+                                    debugPrint(
+                                        "ไอดีที่ดึงมาได้ ${widget.knowledge!.id}");
+                                    context.go(
+                                      Uri(
+                                        path: '/editKnowledge',
+                                        queryParameters: {
+                                          'id': widget.knowledge!
+                                              .id, // ส่ง id ไปใน query params
+                                        },
+                                      ).toString(),
                                     );
                                   }
                                 },
@@ -549,21 +559,27 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                   onPressed: () {
                                     if (widget.status != "เนื้อหาเดียว") {
                                       // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
-                                      context.goNamed(
-                                        '/editmultiKnowledge',
-                                        extra: {
-                                          'knowledge': widget.knowledge,
-                                          'icon': widget.icons,
+                                      context.go(
+                                      Uri(
+                                        path: '/editmultiKnowledge',
+                                        queryParameters: {
+                                          'id': widget.knowledge!
+                                              .id, // ส่ง id ไปใน query params
                                         },
-                                      );
+                                      ).toString(),
+                                    );
                                     } else {
                                       // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
-                                      context.goNamed(
-                                        '/editKnowledge',
-                                        extra: {
-                                          'knowledge': widget.knowledge,
-                                          'icon': widget.icons,
-                                        },
+                                      debugPrint(
+                                          "ไอดีที่ดึงมาได้ ${widget.knowledge!.id}");
+                                      context.go(
+                                        Uri(
+                                          path: '/editKnowledge',
+                                          queryParameters: {
+                                            'id': widget.knowledge!
+                                                .id, // ส่ง id ไปใน query params
+                                          },
+                                        ).toString(),
                                       );
                                     }
                                   },

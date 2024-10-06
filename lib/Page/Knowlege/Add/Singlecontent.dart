@@ -136,60 +136,57 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: Container(
-                                child: DropdownButton(
-                                  items: <String>[
-                                    'สถิติ',
-                                    'ดอกไม้',
-                                    'หนังสือ',
-                                    'น้ำ',
-                                    'ระวัง',
-                                    'คำถาม'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Row(
-                                        children: [
-                                          icons[value] != null
-                                              ? Icon(
-                                                  icons[value]!,
-                                                  color: GPrimaryColor,
-                                                )
-                                              : const SizedBox(),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            value,
-                                            style: const TextStyle(
-                                                color: GPrimaryColor),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedValue = value;
-                                    });
-                                  },
-                                  hint: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.image_outlined,
-                                        color: GPrimaryColor,
-                                      ), // ไอคอนที่ต้องการเพิ่ม
-                                      SizedBox(
-                                          width:
-                                              10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                      Text(
-                                        "เลือกไอคอนสำหรับคลังความรู้",
-                                        style: TextStyle(
-                                            color: GPrimaryColor, fontSize: 17),
-                                      ),
-                                    ],
-                                  ),
-                                  value: _selectedValue,
+                              child: DropdownButton(
+                                items: <String>[
+                                  'สถิติ',
+                                  'ดอกไม้',
+                                  'หนังสือ',
+                                  'น้ำ',
+                                  'ระวัง',
+                                  'คำถาม'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Row(
+                                      children: [
+                                        icons[value] != null
+                                            ? Icon(
+                                                icons[value]!,
+                                                color: GPrimaryColor,
+                                              )
+                                            : const SizedBox(),
+                                        const SizedBox(width: 15),
+                                        Text(
+                                          value,
+                                          style: const TextStyle(
+                                              color: GPrimaryColor),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedValue = value;
+                                  });
+                                },
+                                hint: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.image_outlined,
+                                      color: GPrimaryColor,
+                                    ), // ไอคอนที่ต้องการเพิ่ม
+                                    SizedBox(
+                                        width:
+                                            10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                    Text(
+                                      "เลือกไอคอนสำหรับคลังความรู้",
+                                      style: TextStyle(
+                                          color: GPrimaryColor, fontSize: 17),
+                                    ),
+                                  ],
                                 ),
+                                value: _selectedValue,
                               ),
                             ),
                             const SizedBox(height: 30),
@@ -282,37 +279,31 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             SizedBox(
                               height: 400,
-                              child: Expanded(
-                                  child: Container(
-                                child: Column(
-                                  children: [
-                                    QuillToolbar.simple(
-                                      configurations:
-                                          QuillSimpleToolbarConfigurations(
-                                        controller: _contentController,
-                                        sharedConfigurations:
-                                            const QuillSharedConfigurations(
-                                          locale: Locale('de'),
-                                        ),
+                              child: Column(
+                                children: [
+                                  QuillToolbar.simple(
+                                    configurations:
+                                        QuillSimpleToolbarConfigurations(
+                                      controller: _contentController,
+                                      sharedConfigurations:
+                                          const QuillSharedConfigurations(
+                                        locale: Locale('de'),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: QuillEditor.basic(
-                                        configurations:
-                                            QuillEditorConfigurations(
-                                          controller: _contentController,
-                                          placeholder: 'เขียนข้อความที่นี่...',
-                                          readOnly: false,
-                                          sharedConfigurations:
-                                              const QuillSharedConfigurations(
-                                            locale: Locale('de'),
-                                          ),
-                                        ),
+                                  ),
+                                  QuillEditor.basic(
+                                    configurations: QuillEditorConfigurations(
+                                      controller: _contentController,
+                                      placeholder: 'เขียนข้อความที่นี่...',
+                                      readOnly: false,
+                                      sharedConfigurations:
+                                          const QuillSharedConfigurations(
+                                        locale: Locale('de'),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              )),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 50),
                             const Padding(
@@ -465,7 +456,7 @@ class _SinglecontentState extends State<Singlecontent> {
                               child: Column(
                                 children: [
                                   Expanded(
-                                    child: _displayedWidget ?? Container(),
+                                    child: _displayedWidget,
                                   )
                                 ],
                               ),
@@ -493,8 +484,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                               .width *
                                           2, // กำหนดความสูงของ Container ให้มากกว่าหรือเท่ากับขนาดที่ต้องการเลื่อน
 
-                                      child: _displayedcontentWidget ??
-                                          Container(),
+                                      child: _displayedcontentWidget,
                                     ),
                                   ],
                                 ),
@@ -563,60 +553,57 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: Container(
-                                child: DropdownButton(
-                                  items: <String>[
-                                    'สถิติ',
-                                    'ดอกไม้',
-                                    'หนังสือ',
-                                    'น้ำ',
-                                    'ระวัง',
-                                    'คำถาม'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Row(
-                                        children: [
-                                          icons[value] != null
-                                              ? Icon(
-                                                  icons[value]!,
-                                                  color: GPrimaryColor,
-                                                )
-                                              : const SizedBox(),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            value,
-                                            style: const TextStyle(
-                                                color: GPrimaryColor),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedValue = value;
-                                    });
-                                  },
-                                  hint: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.image_outlined,
-                                        color: GPrimaryColor,
-                                      ), // ไอคอนที่ต้องการเพิ่ม
-                                      SizedBox(
-                                          width:
-                                              10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                      Text(
-                                        "เลือกไอคอนสำหรับคลังความรู้",
-                                        style: TextStyle(
-                                            color: GPrimaryColor, fontSize: 17),
-                                      ),
-                                    ],
-                                  ),
-                                  value: _selectedValue,
+                              child: DropdownButton(
+                                items: <String>[
+                                  'สถิติ',
+                                  'ดอกไม้',
+                                  'หนังสือ',
+                                  'น้ำ',
+                                  'ระวัง',
+                                  'คำถาม'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Row(
+                                      children: [
+                                        icons[value] != null
+                                            ? Icon(
+                                                icons[value]!,
+                                                color: GPrimaryColor,
+                                              )
+                                            : const SizedBox(),
+                                        const SizedBox(width: 15),
+                                        Text(
+                                          value,
+                                          style: const TextStyle(
+                                              color: GPrimaryColor),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedValue = value;
+                                  });
+                                },
+                                hint: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.image_outlined,
+                                      color: GPrimaryColor,
+                                    ), // ไอคอนที่ต้องการเพิ่ม
+                                    SizedBox(
+                                        width:
+                                            10), // ระยะห่างระหว่างไอคอนและข้อความ
+                                    Text(
+                                      "เลือกไอคอนสำหรับคลังความรู้",
+                                      style: TextStyle(
+                                          color: GPrimaryColor, fontSize: 17),
+                                    ),
+                                  ],
                                 ),
+                                value: _selectedValue,
                               ),
                             ),
                             const SizedBox(height: 30),
@@ -709,37 +696,31 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             SizedBox(
                               height: 400,
-                              child: Expanded(
-                                  child: Container(
-                                child: Column(
-                                  children: [
-                                    QuillToolbar.simple(
-                                      configurations:
-                                          QuillSimpleToolbarConfigurations(
-                                        controller: _contentController,
-                                        sharedConfigurations:
-                                            const QuillSharedConfigurations(
-                                          locale: Locale('de'),
-                                        ),
+                              child: Column(
+                                children: [
+                                  QuillToolbar.simple(
+                                    configurations:
+                                        QuillSimpleToolbarConfigurations(
+                                      controller: _contentController,
+                                      sharedConfigurations:
+                                          const QuillSharedConfigurations(
+                                        locale: Locale('de'),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: QuillEditor.basic(
-                                        configurations:
-                                            QuillEditorConfigurations(
-                                          controller: _contentController,
-                                          placeholder: 'เขียนข้อความที่นี่...',
-                                          readOnly: false,
-                                          sharedConfigurations:
-                                              const QuillSharedConfigurations(
-                                            locale: Locale('de'),
-                                          ),
-                                        ),
+                                  ),
+                                  QuillEditor.basic(
+                                    configurations: QuillEditorConfigurations(
+                                      controller: _contentController,
+                                      placeholder: 'เขียนข้อความที่นี่...',
+                                      readOnly: false,
+                                      sharedConfigurations:
+                                          const QuillSharedConfigurations(
+                                        locale: Locale('de'),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              )),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 50),
                             const Padding(
@@ -809,7 +790,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                                         (BuildContext context) {
                                                       return Stack(
                                                         children: [
-                                                          Container(
+                                                          SizedBox(
                                                             width:
                                                                 MediaQuery.of(
                                                                         context)
@@ -840,7 +821,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                                                   icon:
                                                                       Container(
                                                                     decoration:
-                                                                        BoxDecoration(
+                                                                        const BoxDecoration(
                                                                       shape: BoxShape
                                                                           .circle,
                                                                       color: Colors
@@ -1037,7 +1018,7 @@ class _SinglecontentState extends State<Singlecontent> {
                               child: Column(
                                 children: [
                                   Expanded(
-                                    child: _displayedWidget ?? Container(),
+                                    child: _displayedWidget,
                                   )
                                 ],
                               ),
@@ -1079,67 +1060,65 @@ class _SinglecontentState extends State<Singlecontent> {
           Padding(
             // padding: const EdgeInsets.all(25.0),
             padding: const EdgeInsets.only(right: 70.0, top: 50.0, bottom: 50),
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DialogCancle(),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0x00c5c5c5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "ยกเลิก",
-                      style: TextStyle(color: Colors.white),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => DialogCancle(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0x00c5c5c5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const SizedBox(
-                    width: 20.0,
+                  child: const Text(
+                    "ยกเลิก",
+                    style: TextStyle(color: Colors.white),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      final deltaJson =
-                          _contentController.document.toDelta().toJson();
-                      debugPrint("$deltaJson");
+                ),
+                const SizedBox(
+                  width: 20.0,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final deltaJson =
+                        _contentController.document.toDelta().toJson();
+                    debugPrint("$deltaJson");
 
-                      final converter = QuillDeltaToHtmlConverter(
-                        List.castFrom(deltaJson),
-                      );
-                      _html = converter.convert();
-                      debugPrint(_html);
+                    final converter = QuillDeltaToHtmlConverter(
+                      List.castFrom(deltaJson),
+                    );
+                    _html = converter.convert();
+                    debugPrint(_html);
 
-                      upload();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 15.0),
-                      backgroundColor: GPrimaryColor,
+                    upload();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: uploading
-                        ? const SizedBox(
-                            height: 15.0,
-                            child: CircularProgressIndicator(),
-                          )
-                        : const Text(
-                            "เพิ่ม",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 15.0),
+                    backgroundColor: GPrimaryColor,
+                  ),
+                  child: uploading
+                      ? const SizedBox(
+                          height: 15.0,
+                          child: CircularProgressIndicator(),
+                        )
+                      : const Text(
+                          "เพิ่ม",
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                  ),
-                ],
-              ),
+                        ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1398,7 +1377,7 @@ class _SinglecontentState extends State<Singlecontent> {
                           itemCount: itemPhotosWidgetList.length,
                           itemBuilder:
                               (BuildContext context, int index, int realIndex) {
-                            return Container(
+                            return SizedBox(
                               width: MediaQuery.of(context).size.width,
                               child: itemPhotosWidgetList[index],
                             );
@@ -1435,7 +1414,7 @@ class _SinglecontentState extends State<Singlecontent> {
                         ),
                       ],
                     )
-                  : Container(
+                  : SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.3,
                       child: itemPhotosWidgetList[0],
@@ -1469,18 +1448,22 @@ class _SinglecontentState extends State<Singlecontent> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      child: Text(
-                        nameController.text,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
                         ),
-                      ),
+                        Expanded(
+                          child: Text(
+                            nameController.text,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
