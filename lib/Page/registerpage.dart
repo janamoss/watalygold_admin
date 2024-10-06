@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_top.dart';
 import 'package:watalygold_admin/firebase_auth_implementation/firebase_auth_services.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
 
 class registerPage extends StatefulWidget {
@@ -499,69 +500,26 @@ class _registerPageState extends State<registerPage> {
           _LnameController.text,
           _phonenumberController.text);
       try {
-        User? user = await _auth.RegisterWithEmailandPassword(email, password,
-            "${_FnameController.text} ${_LnameController.text}");
-        logger.d(user?.uid);
-
-        if (user != null) {
-          context.goNamed(
-            '/login',
-            extra: {
-              'showSuccessFlushbar': true,
-              'message': "สมัครสมาชิกเสร็จสิ้น",
-              'description': "คุณได้ทำการสมัครสมาชิกเสร็จสิ้นเรียบร้อย"
-            },
-          );
-          debugPrint("สมัครเสร็จสิ้นแล้ว");
-        }
-      } catch (e) {
-        // เมื่อเกิดข้อผิดพลาด ให้แสดง Flushbar ด้วยข้อความที่ได้รับ
-        _showErrorFlushbar("สมัครสมาชิกล้มเหลว", e.toString());
+      User? user = await _auth.RegisterWithEmailandPassword(
+        email, password, "${_FnameController.text} ${_LnameController.text}");
+      logger.d(user?.uid);
+      
+      if (user != null) {
+        context.goNamed(
+          '/login',
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "สมัครสมาชิกเสร็จสิ้น",
+            'description': "คุณได้ทำการสมัครสมาชิกเสร็จสิ้นเรียบร้อย"
+          },
+        );
+        debugPrint("สมัครเสร็จสิ้นแล้ว");
       }
+    } catch (e) {
+      // เมื่อเกิดข้อผิดพลาด ให้แสดง Flushbar ด้วยข้อความที่ได้รับ
+      showErrorFlushbar(context,"สมัครสมาชิกล้มเหลว", e.toString());
+    }
     }
   }
 
-  void _showErrorFlushbar(String title, String message) {
-    Flushbar(
-      title: title,
-      message: message,
-      messageColor: Colors.red.shade300,
-      titleColor: Colors.red.shade300,
-      borderRadius: BorderRadius.circular(10),
-      margin: EdgeInsets.all(15),
-      maxWidth: 600,
-      icon: Icon(
-        Icons.error_rounded,
-        size: 28,
-        color: Colors.red.shade400,
-      ),
-      duration: const Duration(seconds: 3),
-      leftBarIndicatorColor: Colors.red.shade400,
-      backgroundColor: WhiteColor,
-      flushbarPosition: FlushbarPosition.TOP,
-      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
-    ).show(context);
-  }
-
-  void _showSucessFlushbar(String title, String message) {
-    Flushbar(
-      title: title,
-      message: message,
-      messageColor: Colors.green.shade300,
-      titleColor: Colors.green.shade300,
-      borderRadius: BorderRadius.circular(10),
-      margin: EdgeInsets.all(15),
-      maxWidth: 600,
-      icon: Icon(
-        Icons.check_circle_rounded,
-        size: 28,
-        color: Colors.green.shade400,
-      ),
-      duration: const Duration(seconds: 3),
-      leftBarIndicatorColor: Colors.green.shade400,
-      backgroundColor: WhiteColor,
-      flushbarPosition: FlushbarPosition.TOP,
-      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
-    ).show(context);
-  }
 }

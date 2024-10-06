@@ -13,6 +13,7 @@ import 'package:watalygold_admin/Widgets/Card/resultCard.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainDash extends StatefulWidget {
@@ -44,34 +45,12 @@ class _MainDashState extends State<MainDash> {
     super.initState();
     if (widget.showSuccessFlushbar) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showSucessFlushbar(widget.message, widget.description);
+        showSuccessFlushbar(context, widget.message, widget.description);
       });
     }
     Future.delayed(Duration.zero, () async {
       fetchAllResults();
     });
-  }
-
-  void _showSucessFlushbar(String title, String message) {
-    Flushbar(
-      title: title,
-      message: message,
-      messageColor: Colors.green.shade300,
-      titleColor: Colors.green.shade300,
-      borderRadius: BorderRadius.circular(10),
-      margin: EdgeInsets.all(15),
-      maxWidth: 600,
-      icon: Icon(
-        Icons.check_circle_rounded,
-        size: 28,
-        color: Colors.green.shade400,
-      ),
-      duration: const Duration(seconds: 3),
-      leftBarIndicatorColor: Colors.green.shade400,
-      backgroundColor: WhiteColor,
-      flushbarPosition: FlushbarPosition.TOP,
-      dismissDirection: FlushbarDismissDirection.HORIZONTAL,
-    ).show(context);
   }
 
   Future<void> fetchAllResults() async {
