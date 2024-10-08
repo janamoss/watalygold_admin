@@ -14,13 +14,23 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/Deleteddialogknowledge.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/service/content.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
 
 class MainKnowlege extends StatefulWidget {
-  const MainKnowlege({super.key});
+  final bool showSuccessFlushbar;
+  final String message;
+  final String description;
+
+  const MainKnowlege({
+    super.key,
+    this.showSuccessFlushbar = false,
+    this.message = '',
+    this.description = '',
+  });
 
   @override
   State<MainKnowlege> createState() => _MainKnowlegeState();
@@ -83,6 +93,13 @@ class _MainKnowlegeState extends State<MainKnowlege> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.showSuccessFlushbar) {
+      debugPrint("แสดงผลอยู่");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showSuccessFlushbar(context, widget.message, widget.description);
+      });
+    }
 
     setState(() {
       _isLoading = true; // Set loading state to true
@@ -374,18 +391,19 @@ class KnowledgeContainer extends StatefulWidget {
   final status;
   final Function(String) onKnowledgeDeleted;
   final SidebarController? sidebarController;
-  const KnowledgeContainer(
-      {super.key,
-      this.id,
-      this.title,
-      this.icons,
-      this.image,
-      this.ontap,
-      this.date,
-      this.status,
-      this.sidebarController,
-      this.knowledge,
-      required this.onKnowledgeDeleted});
+  const KnowledgeContainer({
+    super.key,
+    this.id,
+    this.title,
+    this.icons,
+    this.image,
+    this.ontap,
+    this.date,
+    this.status,
+    this.sidebarController,
+    this.knowledge,
+    required this.onKnowledgeDeleted,
+  });
 
   @override
   State<KnowledgeContainer> createState() => _KnowledgeContainerState();
@@ -526,8 +544,8 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                               height: 15,
                             ),
                             ElevatedButton.icon(
-                                onPressed: () {
-                                  showDialog(
+                                onPressed: () async {
+                                  await showDialog(
                                     context: context,
                                     builder: (context) =>
                                         Deleteddialogknowledge(
@@ -535,8 +553,21 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                       id: widget.id,
                                       onDelete: widget.onKnowledgeDeleted,
                                     ),
-                                  ).then((value) => Navigator.popUntil(context,
-                                      ModalRoute.withName("/mainKnowledge")));
+                                  ).then((value) => {
+                                        if (value)
+                                          {
+                                            context.pushNamed(
+                                              "/mainKnowledge",
+                                              extra: {
+                                                'showSuccessFlushbar': true,
+                                                'message':
+                                                    "ลบคลังความรู้เสร็จสิ้น",
+                                                'description':
+                                                    "คุณได้ทำลบคลังความรู้เสร็จสิ้นเรียบร้อย"
+                                              },
+                                            )
+                                          }
+                                      });
                                 },
                                 icon: Icon(
                                   Icons.delete_forever_rounded,
@@ -560,14 +591,14 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                     if (widget.status != "เนื้อหาเดียว") {
                                       // หากมีข้อมูล content ให้เปิดหน้า ExpansionTileExample
                                       context.go(
-                                      Uri(
-                                        path: '/editmultiKnowledge',
-                                        queryParameters: {
-                                          'id': widget.knowledge!
-                                              .id, // ส่ง id ไปใน query params
-                                        },
-                                      ).toString(),
-                                    );
+                                        Uri(
+                                          path: '/editmultiKnowledge',
+                                          queryParameters: {
+                                            'id': widget.knowledge!
+                                                .id, // ส่ง id ไปใน query params
+                                          },
+                                        ).toString(),
+                                      );
                                     } else {
                                       // ถ้าไม่มีข้อมูล content ให้เปิดหน้า EditKnowlege
                                       debugPrint(
@@ -602,8 +633,8 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                 width: 15,
                               ),
                               ElevatedButton.icon(
-                                  onPressed: () {
-                                    showDialog(
+                                  onPressed: () async {
+                                    await showDialog(
                                       context: context,
                                       builder: (context) =>
                                           Deleteddialogknowledge(
@@ -611,9 +642,28 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                                         id: widget.id,
                                         onDelete: widget.onKnowledgeDeleted,
                                       ),
-                                    ).then((value) => Navigator.popUntil(
-                                        context,
-                                        ModalRoute.withName("/mainKnowledge")));
+                                    ).then((value) => {
+                                          if (value == true)
+                                            {
+                                              context.pushNamed(
+                                                "/mainKnowledge",
+                                                extra: {
+                                                  'showSuccessFlushbar': true,
+                                                  'message':
+                                                      "ลบคลังความรู้เสร็จสิ้น",
+                                                  'description':
+                                                      "คุณได้ทำลบคลังความรู้เสร็จสิ้นเรียบร้อย"
+                                                },
+                                              )
+                                            }
+                                          else if (value == "error")
+                                            {
+                                              showErrorFlushbar(
+                                                  context,
+                                                  "ลบคลังความรู้ล้มเหลว",
+                                                  "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง")
+                                            }
+                                        });
                                   },
                                   icon: Icon(
                                     Icons.delete_forever_rounded,

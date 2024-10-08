@@ -49,11 +49,11 @@ class RouteConfig {
         GoRoute(
           path: "/dashboard",
           name: "/dashboard",
-          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>?;
             return MainDash(
-              showSuccessFlushbar: extra?['showSuccessFlushbar'] ?? false, 
+              showSuccessFlushbar: extra?['showSuccessFlushbar'] ?? false,
               message: extra?['message'] ?? '',
               description: extra?['description'] ?? '',
             );
@@ -63,16 +63,24 @@ class RouteConfig {
         GoRoute(
           path: "/mainKnowledge",
           name: "/mainKnowledge",
-          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // sidebarController.index.value = 1;
-            return const MainKnowlege();
+            debugPrint("ทำงานปกตินะคะ");
+            final extra =
+                state.extra as Map<String, dynamic>?; // รับค่าจาก extra
+            return MainKnowlege(
+              showSuccessFlushbar: extra?['showSuccessFlushbar'] ??
+                  false, // ส่งค่าไปยัง LoginPage
+              message: extra?['message'] ?? '',
+              description: extra?['description'] ?? '',
+            );
           },
         ),
         GoRoute(
           path: "/addKnowledge",
           name: "/addKnowledge",
-          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // sidebarController.index.value = 2;
             return const Add_Knowlege();
@@ -81,7 +89,7 @@ class RouteConfig {
         GoRoute(
           path: "/editmultiKnowledge",
           name: "/editmultiKnowledge",
-          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // ดึง id จาก query parameters
             final id = state.uri.queryParameters['id'];
@@ -120,7 +128,7 @@ class RouteConfig {
         GoRoute(
           path: "/editKnowledge",
           name: "/editKnowledge",
-          redirect: (context, state) => CheckUser.handleAuthRedirect(context),
+          // redirect: (context, state) => CheckUser.handleAuthRedirect(context),
           builder: (context, state) {
             // ดึง id จาก query parameters
             final id = state.uri.queryParameters['id'];

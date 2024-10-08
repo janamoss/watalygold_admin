@@ -17,6 +17,7 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogCancle.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
 import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
@@ -1874,15 +1875,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
 
   Future<void> addAllContent(List<String> imageUrl) async {
     if (namecontroller.text.isEmpty || _selectedValue == null) {
-      Fluttertoast.showToast(
-        msg: "กรุณากรอกข้อมูลให้ครบ",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showErrorFlushbar(
+          context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
     }
     List<String> contentIds = [];
@@ -1908,15 +1902,8 @@ class _MultiplecontentState extends State<Multiplecontent> {
     }
 
     if (contentIds.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "กรุณาเพิ่มข้อมูลของเนื้อหา",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showErrorFlushbar(
+          context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
     }
     // Generate a knowledge ID
@@ -1944,18 +1931,15 @@ class _MultiplecontentState extends State<Multiplecontent> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.goNamed("/mainKnowledge");
+        context.goNamed("/mainKnowledge",extra: {
+              'showSuccessFlushbar': true,
+              'message': "เพิ่มคลังความรู้เสร็จสิ้น",
+              'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
+            },);
       });
     }).catchError((error) {
-      Fluttertoast.showToast(
-        msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+     showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
+            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     });
   }
 

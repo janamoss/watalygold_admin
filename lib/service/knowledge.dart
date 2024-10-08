@@ -80,7 +80,7 @@ class Knowledge {
       knowledgeIconString: data['KnowledgeIcons'] ?? '',
       knowledgeImg: knowledgeImgList,
       create_at:
-          data['Create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
+          data['create_at'] as Timestamp? ?? Timestamp.fromDate(DateTime.now()),
     );
   }
 }

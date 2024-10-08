@@ -26,6 +26,7 @@ import 'package:watalygold_admin/Widgets/Dialog/dialogcancleEdit.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
@@ -1955,18 +1956,18 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.goNamed("/mainKnowledge");
+        context.pushNamed(
+          "/mainKnowledge",
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "แก้ไขคลังความรู้เสร็จสิ้น",
+            'description': "คุณได้ทำแก้ไขคลังความรู้เสร็จสิ้นเรียบร้อย"
+          },
+        );
       });
     }).catchError((error) {
-      Fluttertoast.showToast(
-        msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showErrorFlushbar(context, "แก้ไขคลังความรู้ล้มเหลว",
+            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     });
   }
 

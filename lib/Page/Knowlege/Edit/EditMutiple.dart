@@ -34,6 +34,7 @@ import 'package:watalygold_admin/Widgets/Dialog/dialogEdit.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogcancleEdit.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
@@ -275,10 +276,18 @@ class _EditMutipleState extends State<EditMutiple> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.goNamed("/mainKnowledge");
+        context.pushNamed(
+          "/mainKnowledge",
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "แก้ไขคลังความรู้เสร็จสิ้น",
+            'description': "คุณได้ทำแก้ไขคลังความรู้เสร็จสิ้นเรียบร้อย"
+          },
+        );
       });
     } catch (error) {
-      debugPrint("Error updating content: $error");
+      showErrorFlushbar(context, "แก้ไขคลังความรู้ล้มเหลว",
+          "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     }
   }
 

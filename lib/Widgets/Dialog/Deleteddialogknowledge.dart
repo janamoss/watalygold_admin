@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watalygold_admin/Widgets/Dialog/DeleteknowledgeSuccess.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
 
@@ -125,7 +126,7 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
                     side: BorderSide(color: Colors.red),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.of(context).pop(false);
                   },
                   child: const Text("ยกเลิก"),
                 ),
@@ -142,24 +143,18 @@ class _DeleteddialogknowledgeState extends State<Deleteddialogknowledge> {
                   onPressed: () async {
                     try {
                       await deleteKnowledge();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('ลบคลังความรู้สำเร็จ'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
                       widget.onDelete(widget.id);
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(true);
                     } catch (e) {
                       debugPrint("Error deleting knowledge: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('เกิดข้อผิดพลาดในการลบคลังความรู้'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.red, // สีสำหรับแสดงข้อผิดพลาด
-                        ),
-                      );
+                      Navigator.of(context).pop("error");
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(
+                      //     content: Text('เกิดข้อผิดพลาดในการลบคลังความรู้'),
+                      //     duration: Duration(seconds: 2),
+                      //     backgroundColor: Colors.red, // สีสำหรับแสดงข้อผิดพลาด
+                      //   ),
+                      // );
                     }
                   },
                   child: const Text("ยืนยัน"),

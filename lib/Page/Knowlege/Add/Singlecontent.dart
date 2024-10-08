@@ -18,6 +18,7 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogCancle.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
 import 'package:flutter_widget_from_html_core/src/core_data.dart'
     as htmlImageSource;
@@ -1250,15 +1251,8 @@ class _SinglecontentState extends State<Singlecontent> {
   Future<void> addKnowledge(List<String> imageUrls) async {
     // ตรวจสอบความสมบูรณ์ของข้อมูล
     if (nameController.text.isEmpty || _selectedValue == null) {
-      Fluttertoast.showToast(
-        msg: "กรุณากรอกข้อมูลให้ครบ",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showErrorFlushbar(
+          context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
     }
 
@@ -1288,19 +1282,18 @@ class _SinglecontentState extends State<Singlecontent> {
         );
         Future.delayed(const Duration(seconds: 1), () {
           Navigator.pop(context);
-          context.goNamed("/mainKnowledge");
+          context.goNamed(
+            "/mainKnowledge",
+            extra: {
+              'showSuccessFlushbar': true,
+              'message': "เพิ่มคลังความรู้เสร็จสิ้น",
+              'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
+            },
+          );
         });
       }).catchError((error) {
-        // แสดงข้อความเตือนเมื่อเกิดข้อผิดพลาดในการเพิ่มความรู้
-        Fluttertoast.showToast(
-          msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
+            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
       });
     }
   }
