@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,26 @@ class Appbarmain extends StatefulWidget implements PreferredSizeWidget {
 
 class _AppbarmainState extends State<Appbarmain> {
   final logger = Logger();
+
+  String? username;
+
+  static Future<String?> checkSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString("username");
+    return username;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkSharedPrefs().then((value) {
+      setState(() {
+        username = value ?? ""; // กำหนดค่าให้ username หรือ "" ถ้าเป็น null
+        debugPrint(value);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,21 +94,36 @@ class _AppbarmainState extends State<Appbarmain> {
               return [
                 PopupMenuItem<int>(
                   value: 0,
-                  child: ListTile(
-                    onTap: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      prefs.clear();
-                      FirebaseAuth.instance.signOut();
-                      context.goNamed('/login');
-                    },
-                    leading: Icon(
-                      Icons.logout_rounded,
-                      color: WhiteColor,
-                    ),
-                    title: Text(
-                      "ออกจากระบบ",
-                      style: TextStyle(color: WhiteColor, fontSize: 17),
-                    ),
+                  child: Column(
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          "คุณ $username",
+                          style: TextStyle(
+                            color: WhiteColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          prefs.clear();
+                          FirebaseAuth.instance.signOut();
+                          context.goNamed('/login');
+                        },
+                        leading: Icon(
+                          Icons.logout_rounded,
+                          color: WhiteColor,
+                        ),
+                        title: Text(
+                          "ออกจากระบบ",
+                          style: TextStyle(color: WhiteColor, fontSize: 17),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ];

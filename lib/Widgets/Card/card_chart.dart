@@ -145,6 +145,20 @@ class _CardChartState extends State<CardChart> {
   void initState() {
     super.initState();
     _populateYearLabels();
+    // ดึงข้อมูลเดือนและปีปัจจุบัน
+    final now = DateTime.now();
+    final currentMonth = months[now.month - 1]; // แปลงเป็นชื่อเดือน
+    final currentYear = (now.year + 543).toString(); // ปีปัจจุบันเป็น พ.ศ.
+
+    // ตั้งค่า selectedMonth และ selectedYear
+    selectedMonth = currentMonth;
+    selectedYear = currentYear;
+
+    // โหลดข้อมูลเริ่มต้นของกราฟ
+    barData = getBarData(selectedMonth, selectedYear)
+        .cast<BarChartGroupData?>()
+        .whereType<BarChartGroupData>()
+        .toList();
   }
 
   List<String> months = [
@@ -219,6 +233,7 @@ class _CardChartState extends State<CardChart> {
                       ),
                     ),
                     label: Text("เลือกเดือน"),
+                    initialSelection: selectedMonth,
                     dropdownMenuEntries: months
                         .map((month) =>
                             DropdownMenuEntry(value: month, label: month))
@@ -260,6 +275,7 @@ class _CardChartState extends State<CardChart> {
                       ),
                     ),
                     label: Text("เลือกปี"),
+                    initialSelection: selectedYear,
                     dropdownMenuEntries: yearLabels
                         .map((year) =>
                             DropdownMenuEntry(value: year, label: year))

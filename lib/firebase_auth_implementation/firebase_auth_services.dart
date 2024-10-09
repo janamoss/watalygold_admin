@@ -1,37 +1,41 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseAuthService {
   final logger = Logger();
 
   Future<User?> RegisterWithEmailandPassword(
-    String email, String password, String username) async {
-  try {
-    final credential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
-    credential.user?.updateDisplayName(username);
-    return credential.user;
-  } on FirebaseAuthException catch (e) {
-    logger.e(e);
-    
-    // ตรวจสอบ error code ว่าเป็น "email-already-in-use" หรือไม่
-    if (e.code == 'email-already-in-use') {
-      return Future.error('อีเมลนี้ถูกใช้งานไปแล้ว');
-    }
-    return Future.error(e.message ?? 'เกิดข้อผิดพลาดบางอย่าง');
-  } catch (e) {
-    logger.e("error something someone");
-    return Future.error("เกิดข้อผิดพลาดบางอย่าง");
-  }
-}
+      String email, String password, String username) async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      credential.user?.updateDisplayName(username);
+      return credential.user;
+    } on FirebaseAuthException catch (e) {
+      logger.e(e);
 
+      // ตรวจสอบ error code ว่าเป็น "email-already-in-use" หรือไม่
+      if (e.code == 'email-already-in-use') {
+        return Future.error('อีเมลนี้ถูกใช้งานไปแล้ว');
+      }
+      return Future.error(e.message ?? 'เกิดข้อผิดพลาดบางอย่าง');
+    } catch (e) {
+      logger.e("error something someone");
+      return Future.error("เกิดข้อผิดพลาดบางอย่าง");
+    }
+  }
 
   Future<String?> LoginWithEmailandPassword(
       String email, String password) async {
     logger.d("ทำงานปกติ");
     try {
+      final prefs = await SharedPreferences.getInstance();
       final UserCredential credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+      debugPrint(credential.user?.displayName);
+      prefs.setString("username", "${credential.user?.displayName}");
       return credential.user?.uid; // ส่ง UID กลับไป
     } on FirebaseAuthException catch (e) {
       logger.e(e.code);

@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
     // ตรวจสอบว่าต้องแสดง Flushbar หรือไม่
     if (widget.showSuccessFlushbar) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showSuccessFlushbar(context,widget.message, widget.description);
+        showSuccessFlushbar(context, widget.message, widget.description);
       });
     }
   }
@@ -292,18 +292,19 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         prefs.setString("UserID", userId);
         context.goNamed(
-            '/dashboard',extra: {
-              'showSuccessFlushbar': true,
-              'message': "เข้าสู่ระบบเสร็จสิ้น",
-              'description': "ยินดีต้อนรับเข้าสู่ระบบ WatalyGold"
-            },); // Navigate ไปยัง /dashboard หลังจากตั้งค่า "UserID" แล้ว
+          '/dashboard',
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "เข้าสู่ระบบเสร็จสิ้น",
+            'description': "ยินดีต้อนรับเข้าสู่ระบบ WatalyGold"
+          },
+        ); // Navigate ไปยัง /dashboard หลังจากตั้งค่า "UserID" แล้ว
       } else {
-        showErrorFlushbar(context,
-            "เข้าสู่ระบบล้มเหลว", "กรุณาตรวจสอบอีเมลและรหัสผ่านของคุณ");
+        showErrorFlushbar(context, "เข้าสู่ระบบล้มเหลว",
+            "กรุณาตรวจสอบอีเมลและรหัสผ่านของคุณ");
       }
     }
   }
-
 }
 
 class Input_string extends StatelessWidget {

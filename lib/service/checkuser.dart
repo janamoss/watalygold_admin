@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,13 +17,35 @@ class CheckUser {
   }
 
   static Future<String?> handleAuthRedirect(BuildContext context) async {
-    final hasUser = await checkUser();
-    final hasUserID = await checkSharedPrefs();
+    final hasUser = await checkUser(); // ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง
+    final hasUserID =
+        await checkSharedPrefs(); // ตรวจสอบ UserID ใน SharedPreferences
+
+    debugPrint(hasUser.toString());
+    debugPrint(hasUserID.toString());
+
+    // ดึง URL ปัจจุบัน
+    final currentUrl = window.location.href;
+
+    final uri = Uri.parse(currentUrl);
+    final currentRoute = uri.path;
+
+    // Debug ดูว่าตอนนี้อยู่ใน route ไหน
+    debugPrint(currentRoute);
 
     if (hasUser && hasUserID) {
-      return null; // มี user และ UserID ให้คงอยู่ path ปัจจุบัน
+      // ตรวจสอบว่าผู้ใช้พยายามเข้าหน้า /login หรือ /register และได้ทำการล็อกอินแล้ว
+      if (currentRoute == '/login' || currentRoute == '/register') {
+        return '/dashboard'; // Redirect ผู้ใช้ไปที่หน้าอื่น เช่นหน้า home
+      }
+      return null; // ให้คงอยู่ path ปัจจุบันถ้าไม่ใช่หน้า /login หรือ /register
     } else {
-      return '/login'; // ไม่มี user หรือ UserID ให้ redirect ไป login
+      if (currentRoute == '/login' || currentRoute == '/register') {
+        return null; // อนุญาตให้ไปหน้าล็อกอินหรือสมัครสมาชิก
+      }
+
+      // ถ้าผู้ใช้พยายามเข้าถึง path อื่นที่ต้องล็อกอิน ให้ redirect ไปที่หน้า /login
+      return '/login';
     }
   }
 }
