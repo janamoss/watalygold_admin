@@ -181,6 +181,7 @@ class _EditMutipleState extends State<EditMutiple> {
     try {
       await Databasemethods().deleteContent(documentId);
       setState(() {
+        contentList.removeAt(index);
         widget.knowledge!.contents.removeAt(index);
         displayedContentWidgets!.removeAt(index);
       });
