@@ -500,26 +500,25 @@ class _registerPageState extends State<registerPage> {
           _LnameController.text,
           _phonenumberController.text);
       try {
-      User? user = await _auth.RegisterWithEmailandPassword(
-        email, password, "${_FnameController.text} ${_LnameController.text}");
-      logger.d(user?.uid);
-      
-      if (user != null) {
-        context.goNamed(
-          '/login',
-          extra: {
-            'showSuccessFlushbar': true,
-            'message': "สมัครสมาชิกเสร็จสิ้น",
-            'description': "คุณได้ทำการสมัครสมาชิกเสร็จสิ้นเรียบร้อย"
-          },
-        );
-        debugPrint("สมัครเสร็จสิ้นแล้ว");
+        User? user = await _auth.RegisterWithEmailandPassword(email, password,
+            "${_FnameController.text} ${_LnameController.text}");
+        logger.d(user?.uid);
+
+        if (user != null) {
+          context.goNamed(
+            '/login',
+            extra: {
+              'showSuccessFlushbar': true,
+              'message': "สมัครสมาชิกเสร็จสิ้น",
+              'description': "คุณได้ทำการสมัครสมาชิกเสร็จสิ้นเรียบร้อย"
+            },
+          );
+          debugPrint("สมัครเสร็จสิ้นแล้ว");
+        }
+      } catch (e) {
+        // เมื่อเกิดข้อผิดพลาด ให้แสดง Flushbar ด้วยข้อความที่ได้รับ
+        showErrorFlushbar(context, "สมัครสมาชิกล้มเหลว", e.toString());
       }
-    } catch (e) {
-      // เมื่อเกิดข้อผิดพลาด ให้แสดง Flushbar ด้วยข้อความที่ได้รับ
-      showErrorFlushbar(context,"สมัครสมาชิกล้มเหลว", e.toString());
-    }
     }
   }
-
 }

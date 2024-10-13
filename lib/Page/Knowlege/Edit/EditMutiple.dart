@@ -186,6 +186,7 @@ class _EditMutipleState extends State<EditMutiple> {
     try {
       await Databasemethods().deleteContent(documentId);
       setState(() {
+        contentList.removeAt(index);
         widget.knowledge!.contents.removeAt(index);
         displayedContentWidgets!.removeAt(index);
       });
@@ -1016,6 +1017,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 items: <String>[
                                                                   'ใบไม้',
                                                                   'ต้นกล้า',
+                                                                  'ไวรัส',
                                                                   'สถิติ',
                                                                   'ดอกไม้',
                                                                   'หนังสือ',
@@ -1028,7 +1030,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   'ตำแหน่ง',
                                                                   'กล้อง',
                                                                   'ปฏิทิน',
-                                                                  'ไวรัส'
                                                                 ].map<
                                                                     DropdownMenuItem<
                                                                         String>>((String
@@ -1400,6 +1401,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 items: <String>[
                                                                   'ใบไม้',
                                                                   'ต้นกล้า',
+                                                                  'ไวรัส',
                                                                   'สถิติ',
                                                                   'ดอกไม้',
                                                                   'หนังสือ',
@@ -1412,7 +1414,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   'ตำแหน่ง',
                                                                   'กล้อง',
                                                                   'ปฏิทิน',
-                                                                  'ไวรัส'
                                                                 ].map<
                                                                     DropdownMenuItem<
                                                                         String>>((String

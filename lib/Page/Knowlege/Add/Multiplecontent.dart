@@ -174,12 +174,21 @@ class _MultiplecontentState extends State<Multiplecontent> {
                               child: Container(
                                 child: DropdownButton(
                                   items: <String>[
+                                    'ใบไม้',
+                                    'ต้นกล้า',
+                                    'ไวรัส',
                                     'สถิติ',
                                     'ดอกไม้',
                                     'หนังสือ',
                                     'น้ำ',
                                     'ระวัง',
-                                    'คำถาม'
+                                    'คำถาม',
+                                    'รูปภาพ',
+                                    'ระฆัง',
+                                    'ความคิดเห็น',
+                                    'ตำแหน่ง',
+                                    'กล้อง',
+                                    'ปฏิทิน',
                                   ].map<DropdownMenuItem<String>>(
                                       (String value) {
                                     return DropdownMenuItem<String>(
@@ -431,12 +440,21 @@ class _MultiplecontentState extends State<Multiplecontent> {
                               child: Container(
                                 child: DropdownButton(
                                   items: <String>[
+                                    'ใบไม้',
+                                    'ต้นกล้า',
+                                    'ไวรัส',
                                     'สถิติ',
                                     'ดอกไม้',
                                     'หนังสือ',
                                     'น้ำ',
                                     'ระวัง',
-                                    'คำถาม'
+                                    'คำถาม',
+                                    'รูปภาพ',
+                                    'ระฆัง',
+                                    'ความคิดเห็น',
+                                    'ตำแหน่ง',
+                                    'กล้อง',
+                                    'ปฏิทิน',
                                   ].map<DropdownMenuItem<String>>(
                                       (String value) {
                                     return DropdownMenuItem<String>(
@@ -1931,15 +1949,18 @@ class _MultiplecontentState extends State<Multiplecontent> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.goNamed("/mainKnowledge",extra: {
-              'showSuccessFlushbar': true,
-              'message': "เพิ่มคลังความรู้เสร็จสิ้น",
-              'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
-            },);
+        context.goNamed(
+          "/mainKnowledge",
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "เพิ่มคลังความรู้เสร็จสิ้น",
+            'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
+          },
+        );
       });
     }).catchError((error) {
-     showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
-            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
+      showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
+          "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     });
   }
 

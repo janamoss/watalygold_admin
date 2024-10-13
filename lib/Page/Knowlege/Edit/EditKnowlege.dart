@@ -483,6 +483,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                           items: <String>[
                                                             'ใบไม้',
                                                             'ต้นกล้า',
+                                                            'ไวรัส',
                                                             'สถิติ',
                                                             'ดอกไม้',
                                                             'หนังสือ',
@@ -495,7 +496,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                             'ตำแหน่ง',
                                                             'กล้อง',
                                                             'ปฏิทิน',
-                                                            'ไวรัส'
                                                           ].map<
                                                               DropdownMenuItem<
                                                                   String>>((String
@@ -1080,8 +1080,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         child: DropdownButton2<
                                                             String>(
                                                           items: <String>[
-                                                            'ใบไม้',
+                                                             'ใบไม้',
                                                             'ต้นกล้า',
+                                                            'ไวรัส',
                                                             'สถิติ',
                                                             'ดอกไม้',
                                                             'หนังสือ',
@@ -1094,7 +1095,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                             'ตำแหน่ง',
                                                             'กล้อง',
                                                             'ปฏิทิน',
-                                                            'ไวรัส'
                                                           ].map<
                                                               DropdownMenuItem<
                                                                   String>>((String
@@ -1967,7 +1967,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       });
     }).catchError((error) {
       showErrorFlushbar(context, "แก้ไขคลังความรู้ล้มเหลว",
-            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
+          "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     });
   }
 

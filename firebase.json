@@ -3,22 +3,16 @@
     "platforms": {
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "watalygold",
+          "projectId": "watalygoldtest",
           "configurations": {
-            "web": "1:692047570487:web:206c3096e4156fb15281b2"
+            "web": "1:396186191957:web:f6f13113068c3cf8202cdc"
           }
         }
       }
     }
   },
   "hosting": {
-    "public": "build/web",
-    "rewrites":[
-      {
-        "source": "**",
-         "destination": "/index.html"
-     }
-    ],
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",

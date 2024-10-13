@@ -139,12 +139,21 @@ class _SinglecontentState extends State<Singlecontent> {
                               alignment: Alignment.topLeft,
                               child: DropdownButton(
                                 items: <String>[
+                                  'ใบไม้',
+                                  'ต้นกล้า',
+                                  'ไวรัส',
                                   'สถิติ',
                                   'ดอกไม้',
                                   'หนังสือ',
                                   'น้ำ',
                                   'ระวัง',
-                                  'คำถาม'
+                                  'คำถาม',
+                                  'รูปภาพ',
+                                  'ระฆัง',
+                                  'ความคิดเห็น',
+                                  'ตำแหน่ง',
+                                  'กล้อง',
+                                  'ปฏิทิน',
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
@@ -556,12 +565,21 @@ class _SinglecontentState extends State<Singlecontent> {
                               alignment: Alignment.topLeft,
                               child: DropdownButton(
                                 items: <String>[
+                                  'ใบไม้',
+                                  'ต้นกล้า',
+                                  'ไวรัส',
                                   'สถิติ',
                                   'ดอกไม้',
                                   'หนังสือ',
                                   'น้ำ',
                                   'ระวัง',
-                                  'คำถาม'
+                                  'คำถาม',
+                                  'รูปภาพ',
+                                  'ระฆัง',
+                                  'ความคิดเห็น',
+                                  'ตำแหน่ง',
+                                  'กล้อง',
+                                  'ปฏิทิน',
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,

@@ -66,7 +66,7 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
     // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final screenSize = getScreenSize(constraints.maxWidth);
+      ScreenSize screenSize = getScreenSize(context);
 
       return Scaffold(
         body: SafeArea(
@@ -228,11 +228,3 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
     });
   }
 }
-
-// ฟังก์ชันสำหรับกำหนด screen size (ตัวอย่าง)
-ScreenSize getScreenSize(double width) {
-  if (width < 600) return ScreenSize.minidesktop;
-  return ScreenSize.desktop;
-}
-
-enum ScreenSize { minidesktop, desktop }
