@@ -112,6 +112,7 @@ class _MainKnowlegeState extends State<MainKnowlege> {
         String imageUrl = '';
         if (knowledge.knowledgeImg.isNotEmpty) {
           imageUrl = knowledge.knowledgeImg[0];
+          print("รูปภาพที่ดึงมาได้ : $imageUrl");
         } else if (knowledge.contents.isNotEmpty) {
           try {
             final firstContent = knowledge.contents[0].toString();
@@ -412,6 +413,7 @@ class KnowledgeContainer extends StatefulWidget {
 class _KnowledgeContainerState extends State<KnowledgeContainer> {
   @override
   Widget build(BuildContext context) {
+    print(widget.image);
     ScreenSize screenSize = getScreenSize(context);
     return Container(
       margin: EdgeInsets.all(30),
@@ -437,12 +439,15 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      widget.image,
-                    ),
-                    fit: BoxFit.cover,
-                  )),
+                  image: widget.image == ""
+                      ? null
+                      : DecorationImage(
+                          image: NetworkImage(
+                            widget.image,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                  color: widget.image == "" ? GPrimaryColor : null),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(

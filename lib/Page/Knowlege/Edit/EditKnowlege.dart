@@ -636,7 +636,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                                 QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
-                                                              readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -1235,7 +1234,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                                 QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
-                                                              readOnly: false,
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -1529,7 +1527,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   }
 
   int _current = 0;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   Widget buildImageGallery() {
     if (itemPhotosWidgetList.isNotEmpty) {
       return Column(
@@ -1847,7 +1845,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     String Id = widget.knowledge!.id;
 
     String? selectedValue;
-
+    print("ข้อความ edit $_html");
     selectedValue = widget.knowledge!.knowledgeIcons != null
         ? widget.knowledge!.knowledgeIcons.toString()
         : widget.icons != null

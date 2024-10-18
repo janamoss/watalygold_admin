@@ -125,7 +125,7 @@ class _EditMutipleState extends State<EditMutiple> {
   List<String> ContentNamelist = [];
   List? itemContent;
   List<String> ListimageUrl = [];
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   List<List<XFile>> expansionPanelImagesList = [];
   List<List<XFile>> updatedImageFiles = [];
   Map<String, List<String>> localImageUrls = {};
@@ -1977,8 +1977,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 _contentAddController[index],
                                                                             placeholder:
                                                                                 'เขียนข้อความที่นี่...',
-                                                                            readOnly:
-                                                                                false,
                                                                             sharedConfigurations:
                                                                                 const QuillSharedConfigurations(
                                                                               locale: Locale('de'),
@@ -2492,8 +2490,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 _contentAddController[index],
                                                                             placeholder:
                                                                                 'เขียนข้อความที่นี่...',
-                                                                            readOnly:
-                                                                                false,
                                                                             sharedConfigurations:
                                                                                 const QuillSharedConfigurations(
                                                                               locale: Locale('de'),
@@ -3721,7 +3717,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                           controller:
                                                               contentDetailControllers[
                                                                   index],
-                                                          readOnly: false,
                                                           sharedConfigurations:
                                                               const QuillSharedConfigurations(
                                                             locale:
@@ -4196,7 +4191,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                             controller:
                                                                 contentDetailControllers[
                                                                     index],
-                                                            readOnly: false,
                                                             sharedConfigurations:
                                                                 const QuillSharedConfigurations(
                                                               locale:

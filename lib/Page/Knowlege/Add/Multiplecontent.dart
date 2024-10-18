@@ -66,7 +66,7 @@ class Multiplecontent extends StatefulWidget {
 class _MultiplecontentState extends State<Multiplecontent> {
   IconData? selectedIconData;
   String? _selectedValue;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   int _currentExpandedIndex = -1;
   bool addedContent = false;
   TextEditingController contentcontroller = TextEditingController();
@@ -855,7 +855,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                               index],
                                                       placeholder:
                                                           'เขียนข้อความที่นี่...',
-                                                      readOnly: false,
                                                       sharedConfigurations:
                                                           const QuillSharedConfigurations(
                                                         locale: Locale('de'),
@@ -1310,7 +1309,6 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                               index],
                                                       placeholder:
                                                           'เขียนข้อความที่นี่...',
-                                                      readOnly: false,
                                                       sharedConfigurations:
                                                           const QuillSharedConfigurations(
                                                         locale: Locale('de'),

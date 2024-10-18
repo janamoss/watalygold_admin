@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -6,6 +7,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -65,7 +67,7 @@ class _SinglecontentState extends State<Singlecontent> {
   List<XFile> itemImagesList = <XFile>[];
   List<String> downloadUrl = <String>[];
   bool uploading = false;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
 
   @override
   void initState() {
@@ -295,10 +297,22 @@ class _SinglecontentState extends State<Singlecontent> {
                                   QuillToolbar.simple(
                                     configurations:
                                         QuillSimpleToolbarConfigurations(
+                                      showFontFamily: false,
+                                      showFontSize: false,
+                                      showInlineCode: false,
+                                      showSubscript: false,
+                                      showSuperscript: false,
+                                      showSearchButton: false,
+                                      showQuote: false,
+                                      showLink: false,
+                                      showIndent: false,
+                                      showCodeBlock: false,
+                                      showColorButton: false,
+                                      showBackgroundColorButton: false,
                                       controller: _contentController,
                                       sharedConfigurations:
                                           const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                                        locale: Locale('en'),
                                       ),
                                     ),
                                   ),
@@ -306,10 +320,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                     configurations: QuillEditorConfigurations(
                                       controller: _contentController,
                                       placeholder: 'เขียนข้อความที่นี่...',
-                                      readOnly: false,
                                       sharedConfigurations:
                                           const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                                        locale: Locale('en'),
                                       ),
                                     ),
                                   ),
@@ -627,7 +640,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ],
                                     ),
                                     value: _selectedValue,
-                                    dropdownStyleData:  DropdownStyleData(
+                                    dropdownStyleData: DropdownStyleData(
                                       maxHeight: 300,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(14),
@@ -730,32 +743,53 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  )),
+                              padding: EdgeInsets.all(5),
                               height: 400,
-                              child: Column(
-                                children: [
-                                  QuillToolbar.simple(
-                                    configurations:
-                                        QuillSimpleToolbarConfigurations(
-                                      controller: _contentController,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    QuillToolbar.simple(
+                                      configurations:
+                                          QuillSimpleToolbarConfigurations(
+                                        showFontFamily: false,
+                                        showFontSize: false,
+                                        showInlineCode: false,
+                                        showSubscript: false,
+                                        showSuperscript: false,
+                                        showSearchButton: false,
+                                        showQuote: false,
+                                        showLink: false,
+                                        showIndent: false,
+                                        showCodeBlock: false,
+                                        showColorButton: false,
+                                        showBackgroundColorButton: false,
+                                        controller: _contentController,
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  QuillEditor.basic(
-                                    configurations: QuillEditorConfigurations(
-                                      controller: _contentController,
-                                      placeholder: 'เขียนข้อความที่นี่...',
-                                      readOnly: false,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                                    QuillEditor.basic(
+                                      configurations: QuillEditorConfigurations(
+                                        controller: _contentController,
+                                        placeholder: 'เขียนข้อความที่นี่...',
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('de'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(height: 50),
@@ -1122,17 +1156,32 @@ class _SinglecontentState extends State<Singlecontent> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    final deltaJson =
-                        _contentController.document.toDelta().toJson();
-                    debugPrint("$deltaJson");
+                    final jsonString = jsonEncode(
+                        _contentController.document.toDelta().toJson());
+                    print(json);
+                    List<dynamic> jsonList = json.decode(jsonString);
+
+                    // Convert each dynamic item to a Map<String, dynamic>
+                    List<Map<String, dynamic>> resultList = jsonList
+                        .map((item) => Map<String, dynamic>.from(item as Map))
+                        .toList();
 
                     final converter = QuillDeltaToHtmlConverter(
-                      List.castFrom(deltaJson),
+                      resultList,
+                      ConverterOptions.forEmail(),
                     );
-                    _html = converter.convert();
-                    debugPrint(_html);
 
-                    upload();
+                    final html = converter.convert();
+                    print(html);
+
+                    // final converter = QuillDeltaToHtmlConverter(
+                    //   resultList,
+                    // );
+
+                    // final html = converter.convert();
+                    // print(html);
+
+                    // upload();
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -1160,6 +1209,17 @@ class _SinglecontentState extends State<Singlecontent> {
         ],
       ),
     );
+  }
+
+  List<Map<String, dynamic>> parseJsonToListMap(String jsonString) {
+    // Parse the JSON string to a List<dynamic>
+    List<dynamic> jsonList = json.decode(jsonString);
+
+    // Convert each item in the list to a Map<String, dynamic>
+    List<Map<String, dynamic>> resultList =
+        jsonList.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+
+    return resultList;
   }
 
   int _current = 0;
@@ -1244,7 +1304,7 @@ class _SinglecontentState extends State<Singlecontent> {
     debugPrint("$deltaJson");
 
     final converter = QuillDeltaToHtmlConverter(
-      List.castFrom(deltaJson),
+      deltaJson,
     );
     _html = converter.convert();
     debugPrint(_html);
@@ -1520,9 +1580,10 @@ class _SinglecontentState extends State<Singlecontent> {
     // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
     setState(() {
       final deltaJson = _contentController.document.toDelta().toJson();
-      final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
+      final converter = QuillDeltaToHtmlConverter(deltaJson);
       final html = converter.convert();
-
+      print(deltaJson);
+      print(html);
       _displayedWidgetHtmlWidget = HtmlWidget(
         html,
         textStyle: const TextStyle(color: Colors.black, fontSize: 15),
