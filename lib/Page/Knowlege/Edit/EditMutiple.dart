@@ -277,7 +277,7 @@ class _EditMutipleState extends State<EditMutiple> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.pushNamed(
+        context.goNamed(
           "/mainKnowledge",
           extra: {
             'showSuccessFlushbar': true,

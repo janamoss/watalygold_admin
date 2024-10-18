@@ -392,86 +392,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  // Align(
-                                                  //   alignment:
-                                                  //       Alignment.topLeft,
-                                                  //   child: Container(
-                                                  //     child: DropdownButton(
-                                                  //       items: <String>[
-                                                  //         'สถิติ',
-                                                  //         'ดอกไม้',
-                                                  //         'หนังสือ',
-                                                  //         'น้ำ',
-                                                  //         'ระวัง',
-                                                  //         'คำถาม'
-                                                  //       ].map<
-                                                  //           DropdownMenuItem<
-                                                  //               String>>((String
-                                                  //           value) {
-                                                  //         return DropdownMenuItem<
-                                                  //             String>(
-                                                  //           value: value,
-                                                  //           child: Row(
-                                                  //             children: [
-                                                  //               icons[value] !=
-                                                  //                       null
-                                                  //                   ? Icon(
-                                                  //                       icons[
-                                                  //                           value]!,
-                                                  //                       color:
-                                                  //                           GPrimaryColor,
-                                                  //                     )
-                                                  //                   : SizedBox(),
-                                                  //               SizedBox(
-                                                  //                   width: 25),
-                                                  //               Text(
-                                                  //                 value,
-                                                  //                 style: TextStyle(
-                                                  //                     color:
-                                                  //                         GPrimaryColor),
-                                                  //               ),
-                                                  //             ],
-                                                  //           ),
-                                                  //         );
-                                                  //       }).toList(),
-                                                  //       onChanged: (value) {
-                                                  //         setState(() {
-                                                  //           _selectedValue =
-                                                  //               value;
-                                                  //         });
-                                                  //       },
-                                                  //       hint: Row(
-                                                  //         children: [
-                                                  //           // ไอคอนที่ต้องการเพิ่ม
-                                                  //           SizedBox(
-                                                  //               width:
-                                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                                  //           Row(
-                                                  //             children: [
-                                                  //               Icon(
-                                                  //                   widget.icons ??
-                                                  //                       Icons
-                                                  //                           .question_mark_rounded,
-                                                  //                   color:
-                                                  //                       GPrimaryColor,
-                                                  //                   size: 24),
-                                                  //               SizedBox(
-                                                  //                 width: 20,
-                                                  //               ),
-                                                  //               Text(
-                                                  //                 "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
-                                                  //                 style: TextStyle(
-                                                  //                     color:
-                                                  //                         GPrimaryColor),
-                                                  //               ),
-                                                  //             ],
-                                                  //           ),
-                                                  //         ],
-                                                  //       ),
-                                                  //       value: _selectedValue,
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
                                                   Align(
                                                     alignment:
                                                         Alignment.topLeft,
@@ -1080,7 +1000,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         child: DropdownButton2<
                                                             String>(
                                                           items: <String>[
-                                                             'ใบไม้',
+                                                            'ใบไม้',
                                                             'ต้นกล้า',
                                                             'ไวรัส',
                                                             'สถิติ',
@@ -1956,7 +1876,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.pushNamed(
+        context.goNamed(
           "/mainKnowledge",
           extra: {
             'showSuccessFlushbar': true,
