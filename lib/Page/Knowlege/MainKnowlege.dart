@@ -60,10 +60,15 @@ class _MainKnowlegeState extends State<MainKnowlege> {
   }
 
   Future<Contents> getContentsById(String documentId) async {
+    if (documentId.isEmpty) {
+      throw Exception("Document ID cannot be empty");
+    }
+
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final docRef = firestore.collection('Content').doc(documentId);
     final doc = await docRef.get();
     debugPrint("${doc}");
+
     if (doc.exists) {
       final data = doc.data();
       return Contents(
@@ -112,9 +117,10 @@ class _MainKnowlegeState extends State<MainKnowlege> {
         String imageUrl = '';
         if (knowledge.knowledgeImg.isNotEmpty) {
           imageUrl = knowledge.knowledgeImg[0];
-          print("รูปภาพที่ดึงมาได้ : $imageUrl");
+          print("รูปภาพที่ดึงมาได้ : ${knowledge.contents}");
         } else if (knowledge.contents.isNotEmpty) {
           try {
+            print("ไอดี ${knowledge.contents[0].toString()}");
             final firstContent = knowledge.contents[0].toString();
             final contents = await getContentsById(firstContent);
             if (contents.ImageURL.isNotEmpty) {
@@ -440,7 +446,10 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                   image: widget.image == ""
-                      ? null
+                      ? DecorationImage(
+                          image: AssetImage("assets/images/KnowlegeBG.png"),
+                          fit: BoxFit.cover,
+                        )
                       : DecorationImage(
                           image: NetworkImage(
                             widget.image,

@@ -770,6 +770,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                         showIndent: false,
                                         showCodeBlock: false,
                                         showColorButton: false,
+                                        showListCheck: false,
                                         showBackgroundColorButton: false,
                                         controller: _contentController,
                                         sharedConfigurations:
