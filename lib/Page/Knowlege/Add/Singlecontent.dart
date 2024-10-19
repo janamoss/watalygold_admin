@@ -88,7 +88,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: 1200,
+                      height: MediaQuery.of(context).size.width * 2.2,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -140,68 +140,89 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: DropdownButton(
-                                items: <String>[
-                                  'ใบไม้',
-                                  'ต้นกล้า',
-                                  'ไวรัส',
-                                  'สถิติ',
-                                  'ดอกไม้',
-                                  'หนังสือ',
-                                  'น้ำ',
-                                  'ระวัง',
-                                  'คำถาม',
-                                  'รูปภาพ',
-                                  'ระฆัง',
-                                  'ความคิดเห็น',
-                                  'ตำแหน่ง',
-                                  'กล้อง',
-                                  'ปฏิทิน',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Row(
-                                      children: [
-                                        icons[value] != null
-                                            ? Icon(
-                                                icons[value]!,
-                                                color: GPrimaryColor,
-                                              )
-                                            : const SizedBox(),
-                                        const SizedBox(width: 15),
-                                        Text(
-                                          value,
-                                          style: const TextStyle(
-                                              color: GPrimaryColor),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        items: <String>[
+                                          'ใบไม้',
+                                          'ต้นกล้า',
+                                          'ไวรัส',
+                                          'สถิติ',
+                                          'ดอกไม้',
+                                          'หนังสือ',
+                                          'น้ำ',
+                                          'ระวัง',
+                                          'คำถาม',
+                                          'รูปภาพ',
+                                          'ระฆัง',
+                                          'ความคิดเห็น',
+                                          'ตำแหน่ง',
+                                          'กล้อง',
+                                          'ปฏิทิน',
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                icons[value] != null
+                                                    ? Icon(icons[value]!,
+                                                        color: GPrimaryColor)
+                                                    : const SizedBox(),
+                                                const SizedBox(width: 15),
+                                                Text(value,
+                                                    style: const TextStyle(
+                                                        color: GPrimaryColor)),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedValue = value;
+                                            _iconError =
+                                                null; // รีเซ็ต error เมื่อมีการเลือก
+                                          });
+                                        },
+                                        hint: const Row(
+                                          children: [
+                                            Icon(Icons.image_outlined,
+                                                color: GPrimaryColor),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              "เลือกไอคอนสำหรับคลังความรู้",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                        value: _selectedValue,
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 300,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedValue = value;
-                                  });
-                                },
-                                hint: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.image_outlined,
-                                      color: GPrimaryColor,
-                                    ), // ไอคอนที่ต้องการเพิ่ม
-                                    SizedBox(
-                                        width:
-                                            10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                    Text(
-                                      "เลือกไอคอนสำหรับคลังความรู้",
-                                      style: TextStyle(
-                                          color: GPrimaryColor, fontSize: 17),
-                                    ),
-                                  ],
-                                ),
-                                value: _selectedValue,
+                                  ),
+                                ],
                               ),
                             ),
+                            if (_iconError != null) // แสดง ErrorText ถ้ามี
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _iconError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -239,7 +260,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                                 child: TextField(
                                   controller: nameController,
-                                  maxLength: 30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
                                   ),
@@ -249,23 +270,15 @@ class _SinglecontentState extends State<Singlecontent> {
                             const SizedBox(
                               height: 5,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
+                            if (_nameError != null) //error ถ้าไม่กรอกข้อมูล
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _nameError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -292,43 +305,53 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             SizedBox(
                               height: 400,
-                              child: Column(
-                                children: [
-                                  QuillToolbar.simple(
-                                    configurations:
-                                        QuillSimpleToolbarConfigurations(
-                                      showFontFamily: false,
-                                      showFontSize: false,
-                                      showInlineCode: false,
-                                      showSubscript: false,
-                                      showSuperscript: false,
-                                      showSearchButton: false,
-                                      showQuote: false,
-                                      showLink: false,
-                                      showIndent: false,
-                                      showCodeBlock: false,
-                                      showColorButton: false,
-                                      showBackgroundColorButton: false,
-                                      controller: _contentController,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('en'),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    QuillToolbar.simple(
+                                      configurations:
+                                          QuillSimpleToolbarConfigurations(
+                                        showFontFamily: false,
+                                        showFontSize: false,
+                                        showInlineCode: false,
+                                        showSubscript: false,
+                                        showSuperscript: false,
+                                        showSearchButton: false,
+                                        showQuote: false,
+                                        showLink: false,
+                                        showIndent: false,
+                                        showCodeBlock: false,
+                                        showColorButton: false,
+                                        showBackgroundColorButton: false,
+                                        controller: _contentController,
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  QuillEditor.basic(
-                                    configurations: QuillEditorConfigurations(
-                                      controller: _contentController,
-                                      placeholder: 'เขียนข้อความที่นี่...',
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('en'),
+                                    QuillEditor.basic(
+                                      configurations: QuillEditorConfigurations(
+                                        controller: _contentController,
+                                        placeholder: 'เขียนข้อความที่นี่...',
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
+                            if (_contentError != null) // Show error if exists
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _contentError!,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
                             const SizedBox(height: 50),
                             const Padding(
                               padding: EdgeInsets.only(left: 0, right: 0),
@@ -398,6 +421,18 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             const SizedBox(
                               height: 10,
+                            ),
+                            if (_imgError != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _imgError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 15,
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -525,7 +560,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width * 0.34,
-                      height: 1300,
+                      height: MediaQuery.of(context).size.width * 0.95,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -621,6 +656,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                     onChanged: (value) {
                                       setState(() {
                                         _selectedValue = value;
+                                        _iconError =
+                                            null; // รีเซ็ต error เมื่อมีการเลือก
                                       });
                                     },
                                     hint: const Row(
@@ -655,6 +692,15 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
+                            if (_iconError != null) // แสดง ErrorText ถ้ามี
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _iconError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -692,7 +738,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                                 child: TextField(
                                   controller: nameController,
-                                  maxLength: 30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
                                   ),
@@ -702,23 +748,15 @@ class _SinglecontentState extends State<Singlecontent> {
                             const SizedBox(
                               height: 5,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
+                            if (_nameError != null) //error ถ้าไม่กรอกข้อมูล
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _nameError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -793,6 +831,14 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
+                            if (_contentError != null) // Show error if exists
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _contentError!,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
                             const SizedBox(height: 50),
                             const Padding(
                               padding: EdgeInsets.only(left: 0, right: 0),
@@ -1008,6 +1054,18 @@ class _SinglecontentState extends State<Singlecontent> {
                             const SizedBox(
                               height: 10,
                             ),
+                            if (_imgError != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _imgError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             ElevatedButton(
                               onPressed: () {
                                 pickPhotoFromGallery();
@@ -1046,7 +1104,7 @@ class _SinglecontentState extends State<Singlecontent> {
                     const SizedBox(width: 20), // SizedBox
                     Container(
                       width: MediaQuery.of(context).size.width * 0.34,
-                      height: 1300,
+                      height: MediaQuery.of(context).size.width * 0.95,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -1182,7 +1240,7 @@ class _SinglecontentState extends State<Singlecontent> {
                     // final html = converter.convert();
                     // print(html);
 
-                    // upload();
+                    upload();
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -1344,17 +1402,36 @@ class _SinglecontentState extends State<Singlecontent> {
     return knowledgetId;
   }
 
+  String? _nameError;
+  String? _iconError;
+  String? _contentError;
+  String? _imgError;
+
   Future<void> addKnowledge(List<String> imageUrls) async {
-    // ตรวจสอบความสมบูรณ์ของข้อมูล
+    String nameError = nameController.text;
+
+    setState(() {
+      _nameError = nameError.isEmpty
+          ? 'กรุณากรอกชื่อคลังความรู้'
+          : null; // ตรวจสอบชื่อคลังความรู้
+      _iconError =
+          _selectedValue == null ? 'กรุณาเลือกไอคอนสำหรับคลังความรู้' : null;
+      _imgError =
+          itemImagesList.isEmpty ? 'กรุณาเลือกรูปภาพอย่างน้อย 1 รูปภาพ' : null;
+      final content = _contentController.document.toPlainText().trim();
+      _contentError = content.isEmpty ? 'กรุณากรอกข้อมูลในคลังความรู้' : null;
+    });
+
     if (nameController.text.isEmpty || _selectedValue == null) {
       showErrorFlushbar(
           context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
     }
 
-    // ตรวจสอบว่ามีความรู้หรือยัง
-    if (!_isKnowledgeAdded) {
-      _isKnowledgeAdded = true;
+    if (_nameError == null &&
+        _iconError == null &&
+        _imgError == null &&
+        _contentError == null) {
       // สร้าง ID ใหม่
       String Id = const Uuid().v4().substring(0, 10);
       // สร้างข้อมูล Knowledge

@@ -120,7 +120,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: 400,
+                      height: MediaQuery.of(context).size.width * 0.5,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -172,84 +172,89 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: Container(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton2<String>(
-                                    items: <String>[
-                                      'ใบไม้',
-                                      'ต้นกล้า',
-                                      'ไวรัส',
-                                      'สถิติ',
-                                      'ดอกไม้',
-                                      'หนังสือ',
-                                      'น้ำ',
-                                      'ระวัง',
-                                      'คำถาม',
-                                      'รูปภาพ',
-                                      'ระฆัง',
-                                      'ความคิดเห็น',
-                                      'ตำแหน่ง',
-                                      'กล้อง',
-                                      'ปฏิทิน',
-                                    ].map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        items: <String>[
+                                          'ใบไม้',
+                                          'ต้นกล้า',
+                                          'ไวรัส',
+                                          'สถิติ',
+                                          'ดอกไม้',
+                                          'หนังสือ',
+                                          'น้ำ',
+                                          'ระวัง',
+                                          'คำถาม',
+                                          'รูปภาพ',
+                                          'ระฆัง',
+                                          'ความคิดเห็น',
+                                          'ตำแหน่ง',
+                                          'กล้อง',
+                                          'ปฏิทิน',
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                icons[value] != null
+                                                    ? Icon(icons[value]!,
+                                                        color: GPrimaryColor)
+                                                    : const SizedBox(),
+                                                const SizedBox(width: 15),
+                                                Text(value,
+                                                    style: const TextStyle(
+                                                        color: GPrimaryColor)),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedValue = value;
+                                            _iconError =
+                                                null; // รีเซ็ต error เมื่อมีการเลือก
+                                          });
+                                        },
+                                        hint: const Row(
                                           children: [
-                                            icons[value] != null
-                                                ? Icon(
-                                                    icons[value]!,
-                                                    color: GPrimaryColor,
-                                                  )
-                                                : const SizedBox(),
-                                            const SizedBox(width: 15),
+                                            Icon(Icons.image_outlined,
+                                                color: GPrimaryColor),
+                                            SizedBox(width: 10),
                                             Text(
-                                              value,
-                                              style: const TextStyle(
-                                                  color: GPrimaryColor),
+                                              "เลือกไอคอนสำหรับคลังความรู้",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 17),
                                             ),
                                           ],
                                         ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedValue = value;
-                                      });
-                                    },
-                                    hint: const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.image_outlined,
-                                          color: GPrimaryColor,
-                                        ),
-                                        SizedBox(width: 10),
-                                        Text(
-                                          "เลือกไอคอนสำหรับคลังความรู้",
-                                          style: TextStyle(
-                                            color: GPrimaryColor,
-                                            fontSize: 17,
+                                        value: _selectedValue,
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 300,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(14),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    value: _selectedValue,
-                                    dropdownStyleData: DropdownStyleData(
-                                      maxHeight: 300,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
                                       ),
                                     ),
-                                    // scrollbarProps: ScrollbarProps(
-                                    //   radius: const Radius.circular(40),
-                                    //   thickness: 6,
-                                    //   thumbVisibility: true,
-                                    // ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
+                            if (_iconError != null) // แสดง ErrorText ถ้ามี
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _iconError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -287,7 +292,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                 ),
                                 child: TextField(
                                   controller: namecontroller,
-                                  maxLength: 30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
                                   ),
@@ -297,23 +302,15 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             const SizedBox(
                               height: 5,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
+                            if (_nameError != null) //error ถ้าไม่กรอกข้อมูล
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _nameError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            ),
                             const SizedBox(
                               height: 20.0,
                             ),
@@ -399,7 +396,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width * 0.34,
-                      height: 400,
+                      height: MediaQuery.of(context).size.width * 0.3,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -451,71 +448,89 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: Container(
-                                child: DropdownButton(
-                                  items: <String>[
-                                    'ใบไม้',
-                                    'ต้นกล้า',
-                                    'ไวรัส',
-                                    'สถิติ',
-                                    'ดอกไม้',
-                                    'หนังสือ',
-                                    'น้ำ',
-                                    'ระวัง',
-                                    'คำถาม',
-                                    'รูปภาพ',
-                                    'ระฆัง',
-                                    'ความคิดเห็น',
-                                    'ตำแหน่ง',
-                                    'กล้อง',
-                                    'ปฏิทิน',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Row(
-                                        children: [
-                                          icons[value] != null
-                                              ? Icon(
-                                                  icons[value]!,
-                                                  color: GPrimaryColor,
-                                                )
-                                              : const SizedBox(),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            value,
-                                            style: const TextStyle(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        items: <String>[
+                                          'ใบไม้',
+                                          'ต้นกล้า',
+                                          'ไวรัส',
+                                          'สถิติ',
+                                          'ดอกไม้',
+                                          'หนังสือ',
+                                          'น้ำ',
+                                          'ระวัง',
+                                          'คำถาม',
+                                          'รูปภาพ',
+                                          'ระฆัง',
+                                          'ความคิดเห็น',
+                                          'ตำแหน่ง',
+                                          'กล้อง',
+                                          'ปฏิทิน',
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              children: [
+                                                icons[value] != null
+                                                    ? Icon(icons[value]!,
+                                                        color: GPrimaryColor)
+                                                    : const SizedBox(),
+                                                const SizedBox(width: 15),
+                                                Text(value,
+                                                    style: const TextStyle(
+                                                        color: GPrimaryColor)),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedValue = value;
+                                            _iconError =
+                                                null; // รีเซ็ต error เมื่อมีการเลือก
+                                          });
+                                        },
+                                        hint: const Row(
+                                          children: [
+                                            Icon(Icons.image_outlined,
                                                 color: GPrimaryColor),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              "เลือกไอคอนสำหรับคลังความรู้",
+                                              style: TextStyle(
+                                                  color: GPrimaryColor,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
+                                        ),
+                                        value: _selectedValue,
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 300,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(14),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedValue = value;
-                                    });
-                                  },
-                                  hint: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.image_outlined,
-                                        color: GPrimaryColor,
-                                      ), // ไอคอนที่ต้องการเพิ่ม
-                                      SizedBox(
-                                          width:
-                                              10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                      Text(
-                                        "เลือกไอคอนสำหรับคลังความรู้",
-                                        style: TextStyle(
-                                            color: GPrimaryColor, fontSize: 17),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                  value: _selectedValue,
-                                ),
+                                ],
                               ),
                             ),
+                            if (_iconError != null) // แสดง ErrorText ถ้ามี
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _iconError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -553,7 +568,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                 ),
                                 child: TextField(
                                   controller: namecontroller,
-                                  maxLength: 30, // จำกัดจำนวนตัวอักษรไม่เกิน 30
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
                                   ),
@@ -563,23 +578,15 @@ class _MultiplecontentState extends State<Multiplecontent> {
                             const SizedBox(
                               height: 5,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 0.0, right: 0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
+                            if (_nameError != null) //error ถ้าไม่กรอกข้อมูล
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _nameError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            ),
                             const SizedBox(
                               height: 20.0,
                             ),
@@ -603,7 +610,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                     const SizedBox(width: 20), // SizedBox
                     Container(
                       width: MediaQuery.of(context).size.width * 0.34,
-                      height: 400,
+                      height: MediaQuery.of(context).size.width * 0.3,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -724,7 +731,9 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                   children: [
                                     Container(
                                       width: MediaQuery.of(context).size.width,
-                                      height: 1100,
+                                      height:
+                                          MediaQuery.of(context).size.width *
+                                              0.8,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: Colors.white,
@@ -787,24 +796,18 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             const SizedBox(
                                               height: 5,
                                             ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ],
+                                            if (_contentNameError !=
+                                                null) //error ถ้าไม่กรอกข้อมูล
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _contentNameError!,
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 12),
                                                 ),
                                               ),
-                                            ),
                                             const SizedBox(height: 30),
                                             const Padding(
                                               padding: EdgeInsets.only(
@@ -833,37 +836,63 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             ),
                                             SizedBox(
                                               height: 400,
-                                              child: Column(
-                                                children: [
-                                                  QuillToolbar.simple(
-                                                    configurations:
-                                                        QuillSimpleToolbarConfigurations(
-                                                      controller:
-                                                          _contentController[
-                                                              index],
-                                                      sharedConfigurations:
-                                                          const QuillSharedConfigurations(
-                                                        locale: Locale('de'),
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    QuillToolbar.simple(
+                                                      configurations:
+                                                          QuillSimpleToolbarConfigurations(
+                                                        showFontFamily: false,
+                                                        showFontSize: false,
+                                                        showInlineCode: false,
+                                                        showSubscript: false,
+                                                        showSuperscript: false,
+                                                        showSearchButton: false,
+                                                        showQuote: false,
+                                                        showLink: false,
+                                                        showIndent: false,
+                                                        showCodeBlock: false,
+                                                        showColorButton: false,
+                                                        showBackgroundColorButton:
+                                                            false,
+                                                        controller:
+                                                            _contentController[
+                                                                index],
+                                                        sharedConfigurations:
+                                                            const QuillSharedConfigurations(
+                                                          locale: Locale('en'),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  QuillEditor.basic(
-                                                    configurations:
-                                                        QuillEditorConfigurations(
-                                                      controller:
-                                                          _contentController[
-                                                              index],
-                                                      placeholder:
-                                                          'เขียนข้อความที่นี่...',
-                                                      sharedConfigurations:
-                                                          const QuillSharedConfigurations(
-                                                        locale: Locale('de'),
+                                                    QuillEditor.basic(
+                                                      configurations:
+                                                          QuillEditorConfigurations(
+                                                        controller:
+                                                            _contentController[
+                                                                index],
+                                                        placeholder:
+                                                            'เขียนข้อความที่นี่...',
+                                                        sharedConfigurations:
+                                                            const QuillSharedConfigurations(
+                                                          locale: Locale('en'),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
+                                            if (_contentDetailError !=
+                                                null) // Show error if exists
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _contentDetailError!,
+                                                  style: const TextStyle(
+                                                      color: Colors.red),
+                                                ),
+                                              ),
                                             const SizedBox(height: 30),
                                             const Padding(
                                               padding: EdgeInsets.only(
@@ -1076,6 +1105,20 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             const SizedBox(
                                               height: 10,
                                             ),
+                                            if (_imgError != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _imgError!,
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 12),
+                                                ),
+                                              ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
                                             ElevatedButton(
                                               onPressed: () =>
                                                   pickPhotoFromGallery(index),
@@ -1178,7 +1221,9 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                     Container(
                                       width: MediaQuery.of(context).size.width *
                                           0.34,
-                                      height: 1100,
+                                      height:
+                                          MediaQuery.of(context).size.width *
+                                              0.8,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: Colors.white,
@@ -1230,7 +1275,7 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                                   controller:
                                                       contentNameControllers[
                                                           index],
-                                                  maxLength: 30,
+                                                  maxLength: 20,
                                                   decoration:
                                                       const InputDecoration(
                                                           border:
@@ -1241,24 +1286,18 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             const SizedBox(
                                               height: 5,
                                             ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 0.0, right: 0),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ],
+                                            if (_contentNameError !=
+                                                null) //error ถ้าไม่กรอกข้อมูล
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _contentNameError!,
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 12),
                                                 ),
                                               ),
-                                            ),
                                             const SizedBox(height: 30),
                                             const Padding(
                                               padding: EdgeInsets.only(
@@ -1287,37 +1326,63 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             ),
                                             SizedBox(
                                               height: 400,
-                                              child: Column(
-                                                children: [
-                                                  QuillToolbar.simple(
-                                                    configurations:
-                                                        QuillSimpleToolbarConfigurations(
-                                                      controller:
-                                                          _contentController[
-                                                              index],
-                                                      sharedConfigurations:
-                                                          const QuillSharedConfigurations(
-                                                        locale: Locale('de'),
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    QuillToolbar.simple(
+                                                      configurations:
+                                                          QuillSimpleToolbarConfigurations(
+                                                        showFontFamily: false,
+                                                        showFontSize: false,
+                                                        showInlineCode: false,
+                                                        showSubscript: false,
+                                                        showSuperscript: false,
+                                                        showSearchButton: false,
+                                                        showQuote: false,
+                                                        showLink: false,
+                                                        showIndent: false,
+                                                        showCodeBlock: false,
+                                                        showColorButton: false,
+                                                        showBackgroundColorButton:
+                                                            false,
+                                                        controller:
+                                                            _contentController[
+                                                                index],
+                                                        sharedConfigurations:
+                                                            const QuillSharedConfigurations(
+                                                          locale: Locale('en'),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  QuillEditor.basic(
-                                                    configurations:
-                                                        QuillEditorConfigurations(
-                                                      controller:
-                                                          _contentController[
-                                                              index],
-                                                      placeholder:
-                                                          'เขียนข้อความที่นี่...',
-                                                      sharedConfigurations:
-                                                          const QuillSharedConfigurations(
-                                                        locale: Locale('de'),
+                                                    QuillEditor.basic(
+                                                      configurations:
+                                                          QuillEditorConfigurations(
+                                                        controller:
+                                                            _contentController[
+                                                                index],
+                                                        placeholder:
+                                                            'เขียนข้อความที่นี่...',
+                                                        sharedConfigurations:
+                                                            const QuillSharedConfigurations(
+                                                          locale: Locale('en'),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
+                                            if (_contentDetailError !=
+                                                null) // Show error if exists
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _contentDetailError!,
+                                                  style: const TextStyle(
+                                                      color: Colors.red),
+                                                ),
+                                              ),
                                             const SizedBox(height: 30),
                                             const Padding(
                                               padding: EdgeInsets.only(
@@ -1543,6 +1608,20 @@ class _MultiplecontentState extends State<Multiplecontent> {
                                             ),
                                             const SizedBox(
                                               height: 10,
+                                            ),
+                                            if (_imgError != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  _imgError!,
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 12),
+                                                ),
+                                              ),
+                                            const SizedBox(
+                                              height: 15,
                                             ),
                                             ElevatedButton(
                                               onPressed: () =>
@@ -1903,15 +1982,60 @@ class _MultiplecontentState extends State<Multiplecontent> {
     return contentId;
   }
 
+  String? _nameError;
+  String? _iconError;
+  String? _contentNameError;
+  String? _contentDetailError;
+  String? _imgError;
+
   Future<void> addAllContent(List<String> imageUrl) async {
+    String nameError = namecontroller.text;
+
+    setState(() {
+      _nameError = nameError.isEmpty ? 'กรุณากรอกชื่อคลังความรู้' : null;
+      _iconError =
+          _selectedValue == null ? 'กรุณาเลือกไอคอนสำหรับคลังความรู้' : null;
+    });
+
     if (namecontroller.text.isEmpty || _selectedValue == null) {
       showErrorFlushbar(
           context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
     }
+
+    //เช็คข้อมูลที่กรอกไม่ครบในแต่ละ _panelData
+    for (int panelIndex = 0; panelIndex < _panelData.length; panelIndex++) {
+      String contentName = contentNameControllers[panelIndex].text;
+      String contentDetailError =
+          _contentController[panelIndex].document.toPlainText().trim();
+      bool hasImages = panelIndex < expansionPanelImagesList.length &&
+          expansionPanelImagesList[panelIndex].isNotEmpty;
+
+      setState(() {
+        _contentNameError =
+            contentName.isEmpty ? 'กรุณากรอกชื่อเนื้อหาย่อย' : null;
+        _contentDetailError =
+            contentDetailError.isEmpty ? 'กรุณากรอกเนื้อหา' : null;
+        _imgError = !hasImages ? 'กรุณาเพิ่มรูปภาพ' : null;
+        // _imgError =
+        //     panelImages.isEmpty ? 'กรุณากรอกเนื้อหา' : null;
+      });
+
+      if (contentName.isEmpty || contentDetailError.isEmpty || !hasImages) {
+        showErrorFlushbar(context, "เพิ่มเนื้อหาย่อยล้มเหลว",
+            "กรุณากรอกข้อมูลเนื้อหาย่อยให้ครบ");
+        return;
+      }
+
+      print("_panelData ${_panelData.length}");
+      print("panelIndex ${panelIndex}");
+      print("contentNameControllers.length ${contentNameControllers.length}");
+    }
+
     List<String> contentIds = [];
     debugPrint("list ${itemImagesList.length}");
 
+    //ลูปเพิ่ม content
     for (int panelIndex = 0;
         panelIndex < expansionPanelImagesList.length;
         panelIndex++) {
@@ -1925,56 +2049,138 @@ class _MultiplecontentState extends State<Multiplecontent> {
         panelImageUrls.add(ListimageUrl[panelIndex * panelImages.length + i]);
       }
 
-      // เรียกใช้ addContent ด้วย List ของ URL
       String contentId =
           await addContent(contentName, contentDetail, panelImageUrls);
       contentIds.add(contentId);
+      print(
+          "expansionPanelImagesList.length ${expansionPanelImagesList.length}");
     }
 
+    //เช็คว่ามีการเพิ่มcontentไหม
     if (contentIds.isEmpty) {
       showErrorFlushbar(
-          context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
+          context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณาเพิ่มเนื้อหาย่อย");
       return;
     }
-    // Generate a knowledge ID
-    String knowledgeId = const Uuid().v4().substring(0, 10);
-    // Prepare knowledge data
-    Map<String, dynamic> knowledgeMap = {
-      "KnowledgeName": namecontroller.text,
-      "KnowledgeIcons": _selectedValue,
-      "create_at": Timestamp.now(),
-      "deleted_at": null,
-      "update_at": null,
-      "Content": contentIds,
-    };
-    debugPrint("addKnowledge success");
-    debugPrint("KnowledgeName ${namecontroller.text}");
-    debugPrint("contentId $contentIds");
 
-    // Add knowledge to Firebase
-    await Databasemethods()
-        .addKnowlege(knowledgeMap, knowledgeId)
-        .then((value) {
-      showDialog(
-        context: context,
-        builder: (context) => const Addknowledgedialog(),
-      );
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pop(context);
-        context.goNamed(
-          "/mainKnowledge",
-          extra: {
-            'showSuccessFlushbar': true,
-            'message': "เพิ่มคลังความรู้เสร็จสิ้น",
-            'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
-          },
+    if (_nameError == null && _iconError == null) {
+      String knowledgeId = const Uuid().v4().substring(0, 10);
+      Map<String, dynamic> knowledgeMap = {
+        "KnowledgeName": namecontroller.text,
+        "KnowledgeIcons": _selectedValue,
+        "create_at": Timestamp.now(),
+        "deleted_at": null,
+        "update_at": null,
+        "Content": contentIds,
+      };
+      debugPrint("addKnowledge success");
+      debugPrint("KnowledgeName ${namecontroller.text}");
+      debugPrint("contentId $contentIds");
+
+      // Add knowledge to Firebase
+      await Databasemethods()
+          .addKnowlege(knowledgeMap, knowledgeId)
+          .then((value) {
+        showDialog(
+          context: context,
+          builder: (context) => const Addknowledgedialog(),
         );
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.pop(context);
+          context.goNamed(
+            "/mainKnowledge",
+            extra: {
+              'showSuccessFlushbar': true,
+              'message': "เพิ่มคลังความรู้เสร็จสิ้น",
+              'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
+            },
+          );
+        });
+      }).catchError((error) {
+        showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
+            "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
       });
-    }).catchError((error) {
-      showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
-          "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
+    }
+  }
+
+  void updateImagesForPanel(int panelIndex, List<XFile> newImages) {
+    setState(() {
+      expansionPanelImagesList[panelIndex] = newImages; // อัปเดตลิสต์
     });
   }
+
+  // Future<void> addAllContent(List<String> imageUrl) async {
+  //   if (namecontroller.text.isEmpty || _selectedValue == null) {
+  //     showErrorFlushbar(
+  //         context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
+  //     return;
+  //   }
+  //   List<String> contentIds = [];
+  //   debugPrint("list ${itemImagesList.length}");
+
+  //   for (int panelIndex = 0;
+  //       panelIndex < expansionPanelImagesList.length;
+  //       panelIndex++) {
+  //     List<XFile> panelImages = expansionPanelImagesList[panelIndex];
+  //     String contentName = contentNameControllers[panelIndex].text;
+  //     String contentDetail = htmlList[panelIndex];
+
+  //     // สร้าง List ของ URL สำหรับแต่ละ panel
+  //     List<String> panelImageUrls = [];
+  //     for (int i = 0; i < panelImages.length; i++) {
+  //       panelImageUrls.add(ListimageUrl[panelIndex * panelImages.length + i]);
+  //     }
+
+  //     // เรียกใช้ addContent ด้วย List ของ URL
+  //     String contentId =
+  //         await addContent(contentName, contentDetail, panelImageUrls);
+  //     contentIds.add(contentId);
+  //   }
+
+  //   if (contentIds.isEmpty) {
+  //     showErrorFlushbar(
+  //         context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
+  //     return;
+  //   }
+  //   // Generate a knowledge ID
+  //   String knowledgeId = const Uuid().v4().substring(0, 10);
+  //   // Prepare knowledge data
+  //   Map<String, dynamic> knowledgeMap = {
+  //     "KnowledgeName": namecontroller.text,
+  //     "KnowledgeIcons": _selectedValue,
+  //     "create_at": Timestamp.now(),
+  //     "deleted_at": null,
+  //     "update_at": null,
+  //     "Content": contentIds,
+  //   };
+  //   debugPrint("addKnowledge success");
+  //   debugPrint("KnowledgeName ${namecontroller.text}");
+  //   debugPrint("contentId $contentIds");
+
+  //   // Add knowledge to Firebase
+  //   await Databasemethods()
+  //       .addKnowlege(knowledgeMap, knowledgeId)
+  //       .then((value) {
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) => const Addknowledgedialog(),
+  //     );
+  //     Future.delayed(const Duration(seconds: 1), () {
+  //       Navigator.pop(context);
+  //       context.goNamed(
+  //         "/mainKnowledge",
+  //         extra: {
+  //           'showSuccessFlushbar': true,
+  //           'message': "เพิ่มคลังความรู้เสร็จสิ้น",
+  //           'description': "คุณได้ทำเพิ่มคลังความรู้เสร็จสิ้นเรียบร้อย"
+  //         },
+  //       );
+  //     });
+  //   }).catchError((error) {
+  //     showErrorFlushbar(context, "เพิ่มคลังความรู้ล้มเหลว",
+  //         "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
+  //   });
+  // }
 
   void clearAndRemoveData(int index) {
     setState(() {
