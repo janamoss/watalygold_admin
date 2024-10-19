@@ -198,6 +198,7 @@ class _EditMutipleState extends State<EditMutiple> {
     }
   }
 
+
   // void deleteContentById(String documentId) async {
   //   try {
   //     await Databasemethods().deleteContent(documentId);
@@ -940,9 +941,9 @@ class _EditMutipleState extends State<EditMutiple> {
                                                           ],
                                                         ),
                                                         SizedBox(height: 30),
-                                                        Padding(
+                                                        const Padding(
                                                           padding:
-                                                              const EdgeInsets
+                                                              EdgeInsets
                                                                   .only(
                                                                   left: 0.0,
                                                                   right: 0),
