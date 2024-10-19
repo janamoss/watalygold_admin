@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -65,6 +66,7 @@ class _SinglecontentState extends State<Singlecontent> {
   List<XFile> itemImagesList = <XFile>[];
   List<String> downloadUrl = <String>[];
   bool uploading = false;
+  // final CarouselSliderController _controller = CarouselSliderController();
   final CarouselController _controller = CarouselController();
 
   @override
@@ -86,7 +88,7 @@ class _SinglecontentState extends State<Singlecontent> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width * 2.2,
+                      // height: MediaQuery.of(context).size.height * 2.2,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -189,7 +191,7 @@ class _SinglecontentState extends State<Singlecontent> {
                                           children: [
                                             Icon(Icons.image_outlined,
                                                 color: GPrimaryColor),
-                                            SizedBox(width: 10),
+                                            // SizedBox(width: 10),
                                             Text(
                                               "เลือกไอคอนสำหรับคลังความรู้",
                                               style: TextStyle(
@@ -209,20 +211,18 @@ class _SinglecontentState extends State<Singlecontent> {
                                       ),
                                     ),
                                   ),
-                                  
                                 ],
                               ),
                             ),
-                            if (_iconError !=
-                                      null) // แสดง ErrorText ถ้ามี
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _iconError!,
-                                        style: TextStyle(
-                                            color: Colors.red, fontSize: 12),
-                                      ),
-                                    ),
+                            if (_iconError != null) // แสดง ErrorText ถ้ามี
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  _iconError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -260,10 +260,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                                 child: TextField(
                                   controller: nameController,
-                                  maxLength: 20,
-                                  decoration: InputDecoration(
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
+                                  decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    // errorText: _nameError, // No const here
                                   ),
                                 ),
                               ),
@@ -306,30 +305,43 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             SizedBox(
                               height: 400,
-                              child: Column(
-                                children: [
-                                  QuillToolbar.simple(
-                                    configurations:
-                                        QuillSimpleToolbarConfigurations(
-                                      controller: _contentController,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    QuillToolbar.simple(
+                                      configurations:
+                                          QuillSimpleToolbarConfigurations(
+                                        showFontFamily: false,
+                                        showFontSize: false,
+                                        showInlineCode: false,
+                                        showSubscript: false,
+                                        showSuperscript: false,
+                                        showSearchButton: false,
+                                        showQuote: false,
+                                        showLink: false,
+                                        showIndent: false,
+                                        showCodeBlock: false,
+                                        showColorButton: false,
+                                        showBackgroundColorButton: false,
+                                        controller: _contentController,
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  QuillEditor.basic(
-                                    configurations: QuillEditorConfigurations(
-                                      controller: _contentController,
-                                      placeholder: 'เขียนข้อความที่นี่...',
-                                      readOnly: false,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                                    QuillEditor.basic(
+                                      configurations: QuillEditorConfigurations(
+                                        controller: _contentController,
+                                        placeholder: 'เขียนข้อความที่นี่...',
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             if (_contentError != null) // Show error if exists
@@ -365,192 +377,53 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
                             Container(
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12.0),
+                                  color: Colors.white70,
                                   boxShadow: [
-                                    // BoxShadow(
-                                    //   color: Colors.red,
-                                    //   offset: const Offset(0.0, 0.5),
-                                    //   blurRadius: 30.0,
-                                    // )
+                                    BoxShadow(
+                                      color: Colors.grey.shade200,
+                                      offset: const Offset(0.0, 0.5),
+                                      blurRadius: 30.0,
+                                    )
                                   ]),
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              height: 250.0,
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.width * 0.2,
                               child: Center(
-                                  child: itemPhotosWidgetList.isEmpty
-                                      ? Center(
-                                          child: MaterialButton(
-                                            onPressed: pickPhotoFromGallery,
-                                            child: Container(
-                                              alignment: Alignment.bottomCenter,
-                                              child: Center(
-                                                child: Image.network(
-                                                  "https://static.thenounproject.com/png/3322766-200.png",
-                                                  height: 100.0,
-                                                  width: 100.0,
-                                                ),
+                                child: itemPhotosWidgetList.isEmpty
+                                    ? Center(
+                                        child: MaterialButton(
+                                          onPressed: pickPhotoFromGallery,
+                                          child: Container(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Center(
+                                              child: Image.network(
+                                                "https://static.thenounproject.com/png/3322766-200.png",
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.2,
                                               ),
                                             ),
                                           ),
-                                        )
-                                      : Column(
-                                          children: [
-                                            Expanded(
-                                              child: CarouselSlider(
-                                                items: itemPhotosWidgetList
-                                                    .map((photo) {
-                                                  return Builder(
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Stack(
-                                                        children: [
-                                                          SizedBox(
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            height: 250.0,
-                                                            child: photo,
-                                                          ),
-                                                          Positioned(
-                                                            bottom: 8.0,
-                                                            right: 8.0,
-                                                            child: Row(
-                                                              children: [
-                                                                IconButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    int index =
-                                                                        itemPhotosWidgetList
-                                                                            .indexOf(photo);
-                                                                    if (index !=
-                                                                        -1) {
-                                                                      editImage(
-                                                                          index);
-                                                                    }
-                                                                    // editImage(
-                                                                    //     itemPhotosWidgetList.indexOf(imageWidget));
-                                                                  },
-                                                                  icon:
-                                                                      Container(
-                                                                    decoration:
-                                                                        const BoxDecoration(
-                                                                      shape: BoxShape
-                                                                          .circle,
-                                                                      color: Colors
-                                                                          .white,
-                                                                    ),
-                                                                    padding:
-                                                                        EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .edit,
-                                                                      color:
-                                                                          YellowColor,
-                                                                      size:
-                                                                          20.0,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                IconButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    int index =
-                                                                        itemPhotosWidgetList
-                                                                            .indexOf(photo);
-                                                                    if (index !=
-                                                                        -1) {
-                                                                      deleteImage(
-                                                                          index);
-                                                                    }
-                                                                  },
-                                                                  icon:
-                                                                      Container(
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      shape: BoxShape
-                                                                          .circle,
-                                                                      color: Colors
-                                                                          .white,
-                                                                    ),
-                                                                    padding:
-                                                                        EdgeInsets.all(
-                                                                            8.0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .delete_forever_rounded,
-                                                                      color: Colors
-                                                                          .red,
-                                                                      size:
-                                                                          20.0,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                }).toList(),
-                                                options: CarouselOptions(
-                                                  height: 250.0,
-                                                  viewportFraction: 1,
-                                                  enlargeCenterPage: true,
-                                                  enableInfiniteScroll: false,
-                                                  onPageChanged:
-                                                      (index, reason) {
-                                                    setState(() {
-                                                      _current = index;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: itemPhotosWidgetList
-                                                  .asMap()
-                                                  .entries
-                                                  .map((entry) {
-                                                return GestureDetector(
-                                                  onTap: () => _controller
-                                                      .animateToPage(entry.key),
-                                                  child: Container(
-                                                    width: 8.0,
-                                                    height: 8.0,
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0,
-                                                            horizontal: 4.0),
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: (Theme.of(context)
-                                                                      .brightness ==
-                                                                  Brightness
-                                                                      .dark
-                                                              ? Colors.white
-                                                              : GPrimaryColor)
-                                                          .withOpacity(
-                                                              _current ==
-                                                                      entry.key
-                                                                  ? 0.9
-                                                                  : 0.4),
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ],
-                                        )),
+                                        ),
+                                      )
+                                    : SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Wrap(
+                                          spacing: 5.0,
+                                          direction: Axis.horizontal,
+                                          alignment: WrapAlignment.spaceEvenly,
+                                          runSpacing: 10.0,
+                                          children: itemPhotosWidgetList,
+                                        ),
+                                      ),
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
@@ -567,35 +440,43 @@ class _SinglecontentState extends State<Singlecontent> {
                             const SizedBox(
                               height: 15,
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                pickPhotoFromGallery();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: GPrimaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.25,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  pickPhotoFromGallery();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: GPrimaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                "เพิ่มรูปภาพ",
-                                style: TextStyle(color: Colors.white),
+                                child: FittedBox(
+                                  child: const Text(
+                                    "เพิ่มรูปภาพ",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(
                               height: 50.0,
                             ),
-                            ElevatedButton(
-                              onPressed: display,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xffE69800),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.25,
+                              child: ElevatedButton(
+                                onPressed: display,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xffE69800),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                "แสดงผล",
-                                style: TextStyle(color: Colors.white),
+                                child: const Text(
+                                  "แสดงผล",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
                           ],
@@ -691,14 +572,15 @@ class _SinglecontentState extends State<Singlecontent> {
                 )
               : Row(
                   children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.34,
-                      height: MediaQuery.of(context).size.width * 0.95,
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.36,
+                      height: MediaQuery.of(context).size.width * 0.85,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
                       ),
-                      child: Padding(
+                     child:  SingleChildScrollView( 
+                        child: Padding(
                         padding: const EdgeInsets.all(25.0),
                         child: Column(
                           children: [
@@ -745,78 +627,84 @@ class _SinglecontentState extends State<Singlecontent> {
                             ),
                             Align(
                               alignment: Alignment.topLeft,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton2<String>(
-                                        items: <String>[
-                                          'ใบไม้',
-                                          'ต้นกล้า',
-                                          'ไวรัส',
-                                          'สถิติ',
-                                          'ดอกไม้',
-                                          'หนังสือ',
-                                          'น้ำ',
-                                          'ระวัง',
-                                          'คำถาม',
-                                          'รูปภาพ',
-                                          'ระฆัง',
-                                          'ความคิดเห็น',
-                                          'ตำแหน่ง',
-                                          'กล้อง',
-                                          'ปฏิทิน',
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Row(
-                                              children: [
-                                                icons[value] != null
-                                                    ? Icon(icons[value]!,
-                                                        color: GPrimaryColor)
-                                                    : const SizedBox(),
-                                                const SizedBox(width: 15),
-                                                Text(value,
-                                                    style: const TextStyle(
-                                                        color: GPrimaryColor)),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _selectedValue = value;
-                                            _iconError =
-                                                null; // รีเซ็ต error เมื่อมีการเลือก
-                                          });
-                                        },
-                                        hint: const Row(
+                              child: Container(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    items: <String>[
+                                      'ใบไม้',
+                                      'ต้นกล้า',
+                                      'ไวรัส',
+                                      'สถิติ',
+                                      'ดอกไม้',
+                                      'หนังสือ',
+                                      'น้ำ',
+                                      'ระวัง',
+                                      'คำถาม',
+                                      'รูปภาพ',
+                                      'ระฆัง',
+                                      'ความคิดเห็น',
+                                      'ตำแหน่ง',
+                                      'กล้อง',
+                                      'ปฏิทิน',
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Row(
                                           children: [
-                                            Icon(Icons.image_outlined,
-                                                color: GPrimaryColor),
-                                            SizedBox(width: 10),
+                                            icons[value] != null
+                                                ? Icon(
+                                                    icons[value]!,
+                                                    color: GPrimaryColor,
+                                                  )
+                                                : const SizedBox(),
+                                            const SizedBox(width: 15),
                                             Text(
-                                              "เลือกไอคอนสำหรับคลังความรู้",
-                                              style: TextStyle(
-                                                  color: GPrimaryColor,
-                                                  fontSize: 17),
+                                              value,
+                                              style: const TextStyle(
+                                                  color: GPrimaryColor),
                                             ),
                                           ],
                                         ),
-                                        value: _selectedValue,
-                                        dropdownStyleData: DropdownStyleData(
-                                          maxHeight: 300,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(14),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedValue = value;
+                                        _iconError =
+                                            null; // รีเซ็ต error เมื่อมีการเลือก
+                                      });
+                                    },
+                                    hint: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.image_outlined,
+                                          color: GPrimaryColor,
+                                        ),
+
+                                        Text(
+                                          "เลือกไอคอนสำหรับคลังความรู้",
+                                          style: TextStyle(
+                                            color: GPrimaryColor,
+                                            fontSize: 17,
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                    value: _selectedValue,
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 300,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
                                     ),
+                                    // scrollbarProps: ScrollbarProps(
+                                    //   radius: const Radius.circular(40),
+                                    //   thickness: 6,
+                                    //   thumbVisibility: true,
+                                    // ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                             if (_iconError != null) // แสดง ErrorText ถ้ามี
@@ -828,86 +716,6 @@ class _SinglecontentState extends State<Singlecontent> {
                                       color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            // Align(
-                            //   alignment: Alignment.topLeft,
-                            //   child: Container(
-                            //     child: DropdownButtonHideUnderline(
-                            //       child: DropdownButton2<String>(
-                            //         items: <String>[
-                            //           'ใบไม้',
-                            //           'ต้นกล้า',
-                            //           'ไวรัส',
-                            //           'สถิติ',
-                            //           'ดอกไม้',
-                            //           'หนังสือ',
-                            //           'น้ำ',
-                            //           'ระวัง',
-                            //           'คำถาม',
-                            //           'รูปภาพ',
-                            //           'ระฆัง',
-                            //           'ความคิดเห็น',
-                            //           'ตำแหน่ง',
-                            //           'กล้อง',
-                            //           'ปฏิทิน',
-                            //         ].map<DropdownMenuItem<String>>(
-                            //             (String value) {
-                            //           return DropdownMenuItem<String>(
-                            //             value: value,
-                            //             child: Row(
-                            //               children: [
-                            //                 icons[value] != null
-                            //                     ? Icon(
-                            //                         icons[value]!,
-                            //                         color: GPrimaryColor,
-                            //                       )
-                            //                     : const SizedBox(),
-                            //                 const SizedBox(width: 15),
-                            //                 Text(
-                            //                   value,
-                            //                   style: const TextStyle(
-                            //                       color: GPrimaryColor),
-                            //                 ),
-                            //               ],
-                            //             ),
-                            //           );
-                            //         }).toList(),
-                            //         onChanged: (value) {
-                            //           setState(() {
-                            //             _selectedValue = value;
-                            //           });
-                            //         },
-                            //         hint: const Row(
-                            //           children: [
-                            //             Icon(
-                            //               Icons.image_outlined,
-                            //               color: GPrimaryColor,
-                            //             ),
-                            //             SizedBox(width: 10),
-                            //             Text(
-                            //               "เลือกไอคอนสำหรับคลังความรู้",
-                            //               style: TextStyle(
-                            //                 color: GPrimaryColor,
-                            //                 fontSize: 17,
-                            //               ),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //         value: _selectedValue,
-                            //         dropdownStyleData: DropdownStyleData(
-                            //           maxHeight: 300,
-                            //           decoration: BoxDecoration(
-                            //             borderRadius: BorderRadius.circular(14),
-                            //           ),
-                            //         ),
-                            //         // scrollbarProps: ScrollbarProps(
-                            //         //   radius: const Radius.circular(40),
-                            //         //   thickness: 6,
-                            //         //   thumbVisibility: true,
-                            //         // ),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -945,10 +753,9 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                                 child: TextField(
                                   controller: nameController,
-                                  maxLength: 20,
-                                  decoration: InputDecoration(
+                                  maxLength: 20, // จำกัดจำนวนตัวอักษรไม่เกิน 20
+                                  decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    // errorText: _nameError, // No const here
                                   ),
                                 ),
                               ),
@@ -965,23 +772,6 @@ class _SinglecontentState extends State<Singlecontent> {
                                       color: Colors.red, fontSize: 12),
                                 ),
                               ),
-                            // const Padding(
-                            //   padding: EdgeInsets.only(left: 0.0, right: 0),
-                            //   child: Align(
-                            //     alignment: Alignment.topLeft,
-                            //     child: Row(
-                            //       children: [
-                            //         Text(
-                            //           "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                            //           style: TextStyle(
-                            //             color: Colors.red,
-                            //             fontSize: 12,
-                            //           ),
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
                             const SizedBox(height: 30),
                             const Padding(
                               padding: EdgeInsets.only(left: 0.0, right: 0),
@@ -1006,32 +796,54 @@ class _SinglecontentState extends State<Singlecontent> {
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  )),
+                              padding: EdgeInsets.all(5),
                               height: 400,
-                              child: Column(
-                                children: [
-                                  QuillToolbar.simple(
-                                    configurations:
-                                        QuillSimpleToolbarConfigurations(
-                                      controller: _contentController,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    QuillToolbar.simple(
+                                      configurations:
+                                          QuillSimpleToolbarConfigurations(
+                                        showFontFamily: false,
+                                        showFontSize: false,
+                                        showInlineCode: false,
+                                        showSubscript: false,
+                                        showSuperscript: false,
+                                        showSearchButton: false,
+                                        showQuote: false,
+                                        showLink: false,
+                                        showIndent: false,
+                                        showCodeBlock: false,
+                                        showColorButton: false,
+                                        showListCheck: false,
+                                        showBackgroundColorButton: false,
+                                        controller: _contentController,
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  QuillEditor.basic(
-                                    configurations: QuillEditorConfigurations(
-                                      controller: _contentController,
-                                      placeholder: 'เขียนข้อความที่นี่...',
-                                      readOnly: false,
-                                      sharedConfigurations:
-                                          const QuillSharedConfigurations(
-                                        locale: Locale('de'),
+                                    QuillEditor.basic(
+                                      configurations: QuillEditorConfigurations(
+                                        controller: _contentController,
+                                        placeholder: 'เขียนข้อความที่นี่...',
+                                        sharedConfigurations:
+                                            const QuillSharedConfigurations(
+                                          locale: Locale('de'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             if (_contentError != null) // Show error if exists
@@ -1073,15 +885,9 @@ class _SinglecontentState extends State<Singlecontent> {
                             Container(
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12.0),
-                                  boxShadow: [
-                                    // BoxShadow(
-                                    //   color: Colors.red,
-                                    //   offset: const Offset(0.0, 0.5),
-                                    //   blurRadius: 30.0,
-                                    // )
-                                  ]),
+                                  ),
                               width: MediaQuery.of(context).size.width * 0.5,
-                              height: 250.0,
+                              height: MediaQuery.of(context).size.width * 0.1,
                               child: Center(
                                   child: itemPhotosWidgetList.isEmpty
                                       ? Center(
@@ -1092,8 +898,8 @@ class _SinglecontentState extends State<Singlecontent> {
                                               child: Center(
                                                 child: Image.network(
                                                   "https://static.thenounproject.com/png/3322766-200.png",
-                                                  height: 100.0,
-                                                  width: 100.0,
+                                                   height:MediaQuery.of(context).size.width,
+                                                width: MediaQuery.of(context).size.width * 0.2,
                                                 ),
                                               ),
                                             ),
@@ -1269,120 +1075,131 @@ class _SinglecontentState extends State<Singlecontent> {
                             const SizedBox(
                               height: 15,
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                pickPhotoFromGallery();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: GPrimaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                            Container(
+                              // width: MediaQuery.of(context).size.width * 0.,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  pickPhotoFromGallery();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: GPrimaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                "เพิ่มรูปภาพ",
-                                style: TextStyle(color: Colors.white),
+                                child: FittedBox(
+                                  child: const Text(
+                                    "เพิ่มรูปภาพ",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(
                               height: 50.0,
                             ),
-                            ElevatedButton(
-                              onPressed: display,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xffE69800),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.1,
+                              child: ElevatedButton(
+                                onPressed: display,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xffE69800),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                "แสดงผล",
-                                style: TextStyle(color: Colors.white),
+                                child: const Text(
+                                  "แสดงผล",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                      ),),
                     ),
+                    
                     const SizedBox(width: 20), // SizedBox
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.34,
-                      height: MediaQuery.of(context).size.width * 0.95,
+                      width: MediaQuery.of(context).size.width * 0.36,
+                      height: MediaQuery.of(context).size.width * 0.85,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Column(
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.light_mode_rounded,
-                                  color: Color(0xffFFEE58),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "แสดงผล",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                            Container(
-                              width: 390,
-                              height: 100,
-                              decoration: ShapeDecoration(
-                                color: const Color(0xFFE7E7E7),
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      width: 5, color: GPrimaryColor),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Column(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: Column(
+                            children: [
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Expanded(
-                                    child: _displayedWidget,
-                                  )
+                                  Icon(
+                                    Icons.light_mode_rounded,
+                                    color: Color(0xffFFEE58),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "แสดงผล",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              width: 390,
-                              height: 750,
-                              decoration: ShapeDecoration(
-                                color: const Color(0xFFE7E7E7),
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      width: 5, color: GPrimaryColor),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                              const SizedBox(
+                                height: 40,
                               ),
-                              child: SingleChildScrollView(
+                              Container(
+                                width: 390,
+                                height: 100,
+                                decoration: ShapeDecoration(
+                                  color: const Color(0xFFE7E7E7),
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                        width: 5, color: GPrimaryColor),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
                                 child: Column(
                                   children: [
-                                    SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.width * 2,
-                                      child: _displayedcontentWidget ??
-                                          Container(),
-                                    ),
+                                    Expanded(
+                                      child: _displayedWidget,
+                                    )
                                   ],
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                width: 390,
+                                height: 750,
+                                decoration: ShapeDecoration(
+                                  color: const Color(0xFFE7E7E7),
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                        width: 5, color: GPrimaryColor),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.width * 2,
+                                        child: _displayedcontentWidget ??
+                                            Container(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1418,15 +1235,30 @@ class _SinglecontentState extends State<Singlecontent> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    final deltaJson =
-                        _contentController.document.toDelta().toJson();
-                    debugPrint("$deltaJson");
+                    final jsonString = jsonEncode(
+                        _contentController.document.toDelta().toJson());
+                    print(json);
+                    List<dynamic> jsonList = json.decode(jsonString);
+
+                    // Convert each dynamic item to a Map<String, dynamic>
+                    List<Map<String, dynamic>> resultList = jsonList
+                        .map((item) => Map<String, dynamic>.from(item as Map))
+                        .toList();
 
                     final converter = QuillDeltaToHtmlConverter(
-                      List.castFrom(deltaJson),
+                      resultList,
+                      ConverterOptions.forEmail(),
                     );
-                    _html = converter.convert();
-                    debugPrint(_html);
+
+                    final html = converter.convert();
+                    print(html);
+
+                    // final converter = QuillDeltaToHtmlConverter(
+                    //   resultList,
+                    // );
+
+                    // final html = converter.convert();
+                    // print(html);
 
                     upload();
                   },
@@ -1456,6 +1288,17 @@ class _SinglecontentState extends State<Singlecontent> {
         ],
       ),
     );
+  }
+
+  List<Map<String, dynamic>> parseJsonToListMap(String jsonString) {
+    // Parse the JSON string to a List<dynamic>
+    List<dynamic> jsonList = json.decode(jsonString);
+
+    // Convert each item in the list to a Map<String, dynamic>
+    List<Map<String, dynamic>> resultList =
+        jsonList.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+
+    return resultList;
   }
 
   int _current = 0;
@@ -1540,7 +1383,7 @@ class _SinglecontentState extends State<Singlecontent> {
     debugPrint("$deltaJson");
 
     final converter = QuillDeltaToHtmlConverter(
-      List.castFrom(deltaJson),
+      deltaJson,
     );
     _html = converter.convert();
     debugPrint(_html);
@@ -1549,6 +1392,8 @@ class _SinglecontentState extends State<Singlecontent> {
       uploading = false;
     });
   }
+
+  bool _isKnowledgeAdded = false;
 
   Future<String> uploadImageAndSaveItemInfo() async {
     setState(() {
@@ -1567,7 +1412,7 @@ class _SinglecontentState extends State<Singlecontent> {
         imageUrls.add(imageUrl); // เพิ่ม URL รูปภาพลงใน List
       }
     }
-    print("imageUrls ${imageUrls}");
+
     // เรียกใช้งานฟังก์ชัน addKnowledge โดยส่ง List ของ URL รูปภาพ
     await addKnowledge(imageUrls);
 
@@ -1597,7 +1442,7 @@ class _SinglecontentState extends State<Singlecontent> {
       _contentError = content.isEmpty ? 'กรุณากรอกข้อมูลในคลังความรู้' : null;
     });
 
-      if (nameController.text.isEmpty || _selectedValue  == null) {
+    if (nameController.text.isEmpty || _selectedValue == null) {
       showErrorFlushbar(
           context, "เพิ่มคลังความรู้ล้มเหลว", "กรุณากรอกข้อมูลให้ครบ");
       return;
@@ -1833,9 +1678,10 @@ class _SinglecontentState extends State<Singlecontent> {
     // อัปเดตการแสดงผลโดยการ rebuild ด้วย setState()
     setState(() {
       final deltaJson = _contentController.document.toDelta().toJson();
-      final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
+      final converter = QuillDeltaToHtmlConverter(deltaJson);
       final html = converter.convert();
-
+      print(deltaJson);
+      print(html);
       _displayedWidgetHtmlWidget = HtmlWidget(
         html,
         textStyle: const TextStyle(color: Colors.black, fontSize: 15),
