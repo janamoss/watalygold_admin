@@ -13,6 +13,7 @@
     }
   },
   "hosting": {
+    "site" : "watalygold",
     "public": "build/web",
     "rewrites":[
       {

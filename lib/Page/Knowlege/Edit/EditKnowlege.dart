@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,8 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill/quill_delta.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
@@ -23,15 +22,12 @@ import 'package:watalygold_admin/Widgets/Color.dart';
 import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogEdit.dart';
 import 'package:watalygold_admin/Widgets/Dialog/dialogcancleEdit.dart';
-import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
 import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
-import 'package:flutter_widget_from_html_core/src/core_data.dart'
-    as htmlImageSource;
 import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
 
@@ -154,7 +150,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                               ),
                             ),
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: screenSize == ScreenSize.minidesktop
@@ -205,7 +201,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: const Center(
@@ -225,6 +221,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
     ScreenSize screensize = getScreenSize(context);
@@ -284,7 +281,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                           const SizedBox(
                             height: 50,
                           ),
-                          Container(
+                          SizedBox(
                               width: MediaQuery.of(context).size.width * 0.68,
                               child: screensize == ScreenSize.minidesktop
                                   ? Container(
@@ -326,7 +323,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                           SizedBox(
                             height: 50,
                           ),
-                          Container(
+                          SizedBox(
                             width: MediaQuery.of(context).size.width * 0.68,
                             child: Column(
                               children: [
@@ -554,36 +551,10 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          Text(
-                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
                                                   SizedBox(height: 30),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
                                                     child: Align(
                                                       alignment:
                                                           Alignment.topLeft,
@@ -608,34 +579,65 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                        border: Border.all(
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          width: 1,
+                                                        )),
+                                                    padding: EdgeInsets.all(5),
                                                     height: 400,
-                                                    child: Column(
-                                                      children: [
-                                                        QuillToolbar.simple(
-                                                          configurations:
-                                                              QuillSimpleToolbarConfigurations(
-                                                            controller:
-                                                                _contentController,
-                                                            sharedConfigurations:
-                                                                const QuillSharedConfigurations(
-                                                              locale:
-                                                                  Locale('de'),
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        children: [
+                                                          QuillToolbar.simple(
+                                                            configurations:
+                                                                QuillSimpleToolbarConfigurations(
+                                                              showFontFamily:
+                                                                  false,
+                                                              showFontSize:
+                                                                  false,
+                                                              showInlineCode:
+                                                                  false,
+                                                              showSubscript:
+                                                                  false,
+                                                              showSuperscript:
+                                                                  false,
+                                                              showSearchButton:
+                                                                  false,
+                                                              showQuote: false,
+                                                              showLink: false,
+                                                              showIndent: false,
+                                                              showCodeBlock:
+                                                                  false,
+                                                              showColorButton:
+                                                                  false,
+                                                              showListCheck:
+                                                                  false,
+                                                              showBackgroundColorButton:
+                                                                  false,
+                                                              controller:
+                                                                  _contentController,
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'en'),
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                        Container(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              238,
-                                                              238,
-                                                              238),
-                                                          child:
-                                                              QuillEditor.basic(
+                                                          QuillEditor.basic(
                                                             configurations:
                                                                 QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
+                                                              placeholder:
+                                                                  'เขียนข้อความที่นี่...',
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -643,10 +645,50 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
+                                                  // SizedBox(
+                                                  //   height: 400,
+                                                  //   child: Column(
+                                                  //     children: [
+                                                  //       QuillToolbar.simple(
+                                                  //         configurations:
+                                                  //             QuillSimpleToolbarConfigurations(
+                                                  //           controller:
+                                                  //               _contentController,
+                                                  //           sharedConfigurations:
+                                                  //               const QuillSharedConfigurations(
+                                                  //             locale:
+                                                  //                 Locale('de'),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //       Container(
+                                                  //         color: Color.fromARGB(
+                                                  //             255,
+                                                  //             238,
+                                                  //             238,
+                                                  //             238),
+                                                  //         child:
+                                                  //             QuillEditor.basic(
+                                                  //           configurations:
+                                                  //               QuillEditorConfigurations(
+                                                  //             controller:
+                                                  //                 _contentController,
+                                                  //             readOnly: false,
+                                                  //             sharedConfigurations:
+                                                  //                 const QuillSharedConfigurations(
+                                                  //               locale: Locale(
+                                                  //                   'de'),
+                                                  //             ),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //     ],
+                                                  //   ),
+                                                  // ),
                                                   SizedBox(height: 30),
                                                   Padding(
                                                     padding:
@@ -679,7 +721,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                   SizedBox(
                                                     height: 30.0,
                                                   ),
-                                                  Container(
+                                                  SizedBox(
                                                     width:
                                                         MediaQuery.of(context)
                                                             .size
@@ -826,7 +868,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         SingleChildScrollView(
                                                       child: Column(
                                                         children: [
-                                                          Container(
+                                                          SizedBox(
                                                             height: MediaQuery.of(
                                                                         context)
                                                                     .size
@@ -1152,30 +1194,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          Text(
-                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
+
                                                   SizedBox(height: 30),
                                                   Padding(
                                                     padding:
@@ -1206,34 +1225,65 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                        border: Border.all(
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          width: 1,
+                                                        )),
+                                                    padding: EdgeInsets.all(5),
                                                     height: 400,
-                                                    child: Column(
-                                                      children: [
-                                                        QuillToolbar.simple(
-                                                          configurations:
-                                                              QuillSimpleToolbarConfigurations(
-                                                            controller:
-                                                                _contentController,
-                                                            sharedConfigurations:
-                                                                const QuillSharedConfigurations(
-                                                              locale:
-                                                                  Locale('de'),
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        children: [
+                                                          QuillToolbar.simple(
+                                                            configurations:
+                                                                QuillSimpleToolbarConfigurations(
+                                                              showFontFamily:
+                                                                  false,
+                                                              showFontSize:
+                                                                  false,
+                                                              showInlineCode:
+                                                                  false,
+                                                              showSubscript:
+                                                                  false,
+                                                              showSuperscript:
+                                                                  false,
+                                                              showSearchButton:
+                                                                  false,
+                                                              showQuote: false,
+                                                              showLink: false,
+                                                              showIndent: false,
+                                                              showCodeBlock:
+                                                                  false,
+                                                              showColorButton:
+                                                                  false,
+                                                              showListCheck:
+                                                                  false,
+                                                              showBackgroundColorButton:
+                                                                  false,
+                                                              controller:
+                                                                  _contentController,
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'en'),
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                        Container(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              238,
-                                                              238,
-                                                              238),
-                                                          child:
-                                                              QuillEditor.basic(
+                                                          QuillEditor.basic(
                                                             configurations:
                                                                 QuillEditorConfigurations(
                                                               controller:
                                                                   _contentController,
+                                                              placeholder:
+                                                                  'เขียนข้อความที่นี่...',
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -1241,8 +1291,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                   SizedBox(height: 30),
@@ -1277,7 +1327,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                   SizedBox(
                                                     height: 30.0,
                                                   ),
-                                                  Container(
+                                                  SizedBox(
                                                     width:
                                                         MediaQuery.of(context)
                                                             .size
@@ -1425,7 +1475,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                         SingleChildScrollView(
                                                       child: Column(
                                                         children: [
-                                                          Container(
+                                                          SizedBox(
                                                             height: MediaQuery.of(
                                                                         context)
                                                                     .size
@@ -1468,7 +1518,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                       );
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xC5C5C5),
+                                      backgroundColor: Color(0x00c5c5c5),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -1486,6 +1536,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                   ElevatedButton(
                                     onPressed: () async {
                                       convertDeltaToHtml();
+                                      
                                       upload();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -1498,8 +1549,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                     ),
                                     child: uploading
                                         ? SizedBox(
-                                            child: CircularProgressIndicator(),
                                             height: 15.0,
+                                            child: CircularProgressIndicator(),
                                           )
                                         : const Text(
                                             "แก้ไข",
@@ -1644,11 +1695,22 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     debugPrint(_html);
   }
 
+  List<Map<String, dynamic>> parseJsonToListMap(String jsonString) {
+    // Parse the JSON string to a List<dynamic>
+    List<dynamic> jsonList = json.decode(jsonString);
+
+    // Convert each item in the list to a Map<String, dynamic>
+    List<Map<String, dynamic>> resultList =
+        jsonList.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+
+    return resultList;
+  }
+
   void addImagewidget() {
     for (var images in itemImagesList) {
       itemPhotosWidgetList.add(Padding(
         padding: const EdgeInsets.all(0),
-        child: Container(
+        child: SizedBox(
           height: 200,
           child: Container(
             child: kIsWeb
@@ -1670,7 +1732,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     if (photo != null && photo!.isNotEmpty) {
       setState(() {
         itemImagesList.addAll(photo!.toSet().toList());
-        debugPrint("itemImagesList ${itemImagesList}");
+        debugPrint("itemImagesList $itemImagesList");
         addImagewidget();
       });
     }
@@ -1682,7 +1744,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         for (var imageUrl in _imageUrlsList) {
           itemPhotosWidgetList.add(Padding(
             padding: const EdgeInsets.all(0),
-            child: Container(
+            child: SizedBox(
               height: 200,
               child: Image.network(
                 imageUrl,
@@ -1727,7 +1789,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
   upload() async {
     List<String> existingImageUrls = [];
 
-    if (widget.knowledge != null && widget.knowledge!.knowledgeImg != null) {
+    if (widget.knowledge != null) {
       existingImageUrls = widget.knowledge!.knowledgeImg;
     } else if (widget.contents != null) {
       // existingImageUrls.add(widget.contents!.ImageURL);
@@ -1739,8 +1801,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       setState(() {
         _imageUrlsList.addAll(newImageUrls);
       });
-      debugPrint("_imageUrlsList ${_imageUrlsList}");
-      debugPrint("newImageUrls ${newImageUrls}");
+      debugPrint("_imageUrlsList $_imageUrlsList");
+      debugPrint("newImageUrls $newImageUrls");
     }
 
     // ตรวจสอบว่ามีการเปลี่ยนแปลงรูปภาพหรือไม่
@@ -1777,7 +1839,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         }
         itemPhotosWidgetList[index] = Padding(
           padding: const EdgeInsets.all(0),
-          child: Container(
+          child: SizedBox(
             height: 200,
             child: Image.network(
               _imageUrlsList[index], // ใช้ URL จาก _imageUrls
@@ -1835,7 +1897,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       String imageUrl = await reference.getDownloadURL();
 
       imageUrls.add(imageUrl);
-      debugPrint("imageUrls ${imageUrls}");
+      debugPrint("imageUrls $imageUrls");
     }
 
     return imageUrls;
@@ -1845,7 +1907,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     String Id = widget.knowledge!.id;
 
     String? selectedValue;
-    print("ข้อความ edit $_html");
+
     selectedValue = widget.knowledge!.knowledgeIcons != null
         ? widget.knowledge!.knowledgeIcons.toString()
         : widget.icons != null
@@ -1962,12 +2024,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                   ? Column(
                       children: [
                         CarouselSlider.builder(
-                          itemCount: itemPhotosWidgetList.length > 0
+                          itemCount: itemPhotosWidgetList.isNotEmpty
                               ? itemPhotosWidgetList.length
                               : 1,
                           itemBuilder:
                               (BuildContext context, int index, int realIndex) {
-                            return Container(
+                            return SizedBox(
                               width: MediaQuery.of(context).size.width,
                               child: itemPhotosWidgetList[index],
                             );
@@ -1981,7 +2043,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         ),
                       ],
                     )
-                  : Container(
+                  : SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.3,
                       child: itemPhotosWidgetList[0],

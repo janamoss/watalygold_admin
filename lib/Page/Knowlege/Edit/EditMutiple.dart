@@ -1,12 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,12 +15,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import 'package:watalygold_admin/Components/SidebarController.dart';
-import 'package:watalygold_admin/Page/Knowlege/Add/Multiplecontent.dart';
 import 'package:watalygold_admin/Page/Knowlege/htmltodelta.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Dialog/Deleteddialogknowledge.dart';
 import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as pickerImageSource;
 import 'package:watalygold_admin/Widgets/Dialog/DeleteknowledgeSuccess.dart';
@@ -90,16 +83,16 @@ class _EditMutipleState extends State<EditMutiple> {
   String? message;
   IconData? selectedIconData;
   String? _selectedValue;
-  List<bool> _showPreview = [];
+  final List<bool> _showPreview = [];
   int _currentExpandedIndex = -1;
   bool addedContent = false;
-  TextEditingController contentcontroller = new TextEditingController();
+  TextEditingController contentcontroller = TextEditingController();
   TextEditingController namecontroller = TextEditingController();
   TextEditingController contentdetailcontroller = TextEditingController();
   TextEditingController contentnamecontroller = TextEditingController();
   List<TextEditingController> contentNameControllers = [];
   List<TextEditingController> contentNameAdd = [];
-  List<QuillController> _contentAddController = [];
+  final List<QuillController> _contentAddController = [];
   List<QuillController> contentDetailControllers = [];
   QuillController _contentController = QuillController.basic();
   String _html = '';
@@ -108,7 +101,7 @@ class _EditMutipleState extends State<EditMutiple> {
   int _current = 0;
   List<Widget>? displayedContentWidgets;
   List<Knowledge> knowledgelist = [];
-  List<int> _deletedPanels = [];
+  final List<int> _deletedPanels = [];
   List<Widget> itemPhotosWidgetList = <Widget>[]; //แสดงตัวอย่างรูปภาพ
   final ImagePicker _picker = ImagePicker();
   File? file;
@@ -262,6 +255,7 @@ class _EditMutipleState extends State<EditMutiple> {
         String contentNamenew = contentNameAdd[index].text;
         String contentdetailnew = htmlAddList[index];
         List<String> imageUrls = newImageUrlsList[index];
+
         String newContentId =
             await addContent(contentNamenew, contentdetailnew, imageUrls);
         updatedContentIds.add(newContentId);
@@ -333,7 +327,7 @@ class _EditMutipleState extends State<EditMutiple> {
       "deleted_at": null,
       "update_at": null,
     };
-    debugPrint(" contentNamenew ${contentNamenew}");
+    debugPrint(" contentNamenew $contentNamenew");
     debugPrint('addContent successfully');
     String contentId = const Uuid().v4().substring(0, 10);
     await Databasemethods().addContent(contentMap, contentId);
@@ -342,9 +336,9 @@ class _EditMutipleState extends State<EditMutiple> {
   }
 
   Future<void> editImage(int contentIndex, int imageIndex) async {
-    final ImagePicker _picker = ImagePicker();
+    final ImagePicker picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: pickerImageSource.ImageSource.gallery);
+        await picker.pickImage(source: pickerImageSource.ImageSource.gallery);
     if (image != null) {
       String contentId = contentList[contentIndex].id;
       // แปลง XFile เป็น PickedFile
@@ -380,23 +374,21 @@ class _EditMutipleState extends State<EditMutiple> {
   Future<void> pickPhotoFromGallery(int index) async {
     debugPrint("srr");
     List<XFile>? newPhotos = await _picker.pickMultiImage();
-    if (newPhotos != null) {
-      setState(() {
-        debugPrint("srr11");
-        if (expansionPanelImagesList.length <= index) {
-          expansionPanelImagesList.add(newPhotos);
-          debugPrint("expansionPanelImagesList");
-        } else {
-          expansionPanelImagesList[index].addAll(newPhotos);
-        }
-        debugPrint("${expansionPanelImagesList[index]}");
-      });
+    setState(() {
+      debugPrint("srr11");
+      if (expansionPanelImagesList.length <= index) {
+        expansionPanelImagesList.add(newPhotos);
+        debugPrint("expansionPanelImagesList");
+      } else {
+        expansionPanelImagesList[index].addAll(newPhotos);
+      }
+      debugPrint("${expansionPanelImagesList[index]}");
+    });
     }
-  }
 
   Future<void> pickPhotoFromGallers(String contentId) async {
     List<XFile>? newPhotos = await _picker.pickMultiImage();
-    if (newPhotos != null && newPhotos.isNotEmpty) {
+    if (newPhotos.isNotEmpty) {
       List<PickedFile> pickedFiles =
           newPhotos.map((xFile) => PickedFile(xFile.path)).toList();
       List<String> uploadedUrls =
@@ -596,7 +588,7 @@ class _EditMutipleState extends State<EditMutiple> {
     setState(() {
       displayedContentWidgets =
           List.generate(contentList.length, (index) => Container());
-      debugPrint("displayedContentWidgets ${displayedContentWidgets}");
+      debugPrint("displayedContentWidgets $displayedContentWidgets");
     });
   }
 
@@ -689,7 +681,7 @@ class _EditMutipleState extends State<EditMutiple> {
                               ),
                             ),
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: screenSize == ScreenSize.minidesktop
@@ -723,7 +715,7 @@ class _EditMutipleState extends State<EditMutiple> {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.18,
                       height: MediaQuery.of(context).size.width * 0.05,
                       child: Center(
@@ -885,7 +877,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                 SizedBox(
                                   height: 50,
                                 ),
-                                Container(
+                                SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.68,
                                   child: screensize == ScreenSize.minidesktop
@@ -929,7 +921,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                 SizedBox(
                                   height: 50,
                                 ),
-                                Container(
+                                SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.68,
                                   child: Column(
@@ -1177,34 +1169,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                     InputBorder
                                                                         .none,
                                                               ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 5,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  left: 0.0,
-                                                                  right: 0),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .topLeft,
-                                                            child: Row(
-                                                              children: [
-                                                                Text(
-                                                                  "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
-                                                                ),
-                                                              ],
                                                             ),
                                                           ),
                                                         ),
@@ -1565,34 +1529,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                           ),
                                                         ),
                                                         SizedBox(
-                                                          height: 5,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  left: 0.0,
-                                                                  right: 0),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .topLeft,
-                                                            child: Row(
-                                                              children: [
-                                                                Text(
-                                                                  "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
                                                           height: 10,
                                                         ),
                                                         ElevatedButton(
@@ -1709,12 +1645,12 @@ class _EditMutipleState extends State<EditMutiple> {
                                 SizedBox(
                                   height: 30,
                                 ),
-                                Container(
+                                SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.67,
                                   child: buildList(),
                                 ),
-                                Container(
+                                SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.67,
                                   child: ExpansionPanelList.radio(
@@ -1882,37 +1818,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              0.0,
-                                                                          right:
-                                                                              0),
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.red,
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
                                                                     height: 30),
                                                                 const Padding(
                                                                   padding: EdgeInsets
@@ -1953,23 +1858,48 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 ),
                                                                 SizedBox(
                                                                   height: 400,
-                                                                  child: Column(
-                                                                    children: [
-                                                                      QuillToolbar
-                                                                          .simple(
-                                                                        configurations:
-                                                                            QuillSimpleToolbarConfigurations(
-                                                                          controller:
-                                                                              _contentAddController[index],
-                                                                          sharedConfigurations:
-                                                                              const QuillSharedConfigurations(
-                                                                            locale:
-                                                                                Locale('de'),
+                                                                  child:
+                                                                      SingleChildScrollView(
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        QuillToolbar
+                                                                            .simple(
+                                                                          configurations:
+                                                                              QuillSimpleToolbarConfigurations(
+                                                                            showFontFamily:
+                                                                                false,
+                                                                            showFontSize:
+                                                                                false,
+                                                                            showInlineCode:
+                                                                                false,
+                                                                            showSubscript:
+                                                                                false,
+                                                                            showSuperscript:
+                                                                                false,
+                                                                            showSearchButton:
+                                                                                false,
+                                                                            showQuote:
+                                                                                false,
+                                                                            showLink:
+                                                                                false,
+                                                                            showIndent:
+                                                                                false,
+                                                                            showCodeBlock:
+                                                                                false,
+                                                                            showColorButton:
+                                                                                false,
+                                                                            showBackgroundColorButton:
+                                                                                false,
+                                                                            controller:
+                                                                                _contentAddController[index],
+                                                                            sharedConfigurations:
+                                                                                const QuillSharedConfigurations(
+                                                                              locale: Locale('en'),
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                      Container(
-                                                                        child: QuillEditor
+                                                                        QuillEditor
                                                                             .basic(
                                                                           configurations:
                                                                               QuillEditorConfigurations(
@@ -1979,12 +1909,12 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 'เขียนข้อความที่นี่...',
                                                                             sharedConfigurations:
                                                                                 const QuillSharedConfigurations(
-                                                                              locale: Locale('de'),
+                                                                              locale: Locale('en'),
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    ],
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                                 const SizedBox(
@@ -2152,7 +2082,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 : MaterialButton(
                                                                                     height: 250.0,
                                                                                     onPressed: () => pickPhotoFromGallery(index),
-                                                                                    child: Container(
+                                                                                    child: SizedBox(
                                                                                       width: MediaQuery.of(context).size.width * 0.5,
                                                                                       child: Image.network(
                                                                                         "https://static.thenounproject.com/png/3322766-200.png",
@@ -2395,37 +2325,6 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              0.0,
-                                                                          right:
-                                                                              0),
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.red,
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
                                                                     height: 30),
                                                                 const Padding(
                                                                   padding: EdgeInsets
@@ -2466,23 +2365,48 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 ),
                                                                 SizedBox(
                                                                   height: 400,
-                                                                  child: Column(
-                                                                    children: [
-                                                                      QuillToolbar
-                                                                          .simple(
-                                                                        configurations:
-                                                                            QuillSimpleToolbarConfigurations(
-                                                                          controller:
-                                                                              _contentAddController[index],
-                                                                          sharedConfigurations:
-                                                                              const QuillSharedConfigurations(
-                                                                            locale:
-                                                                                Locale('de'),
+                                                                  child:
+                                                                      SingleChildScrollView(
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        QuillToolbar
+                                                                            .simple(
+                                                                          configurations:
+                                                                              QuillSimpleToolbarConfigurations(
+                                                                            showFontFamily:
+                                                                                false,
+                                                                            showFontSize:
+                                                                                false,
+                                                                            showInlineCode:
+                                                                                false,
+                                                                            showSubscript:
+                                                                                false,
+                                                                            showSuperscript:
+                                                                                false,
+                                                                            showSearchButton:
+                                                                                false,
+                                                                            showQuote:
+                                                                                false,
+                                                                            showLink:
+                                                                                false,
+                                                                            showIndent:
+                                                                                false,
+                                                                            showCodeBlock:
+                                                                                false,
+                                                                            showColorButton:
+                                                                                false,
+                                                                            showBackgroundColorButton:
+                                                                                false,
+                                                                            controller:
+                                                                                _contentAddController[index],
+                                                                            sharedConfigurations:
+                                                                                const QuillSharedConfigurations(
+                                                                              locale: Locale('en'),
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                      Container(
-                                                                        child: QuillEditor
+                                                                        QuillEditor
                                                                             .basic(
                                                                           configurations:
                                                                               QuillEditorConfigurations(
@@ -2492,12 +2416,12 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 'เขียนข้อความที่นี่...',
                                                                             sharedConfigurations:
                                                                                 const QuillSharedConfigurations(
-                                                                              locale: Locale('de'),
+                                                                              locale: Locale('en'),
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    ],
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                                 const SizedBox(
@@ -2665,7 +2589,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                                 : MaterialButton(
                                                                                     height: 250.0,
                                                                                     onPressed: () => pickPhotoFromGallery(index),
-                                                                                    child: Container(
+                                                                                    child: SizedBox(
                                                                                       width: MediaQuery.of(context).size.width * 0.5,
                                                                                       child: Image.network(
                                                                                         "https://static.thenounproject.com/png/3322766-200.png",
@@ -2819,7 +2743,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                Container(
+                                SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.67,
                                   child: ElevatedButton(
@@ -2886,7 +2810,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color(0xC5C5C5),
+                                            backgroundColor: Color(0x00c5c5c5),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(10),
@@ -3026,22 +2950,18 @@ class _EditMutipleState extends State<EditMutiple> {
                   size: 24, // ขนาดของไอคอน
                   color: GPrimaryColor, // สีของไอคอน
                 ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 20,
+                SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                  child: Text(
+                    namecontroller.text,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
                     ),
-                    Expanded(
-                      child: Text(
-                        namecontroller.text,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 9),
@@ -3093,22 +3013,20 @@ class _EditMutipleState extends State<EditMutiple> {
                     XFile xFile = entry.value;
                     return Stack(
                       children: [
-                        Container(
-                          child: ClipRRect(
-                            child: SizedBox(
-                              child: kIsWeb
-                                  ? Image.network(
-                                      xFile.path,
-                                      fit: BoxFit.cover,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.3,
-                                    )
-                                  : Image.file(
-                                      File(xFile.path),
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
+                        ClipRRect(
+                          child: SizedBox(
+                            child: kIsWeb
+                                ? Image.network(
+                                    xFile.path,
+                                    fit: BoxFit.cover,
+                                    height:
+                                        MediaQuery.of(context).size.height *
+                                            0.3,
+                                  )
+                                : Image.file(
+                                    File(xFile.path),
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                       ],
@@ -3165,22 +3083,18 @@ class _EditMutipleState extends State<EditMutiple> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 15,
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        contentNameAdd[index].text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
                         ),
-                        Expanded(
-                          child: Text(
-                            contentNameAdd[index].text,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -3253,7 +3167,7 @@ class _EditMutipleState extends State<EditMutiple> {
   Widget _displaycontentWidget(int index) {
     String contentId = contentList[index].id;
 
-    debugPrint("$index");
+    print(index);
     return Scaffold(
       appBar: Appbarmain_no_botton(
         name: contentNameControllers.isNotEmpty
@@ -3262,7 +3176,7 @@ class _EditMutipleState extends State<EditMutiple> {
       ),
       body: Stack(
         children: [
-          Container(
+          SizedBox(
             // width: MediaQuery.of(context).size.width * 1,
             height: 250,
             child: Center(
@@ -3304,7 +3218,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                     url,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      debugPrint("Error loading image: $error");
+                                      print("Error loading image: $error");
                                       return Center(
                                           child: Text('Error loading image'));
                                     },
@@ -3345,22 +3259,18 @@ class _EditMutipleState extends State<EditMutiple> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 15,
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Text(
+                        contentNameControllers[index].text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
                         ),
-                        Expanded(
-                          child: Text(
-                            contentNameControllers[index].text,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -3405,7 +3315,7 @@ class _EditMutipleState extends State<EditMutiple> {
       // if (displayedContentWidgets != null &&
       //     index < displayedContentWidgets!.length) {
       displayedContentWidgets![index] = _displaycontentWidget(index);
-      debugPrint(html);
+      print(html);
 
       // }
     });
@@ -3594,8 +3504,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                           child: Column(
                                             children: [
                                               SizedBox(height: 10),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
+                                              const Padding(
+                                                padding: EdgeInsets.only(
                                                     left: 0.0, right: 0),
                                                 child: Align(
                                                   alignment: Alignment.topLeft,
@@ -3694,38 +3604,55 @@ class _EditMutipleState extends State<EditMutiple> {
                                               ),
                                               SizedBox(
                                                 height: 400,
-                                                child: Column(
-                                                  children: [
-                                                    QuillToolbar.simple(
-                                                      configurations:
-                                                          QuillSimpleToolbarConfigurations(
-                                                        controller:
-                                                            contentDetailControllers[
-                                                                index],
-                                                        sharedConfigurations:
-                                                            const QuillSharedConfigurations(
-                                                          locale: Locale('de'),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      color: Color.fromARGB(
-                                                          255, 238, 238, 238),
-                                                      child: QuillEditor.basic(
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: [
+                                                      QuillToolbar.simple(
                                                         configurations:
-                                                            QuillEditorConfigurations(
+                                                            QuillSimpleToolbarConfigurations(
+                                                          showFontFamily: false,
+                                                          showFontSize: false,
+                                                          showInlineCode: false,
+                                                          showSubscript: false,
+                                                          showSuperscript:
+                                                              false,
+                                                          showSearchButton:
+                                                              false,
+                                                          showQuote: false,
+                                                          showLink: false,
+                                                          showIndent: false,
+                                                          showCodeBlock: false,
+                                                          showColorButton:
+                                                              false,
+                                                          showBackgroundColorButton:
+                                                              false,
                                                           controller:
                                                               contentDetailControllers[
                                                                   index],
                                                           sharedConfigurations:
                                                               const QuillSharedConfigurations(
                                                             locale:
-                                                                Locale('de'),
+                                                                Locale('en'),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      QuillEditor.basic(
+                                                        configurations:
+                                                            QuillEditorConfigurations(
+                                                          controller:
+                                                              contentDetailControllers[
+                                                                  index],
+                                                          placeholder:
+                                                              'เขียนข้อความที่นี่...',
+                                                          sharedConfigurations:
+                                                              const QuillSharedConfigurations(
+                                                            locale:
+                                                                Locale('en'),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                               SizedBox(height: 30),
@@ -3754,7 +3681,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -3831,14 +3758,15 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                             errorBuilder: (context,
                                                                                 error,
                                                                                 stackTrace) {
-                                                                              debugPrint("Error loading image: $error");
+                                                                              print("Error loading image: $error");
                                                                               return Center(child: Text('Error loading image'));
                                                                             },
                                                                             loadingBuilder: (context,
                                                                                 child,
                                                                                 loadingProgress) {
-                                                                              if (loadingProgress == null)
+                                                                              if (loadingProgress == null) {
                                                                                 return child;
+                                                                              }
                                                                               return Center(child: CircularProgressIndicator());
                                                                             },
                                                                           ),
@@ -4023,19 +3951,15 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 .size
                                                                 .width *
                                                             2,
-                                                        child: Column(
-                                                          children: [
-                                                            Expanded(
-                                                              child: displayedContentWidgets !=
-                                                                          null &&
-                                                                      displayedContentWidgets!
-                                                                              .length >
-                                                                          index
-                                                                  ? displayedContentWidgets![
-                                                                      index]!
-                                                                  : Container(),
-                                                            ),
-                                                          ],
+                                                        child: Expanded(
+                                                          child: displayedContentWidgets !=
+                                                                      null &&
+                                                                  displayedContentWidgets!
+                                                                          .length >
+                                                                      index
+                                                              ? displayedContentWidgets![
+                                                                  index]
+                                                              : Container(),
                                                         ),
                                                       )
                                                     ],
@@ -4171,31 +4095,44 @@ class _EditMutipleState extends State<EditMutiple> {
                                                       QuillToolbar.simple(
                                                         configurations:
                                                             QuillSimpleToolbarConfigurations(
+                                                          showFontFamily: false,
+                                                          showFontSize: false,
+                                                          showInlineCode: false,
+                                                          showSubscript: false,
+                                                          showSuperscript:
+                                                              false,
+                                                          showSearchButton:
+                                                              false,
+                                                          showQuote: false,
+                                                          showLink: false,
+                                                          showIndent: false,
+                                                          showCodeBlock: false,
+                                                          showColorButton:
+                                                              false,
+                                                          showBackgroundColorButton:
+                                                              false,
                                                           controller:
                                                               contentDetailControllers[
                                                                   index],
                                                           sharedConfigurations:
                                                               const QuillSharedConfigurations(
                                                             locale:
-                                                                Locale('de'),
+                                                                Locale('en'),
                                                           ),
                                                         ),
                                                       ),
-                                                      Container(
-                                                        color: Color.fromARGB(
-                                                            255, 238, 238, 238),
-                                                        child:
-                                                            QuillEditor.basic(
-                                                          configurations:
-                                                              QuillEditorConfigurations(
-                                                            controller:
-                                                                contentDetailControllers[
-                                                                    index],
-                                                            sharedConfigurations:
-                                                                const QuillSharedConfigurations(
-                                                              locale:
-                                                                  Locale('de'),
-                                                            ),
+                                                      QuillEditor.basic(
+                                                        configurations:
+                                                            QuillEditorConfigurations(
+                                                          controller:
+                                                              contentDetailControllers[
+                                                                  index],
+                                                          placeholder:
+                                                              'เขียนข้อความที่นี่...',
+                                                          sharedConfigurations:
+                                                              const QuillSharedConfigurations(
+                                                            locale:
+                                                                Locale('en'),
                                                           ),
                                                         ),
                                                       ),
@@ -4229,7 +4166,7 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -4306,14 +4243,15 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                             errorBuilder: (context,
                                                                                 error,
                                                                                 stackTrace) {
-                                                                              debugPrint("Error loading image: $error");
+                                                                              print("Error loading image: $error");
                                                                               return Center(child: Text('Error loading image'));
                                                                             },
                                                                             loadingBuilder: (context,
                                                                                 child,
                                                                                 loadingProgress) {
-                                                                              if (loadingProgress == null)
+                                                                              if (loadingProgress == null) {
                                                                                 return child;
+                                                                              }
                                                                               return Center(child: CircularProgressIndicator());
                                                                             },
                                                                           ),
@@ -4498,19 +4436,15 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 .size
                                                                 .width *
                                                             2,
-                                                        child: Column(
-                                                          children: [
-                                                            Expanded(
-                                                              child: displayedContentWidgets !=
-                                                                          null &&
-                                                                      displayedContentWidgets!
-                                                                              .length >
-                                                                          index
-                                                                  ? displayedContentWidgets![
-                                                                      index]!
-                                                                  : Container(),
-                                                            ),
-                                                          ],
+                                                        child: Expanded(
+                                                          child: displayedContentWidgets !=
+                                                                      null &&
+                                                                  displayedContentWidgets!
+                                                                          .length >
+                                                                      index
+                                                              ? displayedContentWidgets![
+                                                                  index]
+                                                              : Container(),
                                                         ),
                                                       )
                                                     ],

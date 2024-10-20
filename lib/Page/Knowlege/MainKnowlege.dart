@@ -451,9 +451,7 @@ class _KnowledgeContainerState extends State<KnowledgeContainer> {
                           fit: BoxFit.cover,
                         )
                       : DecorationImage(
-                          image: NetworkImage(
-                            widget.image,
-                          ),
+                          image: Image(image: NetworkImage(widget.image)).image,
                           fit: BoxFit.cover,
                         ),
                   color: widget.image == "" ? GPrimaryColor : null),

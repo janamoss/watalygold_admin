@@ -16,6 +16,10 @@
   -->
   <base href="$FLUTTER_BASE_HREF">
 
+  <script type="text/javascript">
+    window.flutterWebRenderer = "html";
+  </script>
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
@@ -34,6 +38,23 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+<script>
+  // Your web app's Firebase configuration
+//YOU CAN FIND ALL THESE IN YOUR FIREBASE CONSOLE > PROJECT SETTING > SELECT YOUR WEB APP
+  var firebaseConfig = {
+    apiKey: "AIzaSyBmkAwwEYIrdEyZ_FOkm3t4nDvIDvS1OK0",
+    authDomain: "watalygold.firebaseapp.com",
+    databaseURL: "https://watalygold-default-rtdb.firebaseio.com",
+    projectId: "watalygold",
+    storageBucket: "watalygold.appspot.com",
+    messagingSenderId: "692047570487",
+    appId: "1:692047570487:web:206c3096e4156fb15281b2",
+    measurementId: "G-8XEDQLLKFB"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
