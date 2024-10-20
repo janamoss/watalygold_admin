@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,10 +10,13 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:uuid/uuid.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:watalygold_admin/Components/SidebarController.dart';
 import 'package:watalygold_admin/Page/Knowlege/htmltodelta.dart';
 import 'package:watalygold_admin/Widgets/Appbar_mains_notbotton.dart';
 import 'package:watalygold_admin/Widgets/Appbarmain.dart';
@@ -23,6 +27,7 @@ import 'package:watalygold_admin/Widgets/Dialog/dialogcancleEdit.dart';
 import 'package:watalygold_admin/Widgets/knowlege.dart';
 import 'package:watalygold_admin/service/content.dart';
 import 'package:watalygold_admin/service/database.dart';
+import 'package:watalygold_admin/service/flushbar_uit.dart';
 import 'package:watalygold_admin/service/knowledge.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:watalygold_admin/service/screen_unit.dart';
@@ -61,6 +66,8 @@ class EditKnowlege extends StatefulWidget {
 }
 
 class _EditKnowlegeState extends State<EditKnowlege> {
+  final sidebarController = Get.put(SidebarController());
+
   String? _selectedValue;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
@@ -233,8 +240,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                     child: Container(
                       color: GPrimaryColor,
                       child: SideNav(
-                        status: 2,
-                        dropdown: true,
+                        status: sidebarController.index.value == 1
+                            ? sidebarController.index.value = 1
+                            : sidebarController.index.value = 1,
+                        dropdown: sidebarController.dropdown.value == true
+                            ? sidebarController.dropdown.value == true
+                            : sidebarController.dropdown.value == true,
                       ),
                     ),
                   ),
@@ -249,8 +260,12 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                         color: GPrimaryColor,
                         width: 300,
                         child: SideNav(
-                          status: 2,
-                          dropdown: true,
+                          status: sidebarController.index.value == 1
+                              ? sidebarController.index.value = 1
+                              : sidebarController.index.value = 1,
+                          dropdown: sidebarController.dropdown.value == true
+                              ? sidebarController.dropdown.value == true
+                              : sidebarController.dropdown.value == true,
                         ),
                       )
                     : null,
@@ -378,86 +393,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  // Align(
-                                                  //   alignment:
-                                                  //       Alignment.topLeft,
-                                                  //   child: Container(
-                                                  //     child: DropdownButton(
-                                                  //       items: <String>[
-                                                  //         'สถิติ',
-                                                  //         'ดอกไม้',
-                                                  //         'หนังสือ',
-                                                  //         'น้ำ',
-                                                  //         'ระวัง',
-                                                  //         'คำถาม'
-                                                  //       ].map<
-                                                  //           DropdownMenuItem<
-                                                  //               String>>((String
-                                                  //           value) {
-                                                  //         return DropdownMenuItem<
-                                                  //             String>(
-                                                  //           value: value,
-                                                  //           child: Row(
-                                                  //             children: [
-                                                  //               icons[value] !=
-                                                  //                       null
-                                                  //                   ? Icon(
-                                                  //                       icons[
-                                                  //                           value]!,
-                                                  //                       color:
-                                                  //                           GPrimaryColor,
-                                                  //                     )
-                                                  //                   : SizedBox(),
-                                                  //               SizedBox(
-                                                  //                   width: 25),
-                                                  //               Text(
-                                                  //                 value,
-                                                  //                 style: TextStyle(
-                                                  //                     color:
-                                                  //                         GPrimaryColor),
-                                                  //               ),
-                                                  //             ],
-                                                  //           ),
-                                                  //         );
-                                                  //       }).toList(),
-                                                  //       onChanged: (value) {
-                                                  //         setState(() {
-                                                  //           _selectedValue =
-                                                  //               value;
-                                                  //         });
-                                                  //       },
-                                                  //       hint: Row(
-                                                  //         children: [
-                                                  //           // ไอคอนที่ต้องการเพิ่ม
-                                                  //           SizedBox(
-                                                  //               width:
-                                                  //                   10), // ระยะห่างระหว่างไอคอนและข้อความ
-                                                  //           Row(
-                                                  //             children: [
-                                                  //               Icon(
-                                                  //                   widget.icons ??
-                                                  //                       Icons
-                                                  //                           .question_mark_rounded,
-                                                  //                   color:
-                                                  //                       GPrimaryColor,
-                                                  //                   size: 24),
-                                                  //               SizedBox(
-                                                  //                 width: 20,
-                                                  //               ),
-                                                  //               Text(
-                                                  //                 "${widget.icons != null ? icons.keys.firstWhere((key) => icons[key] == widget.icons, orElse: () => '') : ''}",
-                                                  //                 style: TextStyle(
-                                                  //                     color:
-                                                  //                         GPrimaryColor),
-                                                  //               ),
-                                                  //             ],
-                                                  //           ),
-                                                  //         ],
-                                                  //       ),
-                                                  //       value: _selectedValue,
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
                                                   Align(
                                                     alignment:
                                                         Alignment.topLeft,
@@ -469,6 +404,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                           items: <String>[
                                                             'ใบไม้',
                                                             'ต้นกล้า',
+                                                            'ไวรัส',
                                                             'สถิติ',
                                                             'ดอกไม้',
                                                             'หนังสือ',
@@ -481,7 +417,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                             'ตำแหน่ง',
                                                             'กล้อง',
                                                             'ปฏิทิน',
-                                                            'ไวรัส'
                                                           ].map<
                                                               DropdownMenuItem<
                                                                   String>>((String
@@ -620,36 +555,10 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          Text(
-                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
                                                   SizedBox(height: 30),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0.0, right: 0),
                                                     child: Align(
                                                       alignment:
                                                           Alignment.topLeft,
@@ -675,16 +584,64 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     ),
                                                   ),
                                                   Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                        border: Border.all(
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          width: 1,
+                                                        )),
+                                                    padding: EdgeInsets.all(5),
                                                     height: 400,
-                                                    child: Expanded(
-                                                        child: Container(
+                                                    child:
+                                                        SingleChildScrollView(
                                                       child: Column(
                                                         children: [
                                                           QuillToolbar.simple(
                                                             configurations:
                                                                 QuillSimpleToolbarConfigurations(
+                                                              showFontFamily:
+                                                                  false,
+                                                              showFontSize:
+                                                                  false,
+                                                              showInlineCode:
+                                                                  false,
+                                                              showSubscript:
+                                                                  false,
+                                                              showSuperscript:
+                                                                  false,
+                                                              showSearchButton:
+                                                                  false,
+                                                              showQuote: false,
+                                                              showLink: false,
+                                                              showIndent: false,
+                                                              showCodeBlock:
+                                                                  false,
+                                                              showColorButton:
+                                                                  false,
+                                                              showListCheck:
+                                                                  false,
+                                                              showBackgroundColorButton:
+                                                                  false,
                                                               controller:
                                                                   _contentController,
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'en'),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          QuillEditor.basic(
+                                                            configurations:
+                                                                QuillEditorConfigurations(
+                                                              controller:
+                                                                  _contentController,
+                                                              placeholder:
+                                                                  'เขียนข้อความที่นี่...',
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -692,36 +649,50 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                          Expanded(
-                                                            child: Container(
-                                                              color: const Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      238,
-                                                                      238,
-                                                                      238),
-                                                              child: QuillEditor
-                                                                  .basic(
-                                                                configurations:
-                                                                    QuillEditorConfigurations(
-                                                                  controller:
-                                                                      _contentController,
-                                                                  readOnly:
-                                                                      false,
-                                                                  sharedConfigurations:
-                                                                      const QuillSharedConfigurations(
-                                                                    locale:
-                                                                        Locale(
-                                                                            'de'),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
                                                         ],
                                                       ),
-                                                    )),
+                                                    ),
                                                   ),
+                                                  // SizedBox(
+                                                  //   height: 400,
+                                                  //   child: Column(
+                                                  //     children: [
+                                                  //       QuillToolbar.simple(
+                                                  //         configurations:
+                                                  //             QuillSimpleToolbarConfigurations(
+                                                  //           controller:
+                                                  //               _contentController,
+                                                  //           sharedConfigurations:
+                                                  //               const QuillSharedConfigurations(
+                                                  //             locale:
+                                                  //                 Locale('de'),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //       Container(
+                                                  //         color: Color.fromARGB(
+                                                  //             255,
+                                                  //             238,
+                                                  //             238,
+                                                  //             238),
+                                                  //         child:
+                                                  //             QuillEditor.basic(
+                                                  //           configurations:
+                                                  //               QuillEditorConfigurations(
+                                                  //             controller:
+                                                  //                 _contentController,
+                                                  //             readOnly: false,
+                                                  //             sharedConfigurations:
+                                                  //                 const QuillSharedConfigurations(
+                                                  //               locale: Locale(
+                                                  //                   'de'),
+                                                  //             ),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //     ],
+                                                  //   ),
+                                                  // ),
                                                   SizedBox(height: 30),
                                                   Padding(
                                                     padding:
@@ -1076,6 +1047,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                           items: <String>[
                                                             'ใบไม้',
                                                             'ต้นกล้า',
+                                                            'ไวรัส',
                                                             'สถิติ',
                                                             'ดอกไม้',
                                                             'หนังสือ',
@@ -1088,7 +1060,6 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                             'ตำแหน่ง',
                                                             'กล้อง',
                                                             'ปฏิทิน',
-                                                            'ไวรัส'
                                                           ].map<
                                                               DropdownMenuItem<
                                                                   String>>((String
@@ -1227,30 +1198,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 0.0,
-                                                            right: 0),
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          Text(
-                                                            "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
+
                                                   SizedBox(height: 30),
                                                   Padding(
                                                     padding:
@@ -1282,16 +1230,64 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                     ),
                                                   ),
                                                   Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                        border: Border.all(
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          width: 1,
+                                                        )),
+                                                    padding: EdgeInsets.all(5),
                                                     height: 400,
-                                                    child: Expanded(
-                                                        child: Container(
+                                                    child:
+                                                        SingleChildScrollView(
                                                       child: Column(
                                                         children: [
                                                           QuillToolbar.simple(
                                                             configurations:
                                                                 QuillSimpleToolbarConfigurations(
+                                                              showFontFamily:
+                                                                  false,
+                                                              showFontSize:
+                                                                  false,
+                                                              showInlineCode:
+                                                                  false,
+                                                              showSubscript:
+                                                                  false,
+                                                              showSuperscript:
+                                                                  false,
+                                                              showSearchButton:
+                                                                  false,
+                                                              showQuote: false,
+                                                              showLink: false,
+                                                              showIndent: false,
+                                                              showCodeBlock:
+                                                                  false,
+                                                              showColorButton:
+                                                                  false,
+                                                              showListCheck:
+                                                                  false,
+                                                              showBackgroundColorButton:
+                                                                  false,
                                                               controller:
                                                                   _contentController,
+                                                              sharedConfigurations:
+                                                                  const QuillSharedConfigurations(
+                                                                locale: Locale(
+                                                                    'en'),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          QuillEditor.basic(
+                                                            configurations:
+                                                                QuillEditorConfigurations(
+                                                              controller:
+                                                                  _contentController,
+                                                              placeholder:
+                                                                  'เขียนข้อความที่นี่...',
                                                               sharedConfigurations:
                                                                   const QuillSharedConfigurations(
                                                                 locale: Locale(
@@ -1299,35 +1295,9 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                                               ),
                                                             ),
                                                           ),
-                                                          Expanded(
-                                                            child: Container(
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      238,
-                                                                      238,
-                                                                      238),
-                                                              child: QuillEditor
-                                                                  .basic(
-                                                                configurations:
-                                                                    QuillEditorConfigurations(
-                                                                  controller:
-                                                                      _contentController,
-                                                                  readOnly:
-                                                                      false,
-                                                                  sharedConfigurations:
-                                                                      const QuillSharedConfigurations(
-                                                                    locale:
-                                                                        Locale(
-                                                                            'de'),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
                                                         ],
                                                       ),
-                                                    )),
+                                                    ),
                                                   ),
                                                   SizedBox(height: 30),
                                                   Padding(
@@ -1570,6 +1540,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                                   ElevatedButton(
                                     onPressed: () async {
                                       convertDeltaToHtml();
+                                      
                                       upload();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -1722,10 +1693,21 @@ class _EditKnowlegeState extends State<EditKnowlege> {
 
   void convertDeltaToHtml() {
     final deltaJson = _contentController.document.toDelta().toJson();
-    print(deltaJson);
+    debugPrint("$deltaJson");
     final converter = QuillDeltaToHtmlConverter(List.castFrom(deltaJson));
     _html = converter.convert();
-    print(_html);
+    debugPrint(_html);
+  }
+
+  List<Map<String, dynamic>> parseJsonToListMap(String jsonString) {
+    // Parse the JSON string to a List<dynamic>
+    List<dynamic> jsonList = json.decode(jsonString);
+
+    // Convert each item in the list to a Map<String, dynamic>
+    List<Map<String, dynamic>> resultList =
+        jsonList.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+
+    return resultList;
   }
 
   void addImagewidget() {
@@ -1754,7 +1736,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     if (photo != null && photo!.isNotEmpty) {
       setState(() {
         itemImagesList.addAll(photo!.toSet().toList());
-        print("itemImagesList ${itemImagesList}");
+        debugPrint("itemImagesList ${itemImagesList}");
         addImagewidget();
       });
     }
@@ -1781,32 +1763,32 @@ class _EditKnowlegeState extends State<EditKnowlege> {
     }
   }
 
- void deleteImage(int index) {
-  setState(() {
-    if (index >= 0 && index < itemPhotosWidgetList.length) {
-      // ลบออกจาก itemPhotosWidgetList
-      itemPhotosWidgetList.removeAt(index);
-      // itemImagesList.removeAt(index);
-      
-      // ลบออกจาก itemImagesList
-      if (index < itemImagesList.length) {
-        itemImagesList.removeAt(index);
+  void deleteImage(int index) {
+    setState(() {
+      if (index >= 0 && index < itemPhotosWidgetList.length) {
+        // ลบออกจาก itemPhotosWidgetList
+        itemPhotosWidgetList.removeAt(index);
+        // itemImagesList.removeAt(index);
+
+        // ลบออกจาก itemImagesList
+        if (index < itemImagesList.length) {
+          itemImagesList.removeAt(index);
+        }
+
+        // ลบออกจาก _imageUrlsList (ถ้ามี)
+        if (index < _imageUrlsList.length) {
+          _imageUrlsList.removeAt(index);
+        }
+
+        debugPrint("Image deleted at index $index");
+        debugPrint("Remaining photos: ${itemPhotosWidgetList.length}");
+        debugPrint("Remaining images: ${itemImagesList.length}");
+        debugPrint("Remaining URLs: ${_imageUrlsList.length}");
+      } else {
+        debugPrint("Invalid index: $index");
       }
-      
-      // ลบออกจาก _imageUrlsList (ถ้ามี)
-      if (index < _imageUrlsList.length) {
-        _imageUrlsList.removeAt(index);
-      }
-      
-      print("Image deleted at index $index");
-      print("Remaining photos: ${itemPhotosWidgetList.length}");
-      print("Remaining images: ${itemImagesList.length}");
-      print("Remaining URLs: ${_imageUrlsList.length}");
-    } else {
-      print("Invalid index: $index");
-    }
-  });
-}
+    });
+  }
 
   upload() async {
     List<String> existingImageUrls = [];
@@ -1823,8 +1805,8 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       setState(() {
         _imageUrlsList.addAll(newImageUrls);
       });
-      print("_imageUrlsList ${_imageUrlsList}");
-      print("newImageUrls ${newImageUrls}");
+      debugPrint("_imageUrlsList ${_imageUrlsList}");
+      debugPrint("newImageUrls ${newImageUrls}");
     }
 
     // ตรวจสอบว่ามีการเปลี่ยนแปลงรูปภาพหรือไม่
@@ -1832,14 +1814,14 @@ class _EditKnowlegeState extends State<EditKnowlege> {
         existingImageUrls.any((url) => !_imageUrlsList.contains(url))) {
       // มีการเปลี่ยนแปลงรูปภาพ
       updateKnowledges(_imageUrlsList);
-      print("updateKnowledges(_imageUrls)");
-      print(_imageUrlsList);
-      print(existingImageUrls.length);
-      print(_imageUrlsList.length);
+      // debugPrint("$updateKnowledges(_imageUrls)");
+      debugPrint("$_imageUrlsList");
+      debugPrint("${existingImageUrls.length}");
+      debugPrint("${_imageUrlsList.length}");
     } else {
       // ไม่มีการเปลี่ยนแปลงรูปภาพ
       updateKnowledges(existingImageUrls);
-      print(existingImageUrls);
+      debugPrint("$existingImageUrls");
     }
   }
 
@@ -1919,7 +1901,7 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       String imageUrl = await reference.getDownloadURL();
 
       imageUrls.add(imageUrl);
-      print("imageUrls ${imageUrls}");
+      debugPrint("imageUrls ${imageUrls}");
     }
 
     return imageUrls;
@@ -1958,18 +1940,18 @@ class _EditKnowlegeState extends State<EditKnowlege> {
       );
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
-        context.goNamed("/mainKnowledge");
+        context.goNamed(
+          "/mainKnowledge",
+          extra: {
+            'showSuccessFlushbar': true,
+            'message': "แก้ไขคลังความรู้เสร็จสิ้น",
+            'description': "คุณได้ทำแก้ไขคลังความรู้เสร็จสิ้นเรียบร้อย"
+          },
+        );
       });
     }).catchError((error) {
-      Fluttertoast.showToast(
-        msg: "เกิดข้อผิดพลาดในการเพิ่มความรู้: $error",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showErrorFlushbar(context, "แก้ไขคลังความรู้ล้มเหลว",
+          "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง");
     });
   }
 
@@ -2090,18 +2072,22 @@ class _EditKnowlegeState extends State<EditKnowlege> {
                       size: 24, // ขนาดของไอคอน
                       color: GPrimaryColor, // สีของไอคอน
                     ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                      child: Text(
-                        nameController.text,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
                         ),
-                      ),
+                        Expanded(
+                          child: Text(
+                            nameController.text,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -45,25 +45,16 @@ class Add_Knowlege extends StatefulWidget {
 class _Add_KnowlegeState extends State<Add_Knowlege>
     with SingleTickerProviderStateMixin {
   final sidebarController = Get.put(SidebarController());
-
   late TabController _tabController;
-  // final List<bool> _tabEnabled = [false, true];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
-
-    // เปลี่ยนค่า _tabEnabled เพื่อให้ Tab 'เนื้อหาเดียว' ไม่แสดงผล
-    // setState(() {
-    //   _tabEnabled[0] = false;
-    //   _tabEnabled[1] = true;
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    // ตัวแปรที่เอาไว้วัดขนาดหน้าจอว่าตอนนี้เท่าไหร่แล้ว
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       ScreenSize screenSize = getScreenSize(context);
@@ -90,9 +81,7 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
               Expanded(
                 flex: 4,
                 child: Scaffold(
-                  appBar: Appbarmain(
-                      // users: widget.users,
-                      ),
+                  appBar: Appbarmain(),
                   drawer: screenSize == ScreenSize.minidesktop
                       ? Container(
                           color: GPrimaryColor,
@@ -108,117 +97,76 @@ class _Add_KnowlegeState extends State<Add_Knowlege>
                         )
                       : null,
                   backgroundColor: GrayColor,
-                  body: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: Container(
-                        height: MediaQuery.of(context).size.height,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: Center(
-                                child: Container(
-                                  height: 140,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.74,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(30),
-                                        child: TabBar(
-                                          unselectedLabelColor: Colors.black45,
-                                          controller: _tabController,
-                                          labelStyle: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white),
-                                          labelPadding: EdgeInsets.symmetric(
-                                              vertical: 15),
-                                          dividerColor: Colors.transparent,
-                                          // indicatorWeight: 30,
-                                          indicator: BoxDecoration(
-                                            color: GPrimaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          // indicatorPadding: EdgeInsets.symmetric(horizontal: 100),
-                                          tabs: [
-                                            Tab(
-                                              child: screenSize ==
-                                                      ScreenSize.minidesktop
-                                                  ? Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Text('เนื้อหาเดียว'),
-                                                      ],
-                                                    )
-                                                  : Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 90),
-                                                      //                  padding: EdgeInsets.only(
-                                                      // top: 10,
-                                                      // bottom: 0,
-                                                      // left: 80,
-                                                      // right: 80),
-                                                      child:
-                                                          Text('เนื้อหาเดียว'),
-                                                    ),
-                                            ),
-                                            Tab(
-                                              child: screenSize ==
-                                                      ScreenSize.minidesktop
-                                                  ? Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Text('หลายเนื้อหา'),
-                                                      ],
-                                                    )
-                                                  : Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 90),
-                                                      child:
-                                                          Text('หลายเนื้อหา'),
-                                                    ),
-                                            ),
-                                          ],
+                  body: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                        child: Container(
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(30),
+                            child: TabBar(
+                              unselectedLabelColor: Colors.black45,
+                              controller: _tabController,
+                              labelStyle: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                              labelPadding: EdgeInsets.symmetric(vertical: 15),
+                              dividerColor: Colors.transparent,
+                              indicator: BoxDecoration(
+                                color: GPrimaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              tabs: [
+                                Tab(
+                                  child: screenSize == ScreenSize.minidesktop
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [Text('เนื้อหาเดียว')],
+                                        )
+                                      : Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 90),
+                                          child: Text('เนื้อหาเดียว'),
                                         ),
-                                      )
-                                    ],
-                                  ),
                                 ),
-                              ),
+                                Tab(
+                                  child: screenSize == ScreenSize.minidesktop
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [Text('หลายเนื้อหา')],
+                                        )
+                                      : Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 90),
+                                          child: Text('หลายเนื้อหา'),
+                                        ),
+                                ),
+                              ],
                             ),
-                            
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: constraints.maxHeight -
-                                    300, // Adjust this value as needed
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.745,
-                              ),
-                              child: TabBarView(
-                                controller: _tabController,
-                                children: const [
-                                  // Singlecontent()
-                                  SingleChildScrollView(child: Singlecontent()),
-                                  SingleChildScrollView(
-                                      child: Multiplecontent()),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 45, vertical: 20),
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: const [
+                              SingleChildScrollView(child: Singlecontent()),
+                              SingleChildScrollView(child: Multiplecontent()),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
