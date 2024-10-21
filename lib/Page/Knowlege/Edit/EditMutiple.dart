@@ -384,7 +384,7 @@ class _EditMutipleState extends State<EditMutiple> {
       }
       debugPrint("${expansionPanelImagesList[index]}");
     });
-    }
+  }
 
   Future<void> pickPhotoFromGallers(String contentId) async {
     List<XFile>? newPhotos = await _picker.pickMultiImage();
@@ -3019,9 +3019,8 @@ class _EditMutipleState extends State<EditMutiple> {
                                 ? Image.network(
                                     xFile.path,
                                     fit: BoxFit.cover,
-                                    height:
-                                        MediaQuery.of(context).size.height *
-                                            0.3,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.3,
                                   )
                                 : Image.file(
                                     File(xFile.path),
@@ -3555,27 +3554,27 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 0.0, right: 0),
-                                                child: Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Row(
-                                                    children: [
-                                                      Text(
-                                                        "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
+                                              // SizedBox(
+                                              //   height: 5,
+                                              // ),
+                                              // Padding(
+                                              //   padding: const EdgeInsets.only(
+                                              //       left: 0.0, right: 0),
+                                              //   child: Align(
+                                              //     alignment: Alignment.topLeft,
+                                              //     child: Row(
+                                              //       children: [
+                                              //         Text(
+                                              //           "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                              //           style: TextStyle(
+                                              //             color: Colors.red,
+                                              //             fontSize: 12,
+                                              //           ),
+                                              //         ),
+                                              //       ],
+                                              //     ),
+                                              //   ),
+                                              // ),
                                               SizedBox(height: 30),
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -3951,16 +3950,14 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 .size
                                                                 .width *
                                                             2,
-                                                        child: Expanded(
-                                                          child: displayedContentWidgets !=
-                                                                      null &&
-                                                                  displayedContentWidgets!
-                                                                          .length >
-                                                                      index
-                                                              ? displayedContentWidgets![
-                                                                  index]
-                                                              : Container(),
-                                                        ),
+                                                        child: displayedContentWidgets !=
+                                                                    null &&
+                                                                displayedContentWidgets!
+                                                                        .length >
+                                                                    index
+                                                            ? displayedContentWidgets![
+                                                                index]
+                                                            : Container(),
                                                       )
                                                     ],
                                                   ),
@@ -4040,27 +4037,27 @@ class _EditMutipleState extends State<EditMutiple> {
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 0.0, right: 0),
-                                                child: Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Row(
-                                                    children: [
-                                                      Text(
-                                                        "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
+                                              // SizedBox(
+                                              //   height: 5,
+                                              // ),
+                                              // Padding(
+                                              //   padding: const EdgeInsets.only(
+                                              //       left: 0.0, right: 0),
+                                              //   child: Align(
+                                              //     alignment: Alignment.topLeft,
+                                              //     child: Row(
+                                              //       children: [
+                                              //         Text(
+                                              //           "กรอกชื่อคลังความรู้ได้ไม่เกิน 30 ตัวอักษร",
+                                              //           style: TextStyle(
+                                              //             color: Colors.red,
+                                              //             fontSize: 12,
+                                              //           ),
+                                              //         ),
+                                              //       ],
+                                              //     ),
+                                              //   ),
+                                              // ),
                                               SizedBox(height: 30),
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -4436,16 +4433,14 @@ class _EditMutipleState extends State<EditMutiple> {
                                                                 .size
                                                                 .width *
                                                             2,
-                                                        child: Expanded(
-                                                          child: displayedContentWidgets !=
-                                                                      null &&
-                                                                  displayedContentWidgets!
-                                                                          .length >
-                                                                      index
-                                                              ? displayedContentWidgets![
-                                                                  index]
-                                                              : Container(),
-                                                        ),
+                                                        child: displayedContentWidgets !=
+                                                                    null &&
+                                                                displayedContentWidgets!
+                                                                        .length >
+                                                                    index
+                                                            ? displayedContentWidgets![
+                                                                index]
+                                                            : Container(),
                                                       )
                                                     ],
                                                   ),
