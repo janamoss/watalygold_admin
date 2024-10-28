@@ -1,28 +1,52 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseAuthService {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final logger = Logger();
 
   Future<User?> RegisterWithEmailandPassword(
-      String email, String password) async {
+      String email, String password, String username) async {
     try {
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      credential.user?.updateDisplayName(username);
       return credential.user;
+    } on FirebaseAuthException catch (e) {
+      logger.e(e);
+
+      // ตรวจสอบ error code ว่าเป็น "email-already-in-use" หรือไม่
+      if (e.code == 'email-already-in-use') {
+        return Future.error('อีเมลนี้ถูกใช้งานไปแล้ว');
+      }
+      return Future.error(e.message ?? 'เกิดข้อผิดพลาดบางอย่าง');
     } catch (e) {
-      print(e);
+      logger.e("error something someone");
+      return Future.error("เกิดข้อผิดพลาดบางอย่าง");
     }
-    return null;
   }
 
-  Future<User?> LoginWithEmailandPassword(String email, String password) async {
+  Future<String?> LoginWithEmailandPassword(
+      String email, String password) async {
+    logger.d("ทำงานปกติ");
     try {
-      UserCredential credential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return credential.user;
-    } catch (e) {
-      print("Some error occured");
+      final prefs = await SharedPreferences.getInstance();
+      final UserCredential credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      debugPrint(credential.user?.displayName);
+      prefs.setString("username", "${credential.user?.displayName}");
+      return credential.user?.uid; // ส่ง UID กลับไป
+    } on FirebaseAuthException catch (e) {
+      logger.e(e.code);
+      logger.e(e.message);
+      if (e.code == 'user-not-found') {
+        return null; // ส่งข้อความข้อผิดพลาด
+      } else if (e.code == 'wrong-password') {
+        return null; // ส่งข้อความข้อผิดพลาด
+      } else {
+        return null; // ส่งข้อความข้อผิดพลาดทั่วไป
+      }
     }
-    return null;
   }
 }

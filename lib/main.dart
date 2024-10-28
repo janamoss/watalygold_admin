@@ -1,37 +1,55 @@
+import 'package:beamer/beamer.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:watalygold_admin/Page/Home.dart';
-import 'package:watalygold_admin/Page/registerpage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watalygold_admin/Widgets/Color.dart';
-import 'package:watalygold_admin/Widgets/Menu_Sidebar.dart';
+import 'package:watalygold_admin/service/main_screen_locations.dart';
+import 'package:watalygold_admin/service/route_config.dart';
 import 'firebase_options.dart';
-import 'Page/loginPage.dart';
 
 Future<void> main() async {
+  usePathUrlStrategy();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainWeb());
+  runApp(MainWeb());
 }
 
 class MainWeb extends StatelessWidget {
-  const MainWeb({super.key});
+
+  MainWeb({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           fontFamily: GoogleFonts.ibmPlexSansThai().fontFamily,
-          listTileTheme: ListTileThemeData(selectedTileColor: Colors.amber)),
+          colorScheme: ColorScheme.fromSeed(seedColor: GPrimaryColor),
+          useMaterial3: true),
       title: "Wataly Gold Admin",
-      home: const LoginPage(),
-      initialRoute: '/login', // หน้าแรกเริ่มต้น
-      routes: {
-        '/login': (context) => LoginPage(),
-        '/register': (context) => registerPage(),
-        '/homeKnowlege': (context) => Home_Knowlege(),
-      },
+      routerConfig: RouteConfig.returnRotuer(),
     );
   }
 }
+
+// home: const LoginPage(),
+      // initialRoute: '/login', // หน้าแรกเริ่มต้น
+      // routes: {
+      //   '/login': (context) => LoginPage(),
+      //   '/register': (context) => registerPage(),
+      //   '/home': (context) => HomePage(),
+      //   '/mainKnowlege': (context) => MainKnowlege(),
+      //   '/mainDashborad' : (context) => MainDash(),
+      //   '/addKnowlege' : (context) => AddKnowlege(),
+      // },
+      // getPages: [
+      //   GetPage(name: '/login', page: () => LoginPage()),
+      //   GetPage(name: '/register', page: () => registerPage()),
+      //   GetPage(name: '/home', page: () => HomePage()),
+      //   GetPage(name: '/mainDashboard', page: () => MainDash()),
+      //   GetPage(name: '/mainKnowledge', page: () => MainKnowlege()),
+      //   GetPage(name: '/addKnowledge', page: () => AddKnowlege()),
+      // ],

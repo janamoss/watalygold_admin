@@ -53,13 +53,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBmkAwwEYIrdEyZ_FOkm3t4nDvIDvS1OK0',
-    appId: '1:692047570487:web:206c3096e4156fb15281b2',
-    messagingSenderId: '692047570487',
-    projectId: 'watalygold',
-    authDomain: 'watalygold.firebaseapp.com',
-    databaseURL: 'https://watalygold-default-rtdb.firebaseio.com',
-    storageBucket: 'watalygold.appspot.com',
-    measurementId: 'G-8XEDQLLKFB',
-  );
+      apiKey: "AIzaSyBmkAwwEYIrdEyZ_FOkm3t4nDvIDvS1OK0",
+      authDomain: "watalygold.firebaseapp.com",
+      databaseURL: "https://watalygold-default-rtdb.firebaseio.com",
+      projectId: "watalygold",
+      storageBucket: "watalygold.appspot.com",
+      messagingSenderId: "692047570487",
+      appId: "1:692047570487:web:206c3096e4156fb15281b2",
+      measurementId: "G-8XEDQLLKFB");
 }
