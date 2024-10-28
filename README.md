@@ -1,6 +1,12 @@
-# watalygold_admin
+# WatalyGold Web-Application
 
-A new Flutter project.
+เว็บแอปพลิเคชั่นที่ใช้ในการจัดการ คลังความรู้ ที่จะเชื่อมต่อกับแอปพลิเคชั่น WatalyGold
+
+## Preview Web-Application
+
+<img src="./assets/images/screencapture-watalygold-web-app-login-2024-10-28-14_43_58.png" width="600">
+<img src="./assets/images/screencapture-watalygold-web-app-mainKnowledge-2024-10-28-14_40_48.png" width="600">
+<img src="./assets/images/screencapture-watalygold-web-app-dashboard-2024-10-28-15_04_06.png" width="600">
 
 ## Getting Started
 
