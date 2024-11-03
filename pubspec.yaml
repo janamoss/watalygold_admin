@@ -72,6 +72,8 @@ dependencies:
   fl_chart: ^0.67.0
   flutter_widget_from_html: ^0.15.0
   another_flushbar: ^1.12.30
+  flutter_gemini: ^2.0.5
+  google_generative_ai: ^0.4.6
   
 
 dev_dependencies:
